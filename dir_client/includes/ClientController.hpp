@@ -4,18 +4,32 @@
 # include "Client.hpp"
 
 /*
-**	Main instance of the client. Control every other client class;
+**	Main instance of the client. Controls every other client class;
 */
 class ClientController
 {
 	public:
-		ClientConnection	ClientConnection_obj;
+		//--------------------------------//
+		// Attributes.					  //
+		//--------------------------------//
+		bool					IsConnected; // default false;
 
-		ClientController();
-		~ClientController();
+		//--------------------------------//
+		// Methods						  //
+		//--------------------------------//
+		ClientController(); // Default constructor
+		~ClientController(); // Default destructor
 
+		void	OnInitialize(int argc, char **argv); // handle input and connection to serveur
 
-	
+		//void  OnGameStart();
+		//void	OnGameUpdate(); // main loop ?
+
+		//--------------------------------//
+		// Sub classes references.		  //
+		//--------------------------------//
+		ClientInputHandler		InputHandler;
+		ClientConnection		Connection;	// will handle every server related discussion.
 };
 
 #endif

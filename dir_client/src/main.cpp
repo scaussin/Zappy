@@ -2,8 +2,11 @@
 
 int		main(int argc, char **argv)
 {
-	ClientController		Client;
+	ClientController		*Client;
 
-	std::cout << "Hello client" << std::endl;
+	Client = new ClientController();
+	Client->OnInitialize(argc, argv);
+
+	delete Client;
 	return (0);
 }

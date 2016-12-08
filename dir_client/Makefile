@@ -3,8 +3,11 @@ NAME = client
 HEADER = includes/ClientMain.hpp
 
 SRC = src/main.cpp \
-src/ClientController.cpp \
-src/ClientConnection.cpp
+src/ClientInputHandler.cpp \
+src/ClientConnection.cpp \
+src/CustomException.cpp \
+src/ClientController.cpp
+
 
 OBJ = $(SRC:.cpp=.o)
 
