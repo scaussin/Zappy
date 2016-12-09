@@ -1,8 +1,13 @@
 NAME = client
 
-HEADER = includes/client.hpp
+HEADER = includes/ClientMain.hpp
 
-SRC = src/client_main.cpp
+SRC = src/main.cpp \
+src/ClientInputHandler.cpp \
+src/ClientConnection.cpp \
+src/CustomException.cpp \
+src/ClientController.cpp
+
 
 OBJ = $(SRC:.cpp=.o)
 
