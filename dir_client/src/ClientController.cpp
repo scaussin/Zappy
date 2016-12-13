@@ -40,7 +40,7 @@ void	ClientController::OnInitialize(int argc, char **argv)
 	{
 		// ClientConnection.cpp
 		Connection.DisplayInfos();
-		Connection.SetMockMode(true);
+		Connection.SetMockMode(false);
 		Connection.Connect();
 	}
 	catch (CustomException &e)

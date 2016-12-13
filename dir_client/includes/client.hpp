@@ -1,18 +1,26 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-// General Includes
+// General includes
 # include <iostream>
 # include <stdio.h>
 # include <regex>
 
+// Connection includes.
+# include <sys/socket.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <fcntl.h>
+
 // Connection related structure.
 typedef struct			s_ConnectionSettings
 {
-		std::string		TeamName;
-		int				Port;
-		std::string		HostName;
-}						t_ConnectionSettings;
+	std::string				TeamName;
+	int						Port;
+	std::string				HostName;
+
+
+}							t_ConnectionSettings;
 
 // Class definitions.
 class ClientInputHandler; // handle and check args.

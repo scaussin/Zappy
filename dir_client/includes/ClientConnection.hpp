@@ -10,10 +10,13 @@ class ClientConnection
 		bool					IsInMockMode; // allow false connection.
 		bool					IsConnected; // default false;
 
+		
+
 		ClientConnection();
 		~ClientConnection();
 
 		void	Connect();
+		void	ConnectToServer();
 		void	Disconnect();
 
 		// to implement
@@ -23,6 +26,11 @@ class ClientConnection
 		void	DisplayInfos();
 		void	SetMockMode(bool b);
 
+	private:
+		// Connection variables
+		int						sock;
+		struct protoent			*proto;
+		struct sockaddr_in		sin;
 
 };
 

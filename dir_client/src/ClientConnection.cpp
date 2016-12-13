@@ -36,14 +36,45 @@ void	ClientConnection::Connect()
 		else
 		{
 			std::cout << KCYN "Engaging REAL CONNECTION..." KRESET << std::endl;
-			// TODO : effectuer la connection reelle.
-			this->IsConnected = true;
+			try
+			{
+				ConnectToServer();
+				this->IsConnected = true;
+			}
+			catch (CustomException &e)
+			{
+				std::cout << KRED << e.what() << KRESET << std::endl;
+			}
 		}
 	}
 	else
 	{
 		std::cout << "Client already connected" << std::endl;
 	}
+}
+
+void	ClientConnection::ConnectToServer()
+{
+	if (Settings.HostName.compare("localhost") == 0)
+	{
+		Settings.HostName = "127.0.0.1";
+	}
+	this->proto = getprotobyname("tcp");
+	if (!this->proto)
+		throw (CustomException("getprotobyname() error"));
+	this->sock = socket(PF_INET, SOCK_STREAM, proto->p_proto);
+	this->sin.sin_family = AF_INET;
+	this->sin.sin_port = htons(Settings.Port);
+	this->sin.sin_addr.s_addr = inet_addr(Settings.HostName.c_str());
+	if (connect(this->sock, (const struct sockaddr *)&(this->sin), sizeof(this->sin)) == -1)
+	{
+		throw (CustomException("connect() error : cannot connect to hostname"));
+		exit (-1);
+	}
+	std::cout << KGRN "SUCCESS - Connected to server.\n" KRESET << std::endl;
+	std::cout << "Port: " << Settings.Port << std::endl;
+	std::cout << "Client socket: " << Settings.Port << std::endl;
+	std::cout << "Client socket: %d\n" << this->sock << std::endl;
 }
 
 void	ClientConnection::Disconnect()
