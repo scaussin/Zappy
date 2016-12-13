@@ -14,24 +14,20 @@ typedef struct			s_ConnectionSettings
 		std::string		HostName;
 }						t_ConnectionSettings;
 
-// Game related structure.
-typedef struct		s_ClientPlayer
-{
-
-	// hp, level ... etc etc.
-
-}					t_ClientPlayer;
-
 // Class definitions.
 class ClientInputHandler; // handle and check args.
 class ClientConnection; // communicate with the server.
-class ClientController;
-//class ClientAI;
+class ClientPlayer; // the actual game player.
+
+class ClientController; // main controller.
+
 
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
 # include "ClientConnection.hpp"
+# include "ClientPlayer.hpp"
+
 # include "ClientController.hpp"
 
 

@@ -13,6 +13,7 @@ ClientConnection::ClientConnection()
 	Settings.Port = -1;
 	Settings.HostName = "unset";
 	this->IsInMockMode = false;
+	this->IsConnected = false;
 }
 
 ClientConnection::~ClientConnection()
@@ -25,23 +26,37 @@ void	ClientConnection::Connect()
 {
 	std::cout << KCYN "Connection attempt..." KRESET << std::endl;
 	
-	if (IsInMockMode)
+	if (!IsConnected)
 	{
-		std::cout << KMAG "Engaging MOCK CONNECTION..." KRESET << std::endl;
-		// TODO : effectuer la fause connection.
-
+		if (IsInMockMode)
+		{
+			std::cout << KMAG "Engaging MOCK CONNECTION..." KRESET << std::endl;
+			this->IsConnected = true;
+		}
+		else
+		{
+			std::cout << KCYN "Engaging REAL CONNECTION..." KRESET << std::endl;
+			// TODO : effectuer la connection reelle.
+			this->IsConnected = true;
+		}
 	}
 	else
 	{
-		std::cout << KCYN "Engaging REAL CONNECTION..." KRESET << std::endl;
-		// TODO : effectuer la connection reelle.
-
+		std::cout << "Client already connected" << std::endl;
 	}
 }
 
 void	ClientConnection::Disconnect()
 {
 	std::cout << KCYN "Disconnection" KRESET<< std::endl;
+	if (IsConnected)
+	{
+		IsConnected = false;
+	}
+	else
+	{
+		std::cout << "Client is not connected" << std::endl;
+	}
 }
 
 void	ClientConnection::DisplayInfos()

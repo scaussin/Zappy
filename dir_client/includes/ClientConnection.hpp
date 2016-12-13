@@ -8,7 +8,7 @@ class ClientConnection
 	public:
 		t_ConnectionSettings	Settings;
 		bool					IsInMockMode; // allow false connection.
-
+		bool					IsConnected; // default false;
 
 		ClientConnection();
 		~ClientConnection();
