@@ -20,9 +20,10 @@ void ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs)
   }
 }
 
-int   read_client(t_client *client)
+int   read_client(SOCKET c_sock)
 {
   int   ret;
+  char  buffer[BUFF_SIZE];
 
   ret = 0;
   if ((ret = recv(c_sock, buffer, BUFF_SIZE - 1, 0)) < 0)

@@ -2,13 +2,13 @@ NAME = serveur
 
 HEADER = includes/serveur.h
 
-SRC = src/serveur_main.c
+SRC = src/serveur_main.c src/connection.c src/communication.c src/tools.c
 
 OBJ = $(SRC:.c=.o)
 
 CC = gcc -g -Wall -Werror -Wextra
 
-all : $(NAME) 
+all : $(NAME)
 
 $(NAME) : $(OBJ)
 	$(CC) -o $(NAME) $(OBJ)
