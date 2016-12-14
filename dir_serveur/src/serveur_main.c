@@ -91,6 +91,7 @@ void new_client_connection(t_server_data *server)
     perror("accept()");
     return ;
   }
+  printf("New connection\n");
   server->list_clients[server->nb_clients].sock = c_sock;
   new_connection_communication(&(server->list_clients[server->nb_clients]));
   server->nb_clients++;
