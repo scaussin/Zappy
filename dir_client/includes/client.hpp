@@ -5,12 +5,16 @@
 # include <iostream>
 # include <stdio.h>
 # include <regex>
+# include <errno.h>
 
 // Connection includes.
 # include <sys/socket.h>
 # include <arpa/inet.h>
 # include <netdb.h>
 # include <fcntl.h>
+# include <sys/time.h>
+
+# define MSG_BUFSIZE 128
 
 // Connection related structure.
 typedef struct			s_ConnectionSettings

@@ -68,13 +68,53 @@ void	ClientConnection::ConnectToServer()
 	this->sin.sin_addr.s_addr = inet_addr(Settings.HostName.c_str());
 	if (connect(this->sock, (const struct sockaddr *)&(this->sin), sizeof(this->sin)) == -1)
 	{
-		throw (CustomException("connect() error : cannot connect to hostname"));
+		throw (CustomException("connect() error: cannot connect to hostname"));
 		exit (-1);
 	}
-	std::cout << KGRN "SUCCESS - Connected to server.\n" KRESET << std::endl;
+	std::cout << KGRN "SUCCESS - Connected to server." KRESET << std::endl;
 	std::cout << "Port: " << Settings.Port << std::endl;
-	std::cout << "Client socket: " << Settings.Port << std::endl;
-	std::cout << "Client socket: %d\n" << this->sock << std::endl;
+	std::cout << "Client socket: " << this->sock << std::endl << std::endl;
+	DialogStart();
+	
+}
+
+void	ClientConnection::DialogStart()
+{
+	struct timeval		timeout;
+	fd_set				readSet;
+	int					select_ret;
+
+	// First batch of data reception
+	std::cout << KCYN "Awaiting server response..." KRESET << std::endl;
+	timeout.tv_sec = 3; // seconds.
+	timeout.tv_usec = 0; // milliseconds.
+	FD_ZERO(&readSet);
+	FD_SET(this->sock, &readSet);
+	select_ret = select(this->sock + 1, &readSet, NULL, NULL, &timeout);
+	if (select_ret == -1)
+	{
+		perror("Select");
+		throw (CustomException("Select error"));
+	}
+	if (FD_ISSET(this->sock, &readSet))
+	{
+		std::string		receivedString = ReceiveMessage();
+		std::cout << "Received: " << receivedString << std::endl;	
+		if (receivedString.compare("BIENVENUE\n") == 0)
+		{
+			std::cout << "Sending team name: " << Settings.TeamName << std::endl;
+			SendMessage(Settings.TeamName + "\n");
+		}
+		else
+		{
+			throw (CustomException("Wrong starting message received (incorrect server?)"));
+		}
+	}
+	else
+	{
+		throw (CustomException("Connection timed out (the server did not answer). Closing client..."));
+	}
+	std::cout << KGRN "First dialog with server successful: Zappy server recognized" KRESET << std::endl;
 }
 
 void	ClientConnection::Disconnect()
@@ -88,6 +128,23 @@ void	ClientConnection::Disconnect()
 	{
 		std::cout << "Client is not connected" << std::endl;
 	}
+}
+
+void	ClientConnection::SendMessage(std::string msg)
+{
+	send(this->sock, msg.c_str(), msg.size(), MSG_OOB);
+	// OR
+	// send(this->sock, msg, MSG_BUFIZE, MSG_OOB);
+}
+
+std::string		ClientConnection::ReceiveMessage()
+{
+	char			buf[MSG_BUFSIZE];
+	int				ret;
+
+	ret = recv(this->sock, buf, MSG_BUFSIZE - 1, 0);
+	buf[ret] = '\0';
+	return ((std::string)buf);
 }
 
 void	ClientConnection::DisplayInfos()

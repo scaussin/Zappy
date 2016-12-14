@@ -15,16 +15,19 @@ class ClientConnection
 		ClientConnection();
 		~ClientConnection();
 
-		void	Connect();
-		void	ConnectToServer();
-		void	Disconnect();
+		void			Connect();
+		void			ConnectToServer();
+
+		void			DialogStart();
+
+		void			Disconnect();
 
 		// to implement
-		//	void	SendMessage(char *msg);
-		//	void	ReceiveMessage();
+		void			SendMessage(std::string msg);
+		std::string		ReceiveMessage();
 
-		void	DisplayInfos();
-		void	SetMockMode(bool b);
+		void			DisplayInfos();
+		void			SetMockMode(bool b);
 
 	private:
 		// Connection variables
