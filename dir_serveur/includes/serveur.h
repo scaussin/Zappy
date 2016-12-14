@@ -23,7 +23,7 @@ typedef struct in_addr      IN_ADDR;
 typedef struct              s_client
 {
   SOCKET                    sock;
-  char                      *team;
+  char                      team[BUFF_SIZE];
   char                      buff[BUFF_SIZE];
 }                           t_client;
 
