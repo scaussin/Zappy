@@ -54,12 +54,15 @@ void	ClientController::OnInitialize(int argc, char **argv)
 void	ClientController::OnGameStart()
 {
 	std::cout << KCYN "OnGameStart called" KRESET << std::endl;
-
-	// Receiving X and Y.
-	std::string receivedString = Connection.ReceiveMessage();
+	// fill the player position with the received string during connection.
+	std::string		receivedString = Connection.ReceiveMessage();
 	std::cout << "Received: " << receivedString << std::endl;
-	// fill the player position with the received string.
-	sscanf("%d %d\n", receivedString.c_str(), &(Player.x), &(Player.y));
+
+	//Player.x = Connection.Startx;
+	//Player.y = Connection.Starty;
+
+	std::cout << KGRN "Player starting datas:" KRESET << std::endl;
+	std::cout << "Position: " << Player.x << "x " << Player.y << "y " << std::endl;
 }
 
 void	ClientController::MainLoop()

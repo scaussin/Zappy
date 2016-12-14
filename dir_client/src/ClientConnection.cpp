@@ -100,15 +100,19 @@ void	ClientConnection::DialogStart()
 	{
 		std::string		receivedString = ReceiveMessage();
 		std::cout << "Received: " << receivedString << std::endl;
+		// Is it the right server ?
 		if (receivedString.compare("BIENVENUE\n") == 0)
 		{
 			std::cout << "Sending team name: " << Settings.TeamName << std::endl;
 			SendMessage(Settings.TeamName + "\n");
 
-			// Receiving number of slots in team.
+			// Receiving first datas.
 			receivedString = ReceiveMessage();
 			std::cout << "Received: " << receivedString << std::endl;
-			if (strtol(receivedString.c_str(), NULL, 10) <= 0)
+
+			this->TeamSlots = strtol((char *)receivedString.c_str(), NULL, 10);
+
+			if (this->TeamSlots <= 0)
 			{
 				throw (CustomException("No slot available in team or team does not exist."));
 			}
@@ -145,14 +149,24 @@ void	ClientConnection::SendMessage(std::string msg)
 	// send(this->sock, msg, MSG_BUFIZE, MSG_OOB);
 }
 
+// using variables from the object for better performance.
+// buf is used as a circular buffer.
 std::string		ClientConnection::ReceiveMessage()
 {
-	char			buf[MSG_BUFSIZE];
-	int				ret;
+	std::stringstream	ret_string;
 
-	ret = recv(this->sock, buf, MSG_BUFSIZE - 1, 0);
-	buf[ret] = '\0';
-	return ((std::string)buf);
+	while ((recv(this->sock, buf, MSG_BUFSIZE - 1, 0)) > 0)
+	{
+		if ((char_found = strnstr(buf, "\n", MSG_BUFSIZE)))
+		{
+			char_found++; // we keep the \n
+			*char_found = '\0';
+			ret_string << buf;
+			break ;
+		}
+		ret_string << buf;
+	}
+	return (ret_string.str());
 }
 
 void	ClientConnection::DisplayInfos()

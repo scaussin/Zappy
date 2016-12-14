@@ -9,8 +9,14 @@ class ClientConnection
 		t_ConnectionSettings	Settings;
 		bool					IsInMockMode; // allow false connection.
 		bool					IsConnected; // default false;
-
+		int						TeamSlots;
+		int						Startx;
+		int						Starty;
 		
+		// Circular buffer;
+		char			buf[MSG_BUFSIZE];
+		char			*char_found;
+		int				ret;
 
 		ClientConnection();
 		~ClientConnection();
