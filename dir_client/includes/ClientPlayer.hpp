@@ -6,8 +6,8 @@
 class ClientPlayer
 {
 	public:
-		// pourra etre amené à changer
-		int			HP;
+		int			x;
+		int			y;
 
 		ClientPlayer();
 		~ClientPlayer();

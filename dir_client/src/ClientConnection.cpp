@@ -99,11 +99,19 @@ void	ClientConnection::DialogStart()
 	if (FD_ISSET(this->sock, &readSet))
 	{
 		std::string		receivedString = ReceiveMessage();
-		std::cout << "Received: " << receivedString << std::endl;	
+		std::cout << "Received: " << receivedString << std::endl;
 		if (receivedString.compare("BIENVENUE\n") == 0)
 		{
 			std::cout << "Sending team name: " << Settings.TeamName << std::endl;
 			SendMessage(Settings.TeamName + "\n");
+
+			// Receiving number of slots in team.
+			receivedString = ReceiveMessage();
+			std::cout << "Received: " << receivedString << std::endl;
+			if (strtol(receivedString.c_str(), NULL, 10) <= 0)
+			{
+				throw (CustomException("No slot available in team or team does not exist."));
+			}
 		}
 		else
 		{

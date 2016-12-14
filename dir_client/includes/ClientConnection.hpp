@@ -34,7 +34,6 @@ class ClientConnection
 		int						sock;
 		struct protoent			*proto;
 		struct sockaddr_in		sin;
-
 };
 
 #endif
