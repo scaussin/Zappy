@@ -20,9 +20,8 @@ void ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs)
   }
 }
 
-int   read_client(SOCKET c_sock)
+int   read_client(t_client *client)
 {
-  char  buffer[BUFF_SIZE];
   int   ret;
 
   ret = 0;
@@ -32,7 +31,7 @@ int   read_client(SOCKET c_sock)
     ret = 0;
   }
   buffer[ret] = '\0';
-  printf("%s\n", buffer);
+  printf("Recu : %s\n", buffer);
   return(ret);
 }
 
@@ -42,12 +41,27 @@ void new_connection_communication(t_client *client)
   char  buff_recv[BUFF_SIZE];
   int   ret;
 
+  memset(buff_send, 0, BUFF_SIZE);
   strcpy(buff_send, "BIENVENUE\n");
   if (send(client->sock, buff_send, strlen(buff_send), 0) < 0)
     exit_error("send()");
+  printf("Send : %s\n", buff_send);
+
   if ((ret = recv(client->sock, buff_recv, BUFF_SIZE - 1, 0)) < 0)
     exit_error("recv()");
   buff_recv[ret] = '\0';
   strcpy(client->team, buff_recv);
-  printf("%s\n", client->team);
+  printf("Recu : %s\n", buff_recv);
+
+  memset(buff_send, 0, BUFF_SIZE);
+  strcpy(buff_send, "10\n");
+  if (send(client->sock, buff_send, strlen(buff_send), 0) < 0)
+    exit_error("send()");
+  printf("Send : %s\n", buff_send);
+
+  memset(buff_send, 0, BUFF_SIZE);
+  strcpy(buff_send, "20 20\n");
+  if (send(client->sock, buff_send, strlen(buff_send), 0) < 0)
+    exit_error("send()");
+  printf("Send : %s\n", buff_send);
 }
