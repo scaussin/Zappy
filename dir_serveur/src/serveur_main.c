@@ -4,10 +4,6 @@ int main(int argc, char **argv)
 {
   (void)argc;
   (void)argv;
-  /*SOCKET        sock_endpoint;
-  int           last_sock;
-  t_client      list_clients[MAX_CLIENT];
-  int           nb_clients;*/
   t_server_data server;
   fd_set        read_fs;
 
@@ -32,11 +28,9 @@ int main(int argc, char **argv)
     while (++i < server.nb_clients)
       FD_SET(server.list_clients[i].sock, &read_fs);
 
-    // printf("before select\n");
     // BOUYAKA SELECT IS HERE !!!!!!!!!!
     if(select(server.last_sock + 1, &read_fs, NULL, NULL, NULL) < 0)
       exit_error("select()");
-    // printf("after select\n");
 
     // Exit when enter presse
     if (FD_ISSET(STDIN_FILENO, &read_fs))
@@ -47,7 +41,6 @@ int main(int argc, char **argv)
     // Check commands from clients
     else
       ckeck_all_clients_communication(&server, &read_fs);
-    // printf("end boucle\n");
   }
 
   // Todo : exec les commandes clients
@@ -99,9 +92,9 @@ void new_client_connection(t_server_data *server)
     return ;
   }
   server->list_clients[server->nb_clients].sock = c_sock;
+  new_connection_communication(server, &(server->list_clients[server->nb_clients]));
   server->nb_clients++;
   server->last_sock = c_sock > server->last_sock ? c_sock : server->last_sock;
-  printf("new connection\n");
 }
 
 void ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs)
@@ -159,4 +152,20 @@ void close_connections(t_server_data *server)
   while (++i < server->nb_clients)
     close(server->list_clients[i].sock);
   close(server->sock_endpoint);
+}
+
+void new_connection_communication(t_server_data *server, t_client *client)
+{
+  char  buff_send[BUFF_SIZE];
+  char  buff_recv[BUFF_SIZE];
+  int   ret;
+
+  strcpy(buff_send, "BIENVENUE\n");
+  if (send(client->sock, buff_send, strlen(buff_send), 0) < 0)
+    exit_error("send()");
+  if ((ret = recv(client->sock, buff_recv, BUFF_SIZE - 1, 0)) < 0)
+    exit_error("recv()");
+  buff_recv[ret] = '\0';
+  strcpy(client->team, buff_recv, strlen(buff_recv));
+  printf("%s\n", client->team);
 }
