@@ -35,13 +35,24 @@ typedef struct              s_server_data
   int                       nb_clients;
 }                           t_server_data;
 
+/*
+** tools.c
+*/
 void                        exit_error(char *error_log);
+
+/*
+** connection.c
+*/
 void                        init_server(t_server_data *server);
 void                        new_client_connection(t_server_data *server);
-void                        ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs);
-int                         read_client(SOCKET c_sock);
 void                        disconnect_client(t_server_data *server, int i);
-void                        close_connections(t_server_data *server);
+void                        close_all_connections(t_server_data *server);
+
+/*
+** communication.c
+*/
+void                        ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs);
 void                        new_connection_communication(t_client *client);
+int                         read_client(SOCKET c_sock);
 
 #endif
