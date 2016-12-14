@@ -92,7 +92,7 @@ void new_client_connection(t_server_data *server)
     return ;
   }
   server->list_clients[server->nb_clients].sock = c_sock;
-  new_connection_communication(server, &(server->list_clients[server->nb_clients]));
+  new_connection_communication(&(server->list_clients[server->nb_clients]));
   server->nb_clients++;
   server->last_sock = c_sock > server->last_sock ? c_sock : server->last_sock;
 }
@@ -154,7 +154,7 @@ void close_connections(t_server_data *server)
   close(server->sock_endpoint);
 }
 
-void new_connection_communication(t_server_data *server, t_client *client)
+void new_connection_communication(t_client *client)
 {
   char  buff_send[BUFF_SIZE];
   char  buff_recv[BUFF_SIZE];
@@ -166,6 +166,6 @@ void new_connection_communication(t_server_data *server, t_client *client)
   if ((ret = recv(client->sock, buff_recv, BUFF_SIZE - 1, 0)) < 0)
     exit_error("recv()");
   buff_recv[ret] = '\0';
-  strcpy(client->team, buff_recv, strlen(buff_recv));
+  strcpy(client->team, buff_recv);
   printf("%s\n", client->team);
 }

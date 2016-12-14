@@ -42,5 +42,6 @@ void                        ckeck_all_clients_communication(t_server_data *serve
 int                         read_client(SOCKET c_sock);
 void                        disconnect_client(t_server_data *server, int i);
 void                        close_connections(t_server_data *server);
+void                        new_connection_communication(t_client *client);
 
 #endif
