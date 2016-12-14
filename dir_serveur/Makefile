@@ -2,7 +2,8 @@ NAME = serveur
 
 HEADER = includes/serveur.h
 
-SRC = src/serveur_main.c src/connection.c src/communication.c src/tools.c
+SRC = src/serveur_main.c src/connection.c src/communication.c src/tools.c \
+			src/cmd_clients_manager.c src/input_handler.c
 
 OBJ = $(SRC:.c=.o)
 

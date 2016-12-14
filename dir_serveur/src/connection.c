@@ -8,7 +8,7 @@ void init_server(t_server_data *server)
   if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     exit_error("socket()");
   sin.sin_addr.s_addr = htonl(INADDR_ANY);
-  sin.sin_port = htons(PORT);
+  sin.sin_port = htons(server->serv_settings.port);
   sin.sin_family = AF_INET;
   if(bind(sock,(SOCKADDR *)&sin, sizeof sin) < 0)
     exit_error("bind()");
@@ -31,7 +31,7 @@ void new_client_connection(t_server_data *server)
     perror("accept()");
     return ;
   }
-  printf("New connection\n");
+  printf(KGRN "New connection\n" KRESET);
   server->list_clients[server->nb_clients].sock = c_sock;
   new_connection_communication(&(server->list_clients[server->nb_clients]));
   server->nb_clients++;
@@ -40,7 +40,7 @@ void new_client_connection(t_server_data *server)
 
 void disconnect_client(t_server_data *server, int i)
 {
-  printf("client disconnected\n");
+  printf(KRED "client disconnected\n" KRESET);
   close(server->list_clients[i].sock);
   memmove(server->list_clients + i, server->list_clients + i + 1, (server->nb_clients - i - 1) * sizeof(t_client));
   server->nb_clients--;
@@ -54,4 +54,5 @@ void close_all_connections(t_server_data *server)
   while (++i < server->nb_clients)
     close(server->list_clients[i].sock);
   close(server->sock_endpoint);
+  printf(KGRN "Server disconnected\n" KRESET);
 }

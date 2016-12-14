@@ -2,12 +2,11 @@
 
 int main(int argc, char **argv)
 {
-  (void)argc;
-  (void)argv;
   t_server_data server;
   fd_set        read_fs;
 
-  // Todo : parse arg and fill server data
+  // Parse arg and fill server data
+  get_input(&(server.serv_settings), argc, argv);
 
   // Init server
   init_server(&server);
@@ -42,8 +41,8 @@ int main(int argc, char **argv)
     else
       ckeck_all_clients_communication(&server, &read_fs);
 
-
     // Todo : exec les commandes clients
+    manage_cmd_clients(&server);
   }
 
   // Close les socket clients
