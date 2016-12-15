@@ -24,7 +24,7 @@ ClientConnection::~ClientConnection()
 
 void	ClientConnection::Connect()
 {
-	std::cout << KCYN "Connection attempt..." KRESET << std::endl;
+	std::cout << KCYN "- Connection attempt... -" KRESET << std::endl;
 	
 	if (!IsConnected)
 	{
@@ -74,10 +74,13 @@ void	ClientConnection::ConnectToServer()
 	std::cout << KGRN "SUCCESS - Connected to server." KRESET << std::endl;
 	std::cout << "Port: " << Settings.Port << std::endl;
 	std::cout << "Client socket: " << this->sock << std::endl << std::endl;
+	// If connection successful, engage first dialog.
 	DialogStart();
-	
 }
 
+/*
+**	Here is the beginning of the connection server <-> client.
+*/
 void	ClientConnection::DialogStart()
 {
 	struct timeval		timeout;
@@ -85,7 +88,7 @@ void	ClientConnection::DialogStart()
 	int					select_ret;
 
 	// First batch of data reception
-	std::cout << KCYN "Awaiting server response..." KRESET << std::endl;
+	std::cout << KCYN "- Awaiting server response... -" KRESET << std::endl;
 	timeout.tv_sec = 3; // seconds.
 	timeout.tv_usec = 0; // milliseconds.
 	FD_ZERO(&readSet);
@@ -110,8 +113,27 @@ void	ClientConnection::DialogStart()
 			receivedString = ReceiveMessage();
 			std::cout << "Received: " << receivedString << std::endl;
 
-			this->TeamSlots = strtol((char *)receivedString.c_str(), NULL, 10);
-
+			// Recuperating : <slot_number>\n<x_position> <y_position>\n
+			char	*splittedString;
+			// getting slot number.
+			if (!(splittedString = strtok((char *)receivedString.c_str(), " \n")))
+			{
+				throw (CustomException("Error while getting slot number"));
+			}
+			this->TeamSlots = strtol(splittedString, NULL, 10);
+			// getting X start position.
+			if (!(splittedString = strtok(NULL, " \n")))
+			{
+				throw (CustomException("Error while getting x starting position"));
+			}
+			this->Startx = strtol(splittedString, NULL, 10);
+			// getting Y start position.
+			if (!(splittedString = strtok(NULL, " \n")))
+			{
+				throw (CustomException("Error while getting y starting position"));
+			}
+			this->Starty = strtol(splittedString, NULL, 10);
+			std::cout << "Nb of slots received: " << this->TeamSlots << std::endl;
 			if (this->TeamSlots <= 0)
 			{
 				throw (CustomException("No slot available in team or team does not exist."));
@@ -144,29 +166,35 @@ void	ClientConnection::Disconnect()
 
 void	ClientConnection::SendMessage(std::string msg)
 {
-	send(this->sock, msg.c_str(), msg.size(), MSG_OOB);
+	int						send_ret;
+
+	send_ret = send(this->sock, msg.c_str(), msg.size(), MSG_OOB);
 	// OR
-	// send(this->sock, msg, MSG_BUFIZE, MSG_OOB);
+	// send_ret = send(this->sock, msg, MSG_BUFIZE, MSG_OOB);
+	if (send_ret == -1)
+	{
+		perror("send");
+		throw (CustomException("send() error"));
+	}
 }
 
-// using variables from the object for better performance.
-// buf is used as a circular buffer.
 std::string		ClientConnection::ReceiveMessage()
 {
-	std::stringstream	ret_string;
+	std::string			ret_string;
+	int					recv_ret;
 
-	while ((recv(this->sock, buf, MSG_BUFSIZE - 1, 0)) > 0)
+	recv_ret = recv(this->sock, buf, MSG_BUFSIZE - 1, 0);
+	if (recv_ret == 0)
 	{
-		if ((char_found = strnstr(buf, "\n", MSG_BUFSIZE)))
-		{
-			char_found++; // we keep the \n
-			*char_found = '\0';
-			ret_string << buf;
-			break ;
-		}
-		ret_string << buf;
+		throw (CustomException("Disconnected from server"));
 	}
-	return (ret_string.str());
+	else if (recv_ret == -1)
+	{
+		perror("recv");
+		throw (CustomException("recv() error"));
+	}
+	ret_string = buf;
+	return (ret_string);
 }
 
 void	ClientConnection::DisplayInfos()

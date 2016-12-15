@@ -29,10 +29,11 @@ void	ClientController::OnInitialize(int argc, char **argv)
 	{
 		std::cout << KRED << e.what() << KRESET << std::endl;
 		// print usage.
-		std::cout << std::endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]" << KRESET << std::endl;
+		std::cout << std::endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]"
+					<< KRESET << std::endl;
 		return ;
 	}
-	
+
 	//------------------------------------------------------//
 	// II. try to connect to serveur						//
 	//------------------------------------------------------//
@@ -41,7 +42,7 @@ void	ClientController::OnInitialize(int argc, char **argv)
 		// ClientConnection.cpp
 		Connection.DisplayInfos();
 		Connection.SetMockMode(false);
-		Connection.Connect();
+		Connection.Connect(); // also handles first data exchange.(FirstDialog)
 	}
 	catch (CustomException &e)
 	{
@@ -53,13 +54,11 @@ void	ClientController::OnInitialize(int argc, char **argv)
 // Called just before the main loop: the client is connected to the server.
 void	ClientController::OnGameStart()
 {
-	std::cout << KCYN "OnGameStart called" KRESET << std::endl;
-	// fill the player position with the received string during connection.
-	std::string		receivedString = Connection.ReceiveMessage();
-	std::cout << "Received: " << receivedString << std::endl;
+	std::cout << KCYN "- OnGameStart called -" KRESET << std::endl;
 
-	//Player.x = Connection.Startx;
-	//Player.y = Connection.Starty;
+	// fill the player position with the received string during connection.
+	Player.x = Connection.Startx;
+	Player.y = Connection.Starty;
 
 	std::cout << KGRN "Player starting datas:" KRESET << std::endl;
 	std::cout << "Position: " << Player.x << "x " << Player.y << "y " << std::endl;
@@ -67,9 +66,11 @@ void	ClientController::OnGameStart()
 
 void	ClientController::MainLoop()
 {
+	bool	running = true;
+
 	// Main loop
-	std::cout << KCYN "Main loop starting" KRESET << std::endl;
-	while (1)
+	std::cout << KCYN "- Main loop starting -" KRESET << std::endl;
+	while (running)
 	{
 
 	}
