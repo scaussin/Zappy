@@ -25,8 +25,6 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define PORT 4242
-# define MAX_CLIENT 10
 # define BUFF_SIZE 10
 
 typedef int                 SOCKET;
@@ -40,7 +38,7 @@ typedef struct in_addr      IN_ADDR;
 typedef struct 				s_network_data
 {
 	int						port;
-	SOCKET					sock_endpoint;
+	SOCKET					sock_endpoint; // rename serveur_socket
 	SOCKET					sock_max;
 }							t_network_data;
 
