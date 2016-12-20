@@ -10,7 +10,7 @@
 **	-c nombre de client autorises au commencement du jeu
 **	-t diviseur de l'unite de temps (plus t est grand, plus le jeu va vite)
 */
-void	get_input(t_serv_settings *serv_settings, int argc, char **argv)
+void	get_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
 
@@ -22,28 +22,28 @@ void	get_input(t_serv_settings *serv_settings, int argc, char **argv)
 	else
 	{
 		//serv_settings->  = 0;
-		check_input_format(serv_settings, argc, argv);
-		fill_input(serv_settings, argc, argv);
+		check_input_format(serv, argc, argv);
+		fill_input(serv, argc, argv);
 
 		// printing Server settings values.
 		printf(KGRN "Server settings:\n" KRESET);
-		printf("Port: %d\n", serv_settings->port);
-		printf("Map width: %d\n", serv_settings->map_width);
-		printf("Map height: %d\n", serv_settings->map_height);
-		printf("Nb of teams: %d\n", serv_settings->nb_of_teams);
+		printf("Port: %d\n", serv->network.port);
+		printf("Map width: %d\n", serv->world_hdl.map_x);
+		printf("Map height: %d\n", serv->world_hdl.map_y);
+		printf("Nb of teams: %d\n", serv->team_hdl.nb_teams);
 		printf("Team names:");
-		while (i < serv_settings->nb_of_teams)
+		while (i < serv->team_hdl.nb_teams)
 		{
-			printf("  %s", serv_settings->team_names[i]);
+			printf("  %s", serv->team_hdl.array_teams[i].name);
 			i++;
 		}
 		printf("\n");
-		printf("nb of clients: %d\n", serv_settings->nb_of_clients);
-		printf("t: %d\n\n", serv_settings->t);
+		printf("Clients per Team: %d\n", serv->team_hdl.nb_teams_slots);
+		printf("t: %f\n\n", serv->world_hdl.t_unit);
 	}
 }
 
-void	check_input_format(t_serv_settings *serv_settings, int argc, char **argv)
+void	check_input_format(t_serveur *serv, int argc, char **argv)
 {
 	int i;
 
@@ -103,7 +103,7 @@ void	check_input_format(t_serv_settings *serv_settings, int argc, char **argv)
 			{
 				error_in_args(i, "invalid team name format");
 			}
-			serv_settings->nb_of_teams += 1;
+			serv->team_hdl.nb_teams += 1;
 			i++;
 		}
 		if (!argv[i])
@@ -140,7 +140,7 @@ void	check_input_format(t_serv_settings *serv_settings, int argc, char **argv)
 **	At this point, the values are format OK. it is just about filling
 **	and checking their meaning.
 */
-void	fill_input(t_serv_settings *serv_settings, int argc, char **argv)
+void	fill_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
 	int team_i;
@@ -153,8 +153,8 @@ void	fill_input(t_serv_settings *serv_settings, int argc, char **argv)
 		// port -p n
 		if (i == 2)
 		{
-			serv_settings->port = strtol(argv[i], NULL, 10);
-			if (serv_settings->port < 1023 || serv_settings->port > 65535)
+			serv->network.port = strtol(argv[i], NULL, 10);
+			if (serv->network.port < 1023 || serv->network.port > 65535)
 			{
 				error_in_args(i, "Invalid port number [1023 <=> 65535]");
 			}
@@ -162,18 +162,19 @@ void	fill_input(t_serv_settings *serv_settings, int argc, char **argv)
 		// map width -x n
 		if (i == 4)
 		{
-			serv_settings->map_width = strtol(argv[i], NULL, 10);
+			serv->world_hdl.map_x = strtol(argv[i], NULL, 10);
 		}
 		// map height -y n
 		if (i == 6)
 		{
-			serv_settings->map_height = strtol(argv[i], NULL, 10);
+			serv->world_hdl.map_y = strtol(argv[i], NULL, 10);
 		}
 		i++;
 	}
 	i = 8;
 	// team names -n teamname [teamname] [teamname] ...
-	serv_settings->team_names = (char **)malloc(sizeof(char *) * serv_settings->nb_of_teams);
+	serv->team_hdl.array_teams = (t_team_entity *)malloc(sizeof(t_team_entity)
+		* serv->team_hdl.nb_teams);
 	if (i == 8)
 	{
 		while (argv[i]
@@ -182,23 +183,27 @@ void	fill_input(t_serv_settings *serv_settings, int argc, char **argv)
 		{
 			if (strlen(argv[i]) > 40)
 				error_in_args(i, "Team Name is too long (40 char max)");
-			serv_settings->team_names[team_i] = (char *)malloc(sizeof(char) * strlen(argv[i]) + 1);
-			strncpy(serv_settings->team_names[team_i], argv[i], strlen(argv[i]));
-			serv_settings->team_names[team_i][strlen(argv[i])] = '\0';
+			serv->team_hdl.array_teams[team_i].name =
+				(char *)malloc(sizeof(char) * strlen(argv[i]) + 1);
+			strncpy(serv->team_hdl.array_teams[team_i].name, argv[i], strlen(argv[i]));
+			serv->team_hdl.array_teams[team_i].name[strlen(argv[i])] = '\0';
 			team_i++;
 			i++;
 		}
 
 		if (argv[i] && strncmp(argv[i], "-c", 2) == 0)
 		{
-			serv_settings->nb_of_clients = strtol(argv[i + 1], NULL, 10);
+			serv->team_hdl.nb_teams_slots = strtol(argv[i + 1], NULL, 10);
 		}
 		i += 2;
 		if (argv[i] && strncmp(argv[i], "-t", 2) == 0)
 		{
-			serv_settings->t = strtol(argv[i + 1], NULL, 10);
+			serv->world_hdl.t_unit = strtol(argv[i + 1], NULL, 10);
+			serv->world_hdl.t_unit = 1 / serv->world_hdl.t_unit;
 		}
 	}
+	serv->network.max_clients = serv->team_hdl.nb_teams
+		* serv->team_hdl.nb_teams_slots;
 }
 
 void	error_in_args(int pos, char *str)

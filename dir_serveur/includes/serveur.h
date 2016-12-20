@@ -11,6 +11,7 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
+# include <syslog.h>
 
 /*
 **	color in text;
@@ -26,11 +27,15 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 10
+# define MAX_CLIENT 20
 
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
 typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
+
+typedef struct s_list_clients_entity	t_list_clients_entity;
+typedef struct s_list_cmds_entity		t_list_cmds_entity;
 
 /*
 ** ************************ Network **************************
@@ -38,8 +43,9 @@ typedef struct in_addr      IN_ADDR;
 typedef struct 				s_network_data
 {
 	int						port;
-	SOCKET					sock_endpoint; // rename serveur_socket
+	SOCKET					sock_endpoint;
 	SOCKET					sock_max;
+	int						max_clients;
 }							t_network_data;
 
 /*
@@ -54,6 +60,7 @@ typedef struct 				s_team_entity
 typedef struct 				s_team_hdl
 {
 	int						nb_teams;
+	int						nb_teams_slots;
 	t_team_entity			*array_teams;
 }							t_team_hdl;
 
@@ -95,7 +102,7 @@ typedef struct 				s_cmd_entity
 typedef struct 				s_list_cmds_entity
 {
 	t_cmd_entity			*cmd;
-	t_list_cmds_entity		*next
+	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
 typedef struct 				s_cmd_hdl
@@ -103,6 +110,13 @@ typedef struct 				s_cmd_hdl
 	int						nb_cmds;
 	t_client_entity			*array_cmds;
 }							t_cmd_hdl;
+
+typedef struct 				s_world_hdl
+{
+	int						map_x;
+	int						map_y;
+	double					t_unit;
+}							t_world_hdl;
 
 /*
 ** ******************** Serveur Main Struct ******************
@@ -116,7 +130,7 @@ typedef struct				s_serveur
 	t_world_hdl				world_hdl;
 }							t_serveur;
 
-//***********************OLD TOUT POURRRS**********************************************
+//***********************OLD TOUT POURRRS**************************************
 
 // recupéré dans input_handling.c
 typedef struct				s_serv_settings
@@ -148,40 +162,52 @@ typedef struct				s_server_data
   t_serv_settings			serv_settings;
 }							t_server_data;
 
+//***********************OLD TOUT POURRRS**************************************
+
 /*
-** input_handler.c
+** serveur_data.c
 */
-void					              get_input(t_serv_settings *serv_settings, int argc, char **argv);
-void					              check_input_format(t_serv_settings *serv_settings, int argc, char **argv);
-void					              parse_input(int argc, char **argv);
-void					              fill_input(t_serv_settings *serv_settings, int argc, char **argv);
-void					              error_in_args(int pos, char *str);
-int						              regex_match(char *string_to_search, char *regex_str);
+void						init_data(t_serveur *serv);
+void						init_serveur(t_serveur *serv);
 
 /*
 ** tools.c
 */
-void                        exit_error(char *error_log);
+void						exit_error(char *error_log);
 
 /*
-** connection.c
+** input_handler.c
 */
-void                        init_server(t_server_data *server);
-void                        new_client_connection(t_server_data *server);
-void                        disconnect_client(t_server_data *server, int i);
-void                        close_all_connections(t_server_data *server);
+void						get_input(t_serveur *serv, int argc, char **argv);
+void						check_input_format(t_serveur *serv, int argc, char **argv);
+void						parse_input(int argc, char **argv);
+void						fill_input(t_serveur *serv, int argc, char **argv);
+void						error_in_args(int pos, char *str);
+int							regex_match(char *string_to_search, char *regex_str);
+
+/*
+** serveur_loop.c
+*/
+void						main_loop(t_serveur *serv);
+
+/*
+** connection.c      ///////////// DOING
+*/
+void						new_client_connection(t_server_data *server);
+void						disconnect_client(t_server_data *server, int i);
+void						close_all_connections(t_server_data *server);
 
 /*
 ** communication.c
 */
-void                        ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs);
-void                        new_connection_communication(t_client *client);
-int                         read_client(t_client *client);
+void						ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs);
+void						new_connection_communication(t_client *client);
+int							read_client(t_client *client);
 
 /*
 ** cmd_clients_manager.c
 */
-void                        manage_cmd_clients(t_server_data *server);
-void                        exec_cmd_client(t_client *client);
+void						manage_cmd_clients(t_server_data *server);
+void						exec_cmd_client(t_client *client);
 
 #endif
