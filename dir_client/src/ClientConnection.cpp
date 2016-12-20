@@ -25,7 +25,7 @@ ClientConnection::~ClientConnection()
 void	ClientConnection::Connect()
 {
 	std::cout << KCYN "- Connection attempt... -" KRESET << std::endl;
-	
+
 	if (!IsConnected)
 	{
 		if (IsInMockMode)
@@ -193,6 +193,7 @@ std::string		ClientConnection::ReceiveMessage()
 		perror("recv");
 		throw (CustomException("recv() error"));
 	}
+	buf[recv_ret] = '\0';
 	ret_string = buf;
 	return (ret_string);
 }
