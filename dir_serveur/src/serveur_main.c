@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 	get_input(&serv, argc, argv);
 
 	// Init server
-	init_server(&serv);
+	init_serveur(&serv);
 
 	// Boucle du jeux
 	main_loop(&serv);

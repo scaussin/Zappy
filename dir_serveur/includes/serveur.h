@@ -26,7 +26,7 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define BUFF_SIZE 10
+# define BUFF_SIZE 256
 # define MAX_CLIENT 20
 
 typedef int                 SOCKET;
@@ -34,7 +34,6 @@ typedef struct sockaddr_in  SOCKADDR_IN;
 typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
-typedef struct s_list_clients_entity	t_list_clients_entity;
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
 
 /*
@@ -43,8 +42,9 @@ typedef struct s_list_cmds_entity		t_list_cmds_entity;
 typedef struct 				s_network_data
 {
 	int						port;
-	SOCKET					sock_endpoint;
+	SOCKET					sock_serveur;
 	SOCKET					sock_max;
+	fd_set					*read_fs;
 	int						max_clients;
 }							t_network_data;
 
@@ -76,18 +76,14 @@ typedef struct 				s_client_entity
 	int						len_buff;
 	int						nb_pending_cmds;
 	t_list_cmds_entity		*list_pending_cmds;
-}							t_client_entity;
+	struct s_client_entity	*next;
 
-typedef struct				s_list_clients_entity
-{
-	t_client_entity			*client;
-	t_list_clients_entity	*next;
-}							t_list_clients_entity;
+}							t_client_entity;
 
 typedef struct 				s_client_hdl
 {
 	int						nb_clients;
-	t_list_clients_entity	*list_clients;
+	t_client_entity			*list_clients;
 }							t_client_hdl;
 
 /*
@@ -130,10 +126,15 @@ typedef struct				s_serveur
 	t_world_hdl				world_hdl;
 }							t_serveur;
 
+/*typedef struct				s_loh_hdl
+{
+
+}							t_log_hdl;*/
+
 //***********************OLD TOUT POURRRS**************************************
 
 // recupéré dans input_handling.c
-typedef struct				s_serv_settings
+/*typedef struct				s_serv_settings
 {
 	int						port;
 	int						map_width;
@@ -155,12 +156,12 @@ typedef struct				s_client
 
 typedef struct				s_server_data
 {
-  SOCKET					sock_endpoint;
+  SOCKET					sock_serveur;
   int						last_sock;
   t_client					list_clients[MAX_CLIENT];
   int						nb_clients;
   t_serv_settings			serv_settings;
-}							t_server_data;
+}							t_server_data;*/
 
 //***********************OLD TOUT POURRRS**************************************
 
@@ -169,11 +170,17 @@ typedef struct				s_server_data
 */
 void						init_data(t_serveur *serv);
 void						init_serveur(t_serveur *serv);
+void						fill_team_info(t_serveur *serv);
 
 /*
 ** tools.c
 */
 void						exit_error(char *error_log);
+void						*s_malloc(size_t size);
+void						replace_nl(char * str);
+void						logs(int type, char *log);
+int							get_len_cmd(char *str);
+char						*get_cmd_trim(char *str);
 
 /*
 ** input_handler.c
@@ -191,23 +198,37 @@ int							regex_match(char *string_to_search, char *regex_str);
 void						main_loop(t_serveur *serv);
 
 /*
-** connection.c      ///////////// DOING
+** connection.c
 */
-void						new_client_connection(t_server_data *server);
-void						disconnect_client(t_server_data *server, int i);
-void						close_all_connections(t_server_data *server);
+SOCKET						accept_connection(t_serveur *serv);
+void						new_client_connection(t_serveur *serveur);
+void						disconnect_client(SOCKET c_sock);
+void						close_all_connections(t_serveur *serv);
 
 /*
 ** communication.c
 */
-void						ckeck_all_clients_communication(t_server_data *server, fd_set *read_fs);
-void						new_connection_communication(t_client *client);
-int							read_client(t_client *client);
+void						ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs);
+int							read_client(t_client_entity *client);
+t_team_entity				*get_team(t_serveur *serv, char *buff);
+t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
+
+/*
+** client_hdl.c
+*/
+t_client_entity				*create_client(SOCKET sock);
+void						add_client(t_serveur *serv, t_client_entity *client);
+void						remove_client(t_serveur *serv, t_client_entity *client);
+
+/*
+** team_hdl.c
+*/
+t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 
 /*
 ** cmd_clients_manager.c
 */
-void						manage_cmd_clients(t_server_data *server);
-void						exec_cmd_client(t_client *client);
+void						manage_cmd_clients(t_serveur *serv);
+void						exec_cmd_client(t_client_entity *client);
 
 #endif
