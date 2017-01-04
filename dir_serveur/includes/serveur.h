@@ -27,7 +27,6 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 256
-# define MAX_CLIENT 20
 
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
@@ -111,7 +110,7 @@ typedef struct 				s_cmd_hdl
 ** ************************ World struct ***************************** => Game board
 */
 
-typedef enum e_item_type 
+typedef enum e_item_type
 {
 	FOOD,
 	MINERALS
@@ -121,7 +120,7 @@ typedef enum e_item_type
 typedef struct				s_world_item
 {
 	t_item_type 			type;// type -> nourriture ou mineral
-	//  
+	//
 }							t_world_item;
 
 typedef struct				s_world_case
@@ -157,45 +156,6 @@ typedef struct				s_serveur
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
 }							t_serveur;
-
-/*typedef struct				s_loh_hdl
-{
-
-}							t_log_hdl;*/
-
-//***********************OLD TOUT POURRRS**************************************
-
-// recupéré dans input_handling.c
-/*typedef struct				s_serv_settings
-{
-	int						port;
-	int						map_width;
-	int						map_height;
-	int						nb_of_teams;
-	char					**team_names;
-	int						nb_of_clients;
-	int						t;
-}							t_serv_settings;
-
-typedef struct				s_client
-{
-  SOCKET					sock;
-  char						team[BUFF_SIZE];
-  char						buff[BUFF_SIZE];
-  int						start_buff;
-  int						len_buff;
-}							t_client;
-
-typedef struct				s_server_data
-{
-  SOCKET					sock_serveur;
-  int						last_sock;
-  t_client					list_clients[MAX_CLIENT];
-  int						nb_clients;
-  t_serv_settings			serv_settings;
-}							t_server_data;*/
-
-//***********************OLD TOUT POURRRS**************************************
 
 /*
 ** serveur_data.c

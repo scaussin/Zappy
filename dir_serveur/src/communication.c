@@ -94,8 +94,12 @@ t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client
 	if (!(team = get_team(serv, buff)))
 	{
 		printf("Get_team() failed\n");
-		return (NULL);
+		if (send(client->sock, "UNKNOWN TEAM\n",
+			strlen("UNKNOWN TEAM\n"), 0) < 0)
+			exit_error("send()");
 		free(buff);
+		free(to_print);
+		return (NULL);
 	}
 
 	// Format Send buff ans send
@@ -112,5 +116,6 @@ t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client
 	printf("Send : %d %d*\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
 
 	free(buff);
+	free(to_print);
 	return (team);
 }
