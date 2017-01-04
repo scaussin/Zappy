@@ -102,16 +102,16 @@ void	ClientConnection::DialogStart()
 	if (FD_ISSET(this->sock, &readSet))
 	{
 		std::string		receivedString = ReceiveMessage();
-		std::cout << "Received: " << receivedString << std::endl;
+		std::cout << KBLU << "Received: " << KRESET << receivedString << std::endl;
 		// Is it the right server ?
 		if (receivedString.compare("BIENVENUE\n") == 0)
 		{
-			std::cout << "Sending team name: " << Settings.TeamName << std::endl;
+			std::cout << KYEL << "Sending team name: " << KRESET << Settings.TeamName << std::endl;
 			SendMessage(Settings.TeamName + "\n");
 
 			// Receiving first datas.
 			receivedString = ReceiveMessage();
-			std::cout << "Received: " << receivedString << std::endl;
+			std::cout << KBLU << "Received: " << KRESET << receivedString << std::endl;
 
 			// Recuperating : <slot_number>\n<x_position> <y_position>\n
 			char	*splittedString;

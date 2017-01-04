@@ -51,19 +51,22 @@ void	ClientController::OnInitialize(int argc, char **argv)
 	}
 }
 
-// Called just before the main loop: the client is connected to the server.
+// --------------------------------------------------------------------------------	//
+// Called just before the main loop: the client is connected to the server.			//
+//																					//
+// --------------------------------------------------------------------------------	//
 void	ClientController::OnGameStart()
 {
 	std::cout << KCYN "- OnGameStart called -" KRESET << std::endl;
 
-	// fill the player position with the received string during connection.
-	Player.x = Connection.Startx;
-	Player.y = Connection.Starty;
-
-	std::cout << KGRN "Player starting datas:" KRESET << std::endl;
-	std::cout << "World size: " << Player.x << "x " << Player.y << "y " << std::endl;
+	// Set the player datas and makes a print;
+	Player.InitGameDatas(Connection);
 }
 
+// --------------------------------------------------------------------------------	//
+// The main loop																	//
+//																					//
+// --------------------------------------------------------------------------------	//
 void	ClientController::MainLoop()
 {
 	bool	running = true;
