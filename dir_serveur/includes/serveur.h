@@ -107,12 +107,44 @@ typedef struct 				s_cmd_hdl
 	t_client_entity			*array_cmds;
 }							t_cmd_hdl;
 
+/*
+** ************************ World struct ***************************** => Game board
+*/
+
+typedef enum e_item_type 
+{
+	FOOD,
+	MINERALS
+
+}			t_item_type;
+
+typedef struct				s_world_item
+{
+	t_item_type 			type;// type -> nourriture ou mineral
+	//  
+}							t_world_item;
+
+typedef struct				s_world_case
+{
+	// une case contient:
+	t_client_entity			*players;// players
+	t_world_item			*items;// items
+
+
+}							t_world_case;
+
 typedef struct 				s_world_hdl
 {
 	int						map_x;
 	int						map_y;
 	double					t_unit;
+
+
+	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
+
 }							t_world_hdl;
+
+
 
 /*
 ** ******************** Serveur Main Struct ******************
