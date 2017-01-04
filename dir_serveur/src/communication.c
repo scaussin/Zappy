@@ -102,7 +102,7 @@ t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client
 		return (NULL);
 	}
 
-	// Format Send buff ans send
+	// Format Send buff and send
 	memset((void *)buff, 0, BUFF_SIZE);
 	sprintf(buff, "%d\n", team->available_slots);
 	if (send(client->sock, buff, strlen(buff), 0) < 0)

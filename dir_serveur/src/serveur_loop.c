@@ -1,5 +1,5 @@
-#include "../includes/serveur.h"
 
+#include "../includes/serveur.h"
 void	set_read_fs(t_serveur *serv)
 {
 	t_client_entity	*p_client;
@@ -34,7 +34,7 @@ void	main_loop(t_serveur *serv)
 		set_read_fs(serv);
 
 		// BOUYAKA SELECT IS HERE !!!!!!!!!!
-		if(select(serv->network.sock_max + 1, read_fs, NULL, NULL, NULL) < 0)
+		if (select(serv->network.sock_max + 1, read_fs, NULL, NULL, NULL) < 0)
 			exit_error("select()");
 
 		// Exit when enter presse

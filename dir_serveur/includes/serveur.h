@@ -34,6 +34,7 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
+typedef struct s_buffer					t_buffer;
 
 /*
 ** ************************ Network **************************
@@ -68,16 +69,23 @@ typedef struct 				s_team_hdl
 */
 typedef struct 				s_client_entity
 {
+	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
-	char					buff[BUFF_SIZE];
-	int						start_buff;
-	int						len_buff;
+	t_buffer				buf_recv;
+	t_buffer				buf_send;
 	int						nb_pending_cmds;
 	t_list_cmds_entity		*list_pending_cmds;
 	struct s_client_entity	*next;
 
 }							t_client_entity;
+
+typedef struct				s_buffer
+{
+	char					buff[BUFF_SIZE];
+	int						start_buff;
+	int						len_buff;
+}							t_buffer;
 
 typedef struct 				s_client_hdl
 {
