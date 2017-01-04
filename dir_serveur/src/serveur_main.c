@@ -2,51 +2,22 @@
 
 int main(int argc, char **argv)
 {
-  (void)argc;
-  (void)argv;
-  t_server_data server;
-  fd_set        read_fs;
+	t_serveur	serv;
 
-  // Todo : parse arg and fill server data
+	// Init data
+	init_data(&serv);
 
-  // Init server
-  init_server(&server);
+	// Parse arg and fill server data
+	get_input(&serv, argc, argv);
 
-  // Boucle du jeux
-  while (42)
-  {
-    int i;
+	// Init server
+	init_serveur(&serv);
 
-    // Clear le set de fd ready pour lecture
-    FD_ZERO(&read_fs);
-    // Surveille l'entrée standard pour exit propre quand enter presse
-    FD_SET(STDIN_FILENO, &read_fs);
-    // Surveille le endpoint pour new connection
-    FD_SET(server.sock_endpoint, &read_fs);
-    // Surveille tous les client
-    i = -1;
-    while (++i < server.nb_clients)
-      FD_SET(server.list_clients[i].sock, &read_fs);
+	// Boucle du jeux
+	main_loop(&serv);
 
-    // BOUYAKA SELECT IS HERE !!!!!!!!!!
-    if(select(server.last_sock + 1, &read_fs, NULL, NULL, NULL) < 0)
-      exit_error("select()");
+	// Close les connections
+	close_all_connections(&serv);
 
-    // Exit when enter presse
-    if (FD_ISSET(STDIN_FILENO, &read_fs))
-      break;
-    // Connect new client
-    else if (FD_ISSET(server.sock_endpoint, &read_fs))
-      new_client_connection(&server);
-    // Check commands from clients
-    else
-      ckeck_all_clients_communication(&server, &read_fs);
-
-
-    // Todo : exec les commandes clients
-  }
-
-  // Close les socket clients
-  close_all_connections(&server);
-  return (0);
+	return (0);
 }
