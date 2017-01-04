@@ -61,7 +61,7 @@ void	ClientController::OnGameStart()
 	Player.y = Connection.Starty;
 
 	std::cout << KGRN "Player starting datas:" KRESET << std::endl;
-	std::cout << "Position: " << Player.x << "x " << Player.y << "y " << std::endl;
+	std::cout << "World size: " << Player.x << "x " << Player.y << "y " << std::endl;
 }
 
 void	ClientController::MainLoop()

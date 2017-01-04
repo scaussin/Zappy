@@ -168,7 +168,7 @@ void	ClientConnection::SendMessage(std::string msg)
 {
 	int						send_ret;
 
-	send_ret = send(this->sock, msg.c_str(), msg.size(), MSG_OOB);
+	send_ret = send(this->sock, msg.c_str(), msg.size() + 1, MSG_OOB); // +1 for \n
 	// OR
 	// send_ret = send(this->sock, msg, MSG_BUFIZE, MSG_OOB);
 	if (send_ret == -1)
