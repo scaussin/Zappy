@@ -34,7 +34,6 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
-typedef struct s_buffer					t_buffer;
 
 /*
 ** ************************ Network **************************
@@ -45,6 +44,7 @@ typedef struct 				s_network_data
 	SOCKET					sock_serveur;
 	SOCKET					sock_max;
 	fd_set					*read_fs;
+	fd_set					*write_fs;
 	int						max_clients;
 }							t_network_data;
 
@@ -67,25 +67,26 @@ typedef struct 				s_team_hdl
 /*
 ** ************************ Client **************************
 */
+
+typedef struct				s_buffer
+{
+	char					buff[BUFF_SIZE];
+	int						start;
+	int						len;
+}							t_buffer;
+
 typedef struct 				s_client_entity
 {
 	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
-	t_buffer				buf_recv;
-	t_buffer				buf_send;
+	t_buffer				buff_recv;
+	t_buffer				buff_send;
 	int						nb_pending_cmds;
 	t_list_cmds_entity		*list_pending_cmds;
 	struct s_client_entity	*next;
 
 }							t_client_entity;
-
-typedef struct				s_buffer
-{
-	char					buff[BUFF_SIZE];
-	int						start_buff;
-	int						len_buff;
-}							t_buffer;
 
 typedef struct 				s_client_hdl
 {
@@ -212,6 +213,8 @@ void						ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs);
 int							read_client(t_client_entity *client);
 t_team_entity				*get_team(t_serveur *serv, char *buff);
 t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
+int							write_buffer(t_buffer *buff, char *to_write, int size);
+char						*read_buffer(t_buffer *buff);
 
 /*
 ** client_hdl.c

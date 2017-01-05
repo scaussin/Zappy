@@ -5,7 +5,6 @@ void ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs)
 	t_client_entity	*p_client;
 	int ret_read;
 
-	//printf("start_checked");
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
@@ -20,7 +19,77 @@ void ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs)
 	}
 }
 
-int   read_client(t_client_entity*client)
+int		read_client(t_client_entity *client)
+{
+	int		ret;
+	int		size_read;
+	char	*buff_tmp;
+
+	size_read = BUFF_SIZE - client->buff_recv.len;
+	if (size_read == 0)
+	{
+		perror("read buffer full");
+		return (0);
+	}
+	buff_tmp = s_malloc(size_read);
+	while (1)
+	{
+		ret = recv(client->sock, buff_tmp, size_read, 0);
+		if (ret == -1 && (errno == EAGAIN || errno == EINTR))
+			continue;
+		else
+			break ;
+	}
+	if (ret == -1)
+		perror("recv()");
+	ret = write_buffer(&client->buff_recv, buff_tmp, ret);
+	free(buff_tmp);
+	return (ret);
+}
+
+int		write_buffer(t_buffer *buff, char *to_write, int size)
+{
+	int		i;
+
+	if (size)
+	{
+		i = 0;
+		if (buff->len + size > BUFF_SIZE)
+		{
+			perror("buffer full");
+			return (0);
+		}
+		while (i < size)
+		{
+			buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
+			i++;
+		}
+		buff->len += i;
+	}
+	return (size);
+}
+
+char	*read_buffer(t_buffer *buff)
+{
+	char	*ret_buff;
+	int		i;
+
+	ret_buff = NULL;
+	if (buff->len > 0)
+	{
+		ret_buff = s_malloc(buff->len + 1);
+		bzero(ret_buff, buff->len + 1);
+		i = 0;
+		while (i < buff->len)
+		{
+			ret_buff[i] = buff->buff[(buff->start + i) % BUFF_SIZE];
+			i++;
+		}
+	}
+	return (ret_buff);
+}
+
+/*int   read_client(t_client_entity *client)
 {
 	int   ret;
 	int   i_loop;
@@ -53,8 +122,8 @@ int   read_client(t_client_entity*client)
 		client->len_buff = BUFF_SIZE;
 
 	return(ret);
-}
-
+}*/
+/*
 t_team_entity	*get_team(t_serveur *serv, char *buff)
 {
 	char			*t_name;
@@ -68,8 +137,8 @@ t_team_entity	*get_team(t_serveur *serv, char *buff)
 	team = get_team_by_name(serv, t_name);
 	free(t_name);
 	return (team);
-}
-
+}*/
+/*
 t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client)
 {
 	char			*buff;
@@ -119,3 +188,4 @@ t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client
 	free(to_print);
 	return (team);
 }
+*/
