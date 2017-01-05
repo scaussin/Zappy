@@ -25,22 +25,6 @@ void	replace_nl(char *str)
 	}
 }
 
-/*void	logs(int type, char *log)
-{
-	char *type_str;
-
-	if (type == 0)
-	{
-		type_str = "\x1B[36m[NETWORK]";
-	}
-	else if (type == 1)
-	{
-		type_str = "\x1B[32m[INFO]";
-	}
-	replace_nl(log);
-	printf("%s%s%s\n", type_str, log, KRESET);
-}*/
-
 int		get_len_cmd(char *str)
 {
 	int		len;
@@ -65,4 +49,12 @@ char	*get_cmd_trim(char *str)
 		return (NULL);
 	}
 	return strndup(str, len);
+}
+
+int		modulo(int a, int b)
+{
+	int	ret;
+
+	ret = a % b;
+	return (ret < 0 ? ret + b : ret);
 }

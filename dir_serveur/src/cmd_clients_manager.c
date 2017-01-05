@@ -8,12 +8,12 @@ void manage_cmd_clients(t_serveur *serv)
 	while (p_client)
 	{
 		if (p_client->len_buff > 0)
-			exec_cmd_client(p_client);
+			get_cmd_client(p_client);
 		p_client = p_client->next;
 	}
 }
 
-void exec_cmd_client(t_client_entity *client)
+void get_cmd_client(t_client_entity *client)
 {
 	int		i_loop;
 	int		i_buff;

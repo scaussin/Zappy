@@ -34,6 +34,8 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
+typedef struct s_pos		t_pos;
+typedef enum e_dir			t_dir;
 
 /*
 ** ************************ Network **************************
@@ -66,6 +68,13 @@ typedef struct 				s_team_hdl
 /*
 ** ************************ Client **************************
 */
+typedef struct				s_player
+{
+	int						level;
+	t_pos					pos;
+	t_dir					dir;
+}
+
 typedef struct 				s_client_entity
 {
 	SOCKET					sock;
@@ -103,19 +112,34 @@ typedef struct 				s_list_cmds_entity
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
-	t_client_entity			*array_cmds;
+	t_cmd_entity			*array_cmds;
 }							t_cmd_hdl;
 
 /*
 ** ************************ World struct ***************************** => Game board
 */
 
-typedef enum e_item_type
+typedef enum				e_item_type
 {
 	FOOD,
 	MINERALS
 
-}			t_item_type;
+}							t_item_type;
+
+typedef enum				e_dir
+{
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+
+}							t_dir;
+
+typedef struct				s_pos
+{
+	int						x;
+	int						y;
+}							t_pos;
 
 typedef struct				s_world_item
 {
@@ -173,6 +197,7 @@ void						replace_nl(char * str);
 void						logs(int type, char *log);
 int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
+int							modulo(int a, int b);
 
 /*
 ** input_handler.c
