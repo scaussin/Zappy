@@ -34,8 +34,21 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
-typedef struct s_pos		t_pos;
-typedef enum e_dir			t_dir;
+
+typedef enum				e_dir
+{
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+
+}							t_dir;
+
+typedef struct				s_pos
+{
+	int						x;
+	int						y;
+}							t_pos;
 
 /*
 ** ************************ Network **************************
@@ -73,7 +86,7 @@ typedef struct				s_player
 	int						level;
 	t_pos					pos;
 	t_dir					dir;
-}
+}							t_player;
 
 typedef struct 				s_client_entity
 {
@@ -84,6 +97,7 @@ typedef struct 				s_client_entity
 	int						len_buff;
 	int						nb_pending_cmds;
 	t_list_cmds_entity		*list_pending_cmds;
+	t_player				player;
 	struct s_client_entity	*next;
 
 }							t_client_entity;
@@ -125,21 +139,6 @@ typedef enum				e_item_type
 	MINERALS
 
 }							t_item_type;
-
-typedef enum				e_dir
-{
-	UP,
-	RIGHT,
-	DOWN,
-	LEFT
-
-}							t_dir;
-
-typedef struct				s_pos
-{
-	int						x;
-	int						y;
-}							t_pos;
 
 typedef struct				s_world_item
 {
@@ -246,6 +245,14 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 ** cmd_clients_manager.c
 */
 void						manage_cmd_clients(t_serveur *serv);
-void						exec_cmd_client(t_client_entity *client);
+void						get_cmd_client(t_serveur *serv, t_client_entity *client);
+
+/*
+** see.c
+*/
+void	cmd_see(t_serveur *serv, t_client_entity *client);
+void	get_see_case_positions(t_serveur *serv, t_player *player);
+int		get_nb_case(int level);
+void	fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 
 #endif

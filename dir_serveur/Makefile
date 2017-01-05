@@ -4,7 +4,7 @@ HEADER = includes/serveur.h
 
 SRC = src/serveur_main.c src/connection.c src/communication.c src/tools.c \
 			src/cmd_clients_manager.c src/input_handler.c src/client_hdl.c \
-			src/team_hdl.c src/serveur_data.c src/serveur_loop.c
+			src/team_hdl.c src/serveur_data.c src/serveur_loop.c src/see.c
 
 OBJ = $(SRC:.c=.o)
 

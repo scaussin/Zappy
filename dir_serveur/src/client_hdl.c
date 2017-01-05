@@ -7,6 +7,10 @@ t_client_entity	*create_client(SOCKET sock)
 	new_client = (t_client_entity *)s_malloc(sizeof(t_client_entity));
 	memset((void *)new_client, 0, sizeof(t_client_entity));
 	new_client->sock = sock;
+	new_client->player.level = 3;
+	new_client->player.pos.x = 5;
+	new_client->player.pos.y = 5;
+	new_client->player.dir = UP;
 	return (new_client);
 }
 

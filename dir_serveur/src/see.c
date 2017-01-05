@@ -1,3 +1,4 @@
+#include "../includes/serveur.h"
 /*	Player and World grid
 	+y
 	^
@@ -6,6 +7,11 @@
 	|
 	|------------> +x
 */
+
+void	cmd_see(t_serveur *serv, t_client_entity *client)
+{
+	get_see_case_positions(serv, &(client->player));
+}
 
 void	get_see_case_positions(t_serveur *serv, t_player *player)
 {
@@ -28,11 +34,13 @@ void	get_see_case_positions(t_serveur *serv, t_player *player)
 		while (i_case < 2 * i_line + 1)
 		{
 			fill_tab(tab_pos + i_tab, &rel_pos, player, serv);
+			printf("*x %d y %d*", rel_pos.x, rel_pos.y);	// Debug
 			i_case++;
 			i_tab++;
 			rel_pos.x++;
 		}
 		i_line++;
+		printf("\n");												// Debug
 	}
 }
 
