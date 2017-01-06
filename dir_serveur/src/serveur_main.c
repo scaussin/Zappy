@@ -10,6 +10,9 @@ int main(int argc, char **argv)
 	// Parse arg and fill server data
 	get_input(&serv, argc, argv);
 
+	// Init Terrain from get_input datas
+	init_terrain(&serv);
+
 	// Init server
 	init_serveur(&serv);
 
