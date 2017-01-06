@@ -30,7 +30,7 @@ void new_client_connection(t_serveur *serv)
 
 	// Create Client
 	client = create_client(c_sock);
-
+	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
 	// Welcome comm and Get team
 	/*if (!(team = new_client_communication(serv, client))
 		|| team->available_slots < 1)

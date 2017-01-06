@@ -6,10 +6,8 @@ int main(int argc, char **argv)
 
 	// Init data
 	init_data(&serv);
-
 	// Parse arg and fill server data
 	get_input(&serv, argc, argv);
-
 	// Init server
 	init_serveur(&serv);
 
