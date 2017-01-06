@@ -6,6 +6,7 @@ void	set_read_fs(t_serveur *serv)
 
 	// Clear le set de fd ready pour lecture
 	FD_ZERO(serv->network.read_fs);
+	FD_ZERO(serv->network.write_fs);
 
 	// Surveille l'entrée standard pour exit propre quand enter presse
 	FD_SET(STDIN_FILENO, serv->network.read_fs);
@@ -42,9 +43,8 @@ void	main_loop(t_serveur *serv)
 			new_client_connection(serv);
 		// Check commands from clients
 		else
-			ckeck_all_clients_communication(serv, serv->network.read_fs);
+			ckeck_all_clients_communication(serv);
 
-			//wite
 
 		// Todo : exec les commandes clients
 		manage_cmd_clients(serv);

@@ -1,6 +1,6 @@
 #include "../includes/serveur.h"
 
-void ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs)
+void ckeck_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 	int ret_read;
@@ -8,14 +8,44 @@ void ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs)
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (FD_ISSET(p_client->sock, read_fs)
+		if (FD_ISSET(p_client->sock, serv->network.read_fs)
 			&& !(ret_read = read_client(p_client)))
 		{
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			return ;
 		}
+		if (FD_ISSET(p_client->sock, serv->network.write_fs))
+			write_client(p_client);
 		p_client = p_client->next;
+	}
+}
+
+void		write_client(t_client_entity *client)
+{
+	char	*buff_tmp;
+	int		ret_send;
+
+	buff_tmp = read_buffer(&client->buff_send);
+	while (1)
+	{
+		ret_send = send(client->sock, buff_tmp, client->buff_send.len, MSG_DONTWAIT);
+		if (ret_send == -1 && (errno == EAGAIN || errno == EINTR))
+			continue;
+		else
+			break ;
+	}
+	write(1, "send => [", 9);
+	write(1, buff_tmp, client->buff_send.len);
+	write(1, "]\n", 2);
+	if (buff_tmp)
+		free(buff_tmp);
+	if (ret_send == -1)
+		perror("send()");
+	if (ret_send > 0)
+	{
+		client->buff_send.start = (client->buff_send.start + ret_send) % BUFF_SIZE;
+		client->buff_send.len -= ret_send;
 	}
 }
 
@@ -39,10 +69,14 @@ int		read_client(t_client_entity *client)
 			continue;
 		else
 			break ;
-	}
+	}	
 	if (ret == -1)
 		perror("recv()");
-	ret = write_buffer(&client->buff_recv, buff_tmp, ret);
+	else
+		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
+	write(1, "recv => [", 9);
+	write(1, buff_tmp, client->buff_recv.len);
+	write(1, "]\n", 2);
 	free(buff_tmp);
 	return (ret);
 }

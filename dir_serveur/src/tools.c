@@ -66,3 +66,15 @@ char	*get_cmd_trim(char *str)
 	}
 	return strndup(str, len);
 }
+
+t_lexer *init_lexer()
+{
+	t_lexer *lexer_tab;
+
+	lexer_tab = s_malloc(SIZE_LEXER_TAB);
+	lexer_tab[0].name = "avance";
+	lexer_tab[0].func = cmd_avance;
+	lexer_tab[1].name = "droite";
+	lexer_tab[1].func = cmd_droite;
+	return (lexer_tab);
+}

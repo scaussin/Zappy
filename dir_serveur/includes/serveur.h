@@ -27,6 +27,8 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 256
+# define SIZE_LEXER_TAB 2
+# define END "\n"
 
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
@@ -68,6 +70,13 @@ typedef struct 				s_team_hdl
 ** ************************ Client **************************
 */
 
+typedef struct 				s_list_cmds_entity
+{
+	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	char					*param;
+	t_list_cmds_entity		*next;
+}							t_list_cmds_entity;
+
 typedef struct				s_buffer
 {
 	char					buff[BUFF_SIZE];
@@ -82,10 +91,9 @@ typedef struct 				s_client_entity
 	t_team_entity			*team;
 	t_buffer				buff_recv;
 	t_buffer				buff_send;
-	int						nb_pending_cmds;
-	t_list_cmds_entity		*list_pending_cmds;
+	int						size_list_cmds;
+	t_list_cmds_entity		*list_cmds;
 	struct s_client_entity	*next;
-
 }							t_client_entity;
 
 typedef struct 				s_client_hdl
@@ -97,17 +105,12 @@ typedef struct 				s_client_hdl
 /*
 ** ************************ Cmds *****************************
 */
-typedef struct 				s_cmd_entity
+
+typedef struct 				s_lexer
 {
 	char					*name;
-	int						available_slots;
-}							t_cmd_entity;
-
-typedef struct 				s_list_cmds_entity
-{
-	t_cmd_entity			*cmd;
-	t_list_cmds_entity		*next;
-}							t_list_cmds_entity;
+	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+}							t_lexer;
 
 typedef struct 				s_cmd_hdl
 {
@@ -182,6 +185,7 @@ void						replace_nl(char * str);
 void						logs(int type, char *log);
 int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
+t_lexer						*init_lexer();
 
 /*
 ** input_handler.c
@@ -209,12 +213,13 @@ void						close_all_connections(t_serveur *serv);
 /*
 ** communication.c
 */
-void						ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs);
+void						ckeck_all_clients_communication(t_serveur *serv);
 int							read_client(t_client_entity *client);
 t_team_entity				*get_team(t_serveur *serv, char *buff);
 t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
 int							write_buffer(t_buffer *buff, char *to_write, int size);
 char						*read_buffer(t_buffer *buff);
+void						write_client(t_client_entity *client);
 
 /*
 ** client_hdl.c
@@ -231,7 +236,9 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 /*
 ** cmd_clients_manager.c
 */
-void						manage_cmd_clients(t_serveur *serv);
+void						manage_cmd_clients(t_serveur *serv, t_lexer *lexer_tab);
 void						exec_cmd_client(t_client_entity *client);
+void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 
 #endif
