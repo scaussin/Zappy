@@ -25,7 +25,7 @@ void	set_read_fs(t_serveur *serv)
 	}
 }
 
-void	main_loop(t_serveur *serv)
+void	main_loop(t_serveur *serv, t_match_lexer *match_lexer)
 {
 	while (42)
 	{
@@ -47,6 +47,8 @@ void	main_loop(t_serveur *serv)
 
 
 		// Todo : exec les commandes clients
-		manage_cmd_clients(serv);
+		manage_cmd_clients(serv, match_lexer);
+		
+		exec_cmd_client(serv);//time
 	}
 }

@@ -74,9 +74,8 @@ int		read_client(t_client_entity *client)
 		perror("recv()");
 	else
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
-	write(1, "recv => [", 9);
-	write(1, buff_tmp, client->buff_recv.len);
-	write(1, "]\n", 2);
+	printf("recv -> ");
+	print_buff(client->buff_recv);
 	free(buff_tmp);
 	return (ret);
 }

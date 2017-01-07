@@ -67,14 +67,21 @@ char	*get_cmd_trim(char *str)
 	return strndup(str, len);
 }
 
-t_lexer *init_lexer()
+t_match_lexer *init_match_lexer()
 {
-	t_lexer *lexer_tab;
+	t_match_lexer *match_lexer;
 
-	lexer_tab = s_malloc(SIZE_LEXER_TAB);
-	lexer_tab[0].name = "avance";
-	lexer_tab[0].func = cmd_avance;
-	lexer_tab[1].name = "droite";
-	lexer_tab[1].func = cmd_droite;
-	return (lexer_tab);
+	match_lexer = s_malloc(sizeof(t_match_lexer) * SIZE_MATCH_LEXER);
+	match_lexer[0].name = "avance";
+	match_lexer[0].func = cmd_avance;
+	match_lexer[1].name = "droite";
+	match_lexer[1].func = cmd_droite;
+	return (match_lexer);
+}
+
+void	print_buff(t_buffer buff)
+{
+	printf("buff [%s]\n", buff.buff);
+	printf("start: %d len: %d\n", buff.start, buff.len);
+	fflush(stdout);
 }

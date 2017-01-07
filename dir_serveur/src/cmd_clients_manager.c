@@ -1,6 +1,6 @@
 #include "../includes/serveur.h"
 
-void	manage_cmd_clients(t_serveur *serv, t_lexer *lexer_tab)
+void	manage_cmd_clients(t_serveur *serv, t_match_lexer *match_lexer)
 {
 	t_client_entity	*p_client;
 
@@ -8,81 +8,117 @@ void	manage_cmd_clients(t_serveur *serv, t_lexer *lexer_tab)
 	while (p_client)
 	{
 		if (p_client->buff_recv.len > 0)
-			exec_cmd_client(p_client);
+			lexer(p_client, match_lexer);
 		p_client = p_client->next;
 	}
 }
 
-void	exec_cmd_client(t_client_entity *client)
+void	exec_cmd_client(t_serveur *serv)
 {
-	char	*buff;
+	t_client_entity	*p_client;
 
-	buff = read_buffer(&client->buff_recv);
-	printf("exec cmd : %s\n", buff);
-	client->buff_recv.len = 0;
-	free(buff);
+	p_client = serv->client_hdl.list_clients;
+	while (p_client)
+	{
+		if (p_client->list_cmds)
+		{
+			if (p_client->list_cmds->time == -1)//start cmd
+			{
+				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+			}
+			else if (p_client->list_cmds->time == 0)//end cmd
+			{
+				if (p_client->list_cmds->param)
+					free(p_client->list_cmds->param);
+				p_client->list_cmds = p_client->list_cmds->next;
+				p_client->size_list_cmds -= 1;
+			}
+			else// decremente time
+			{
+				p_client->list_cmds->time -= 1;
+			}
+		}
+		p_client = p_client->next;
+	}
 }
 
 //buff_recv to t_list_cmds_entity
-void	lexer(t_client_entity *client, t_lexer *lexer_tab)
+void	lexer(t_client_entity *client, t_match_lexer *match_lexr)
 {
 	char *buff;
 	char *cmd;
+	//char *last_end;
 
-	buff = read_buffer(&client->buff_recv);	
-
-	cmd = strtok(buff, END);
-	while (cmd != NULL)
+	if (client->size_list_cmds >= MAX_LIST_CMD)
 	{
-		match_lexer();
+		client->buff_recv.len = 0;
+		printf("[WARNING] : list cmds full on sock: %d\n", client->sock);
+		return ;
+	}
+	buff = read_buffer(&client->buff_recv);
+	cmd = strtok(buff, END);
+	while (cmd)
+	{
+		match_lexer(match_lexr, client, cmd);
 		cmd = strtok(NULL, END);
 	}
-	//strrchr()
+	//last_end = strrchr(buff, END); last update len, start
 	if (buff)
 		free(buff);
 }
 
-void	match_lexer(t_lexer *lexer_tab, t_client_entity *client, char *cmd)
+void	match_lexer(t_match_lexer *match_lexer, t_client_entity *client, char *cmd)
 {
 	int i = 0;
 
-	while (i < SIZE_LEXER_TAB)
+	while (i < SIZE_MATCH_LEXER)
 	{
-		if (strcmp(lexer_tab[i].name, cmd) == 0)
+		if (strcmp(match_lexer[i].name, cmd) == 0)
 		{
-			add_cmd(client->list_cmds);
+			add_cmd(client, &match_lexer[i], cmd);
+			return ;
 		}
 		i++;
 	}
+	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
 }
 
-void	add_cmd(t_client_entity *client, t_lexer *cmd, char *param)
+void	add_cmd(t_client_entity *client, t_match_lexer *cmd, char *param)
 {
-	t_list_cmds_entity *lst_tmp;
+	t_list_cmds_entity	*last;
+	t_list_cmds_entity	*new_cmd;
 
+	new_cmd = s_malloc(sizeof(t_list_cmds_entity));
+	new_cmd->func = cmd->func;
+	new_cmd->time = -1;
+	new_cmd->param = strdup(param);
+	new_cmd->next = NULL;
 	if (!client->list_cmds)
+		client->list_cmds = new_cmd;
+	else
 	{
-		client->list_cmds = s_malloc(sizeof(t_list_cmds_entity));
-		client->list_cmds->func = cmd->func;
-		client->list_cmds->param = strdup(param);
-		client->list_cmds->next = NULL;
+		last = client->list_cmds;
+		while (last && last->next)
+		{
+			last = last->next;
+		}
+		last->next = new_cmd;
 	}
-
-	lst_tmp = client->list_cmds;
-	while (lst_tmp && lst_tmp->next)
-	{
-		lst_tmp = lst_tmp->next;
-	}
-	lst_tmp->next
 	client->size_list_cmds += 1;
 }
 
 void	cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
 {
+	(void) param;
+	(void) serv;
 	write_buffer(&client_cur->buff_send, "OK\n", 3);
+	client_cur->list_cmds->time = 7;
 }
 
 void	cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
 {
+	(void) param;
+	(void) serv;
 	write_buffer(&client_cur->buff_send, "OK\n", 3);
+	client_cur->list_cmds->time = 7;
 }

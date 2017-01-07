@@ -27,7 +27,8 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 256
-# define SIZE_LEXER_TAB 2
+# define SIZE_MATCH_LEXER 2
+# define MAX_LIST_CMD 10
 # define END "\n"
 
 typedef int                 SOCKET;
@@ -36,6 +37,9 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
+
+typedef struct s_serveur t_serveur;
+typedef struct s_client_entity t_client_entity;
 
 /*
 ** ************************ Network **************************
@@ -74,6 +78,7 @@ typedef struct 				s_list_cmds_entity
 {
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	char					*param;
+	int						time;
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -106,11 +111,11 @@ typedef struct 				s_client_hdl
 ** ************************ Cmds *****************************
 */
 
-typedef struct 				s_lexer
+typedef struct 				s_match_lexer
 {
 	char					*name;
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-}							t_lexer;
+}							t_match_lexer;
 
 typedef struct 				s_cmd_hdl
 {
@@ -185,7 +190,8 @@ void						replace_nl(char * str);
 void						logs(int type, char *log);
 int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
-t_lexer						*init_lexer();
+t_match_lexer				*init_match_lexer();
+void						print_buff(t_buffer buff);
 
 /*
 ** input_handler.c
@@ -200,7 +206,7 @@ int							regex_match(char *string_to_search, char *regex_str);
 /*
 ** serveur_loop.c
 */
-void						main_loop(t_serveur *serv);
+void						main_loop(t_serveur *serv, t_match_lexer *match_lexer);
 
 /*
 ** connection.c
@@ -236,8 +242,11 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 /*
 ** cmd_clients_manager.c
 */
-void						manage_cmd_clients(t_serveur *serv, t_lexer *lexer_tab);
-void						exec_cmd_client(t_client_entity *client);
+void						manage_cmd_clients(t_serveur *serv, t_match_lexer *lexer_tab);
+void						exec_cmd_client(t_serveur *serv);
+void						lexer(t_client_entity *client, t_match_lexer *lexer_tab);
+void						match_lexer(t_match_lexer *lexer_tab, t_client_entity *client, char *cmd);
+void						add_cmd(t_client_entity *client, t_match_lexer *cmd, char *param);
 void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 

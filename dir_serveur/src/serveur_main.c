@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
 	t_serveur	serv;
-	t_lexer *lexer_tab;
+	t_match_lexer *match_lexer;
 
 	// Init data
 	init_data(&serv);
@@ -12,13 +12,13 @@ int main(int argc, char **argv)
 	// Init server
 	init_serveur(&serv);
 
-	lexer_tab = init_lexer();
+	match_lexer = init_match_lexer();
 	// Boucle du jeux
-	main_loop(&serv);
+	main_loop(&serv, match_lexer);
 
 	// Close les connections
 	close_all_connections(&serv);
-	free(lexer_tab);
+	free(match_lexer);
 
 	return (0);
 }
