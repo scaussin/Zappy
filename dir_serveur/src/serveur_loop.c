@@ -50,7 +50,7 @@ void	main_loop(t_serveur *serv)
 			new_client_connection(serv);
 		// Check commands from clients and fill all clients buffers
 		else
-			ckeck_all_clients_communication(serv);
+			check_all_clients_communication(serv);
 
 		// Treat datas from buffers previously filled.
 		manage_clients_input(serv);

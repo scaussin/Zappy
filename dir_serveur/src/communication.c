@@ -7,7 +7,7 @@
 **	Also check if there is something to read on their buffers.
 */
 
-void		ckeck_all_clients_communication(t_serveur *serv)
+void		check_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 	int ret_read;

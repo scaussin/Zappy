@@ -228,7 +228,7 @@ void						close_all_connections(t_serveur *serv);
 /*
 ** communication.c
 */
-void						ckeck_all_clients_communication(t_serveur *serv);
+void						check_all_clients_communication(t_serveur *serv);
 int							read_client(t_client_entity *client);
 t_team_entity				*get_team(t_serveur *serv, char *buff);
 t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
