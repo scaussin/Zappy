@@ -44,4 +44,5 @@ void	init_serveur(t_serveur *serv)
 	// Client infos
 	serv->client_hdl.nb_clients = 0;
 	serv->client_hdl.list_clients = NULL;
+	serv->client_hdl.gfx_client = NULL;
 }

@@ -22,7 +22,7 @@ void new_client_connection(t_serveur *serv)
 
 
 	// Debug Print
-	printf("%s%s%s\n", KGRN, "New client connection process started", KRESET);
+	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);
 
 	// Accept connection
 	if ((c_sock = accept_connection(serv)) < 0)
@@ -30,7 +30,7 @@ void new_client_connection(t_serveur *serv)
 
 	// Create Client
 	client = create_client(c_sock);
-	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
+	write_buffer(&client->buff_send, "BIENVENUE\n", 11);
 	// Welcome comm and Get team
 	/*if (!(team = new_client_communication(serv, client))
 		|| team->available_slots < 1)

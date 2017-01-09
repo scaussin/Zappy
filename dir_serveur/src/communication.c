@@ -1,6 +1,13 @@
 #include "../includes/serveur.h"
 
-void ckeck_all_clients_communication(t_serveur *serv)
+/*
+**	For each client, check if there is something to read on the socket.
+**	If there is, put the content into the client's circular buffer.
+**
+**	Also check if there is something to read on their buffers.
+*/
+
+void		ckeck_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 	int ret_read;
@@ -21,6 +28,7 @@ void ckeck_all_clients_communication(t_serveur *serv)
 	}
 }
 
+
 void		write_client(t_client_entity *client)
 {
 	char	*buff_tmp;
@@ -29,15 +37,13 @@ void		write_client(t_client_entity *client)
 	buff_tmp = read_buffer(&client->buff_send);
 	while (1)
 	{
-		ret_send = send(client->sock, buff_tmp, client->buff_send.len, MSG_DONTWAIT);
+		ret_send = send(client->sock, buff_tmp, client->buff_send.len, MSG_OOB);
 		if (ret_send == -1 && (errno == EAGAIN || errno == EINTR))
 			continue;
 		else
 			break ;
 	}
-	write(1, "send => [", 9);
-	write(1, buff_tmp, client->buff_send.len);
-	write(1, "]\n", 2);
+	print_send(client->sock, buff_tmp, client->buff_send.len);
 	if (buff_tmp)
 		free(buff_tmp);
 	if (ret_send == -1)
@@ -74,8 +80,7 @@ int		read_client(t_client_entity *client)
 		perror("recv()");
 	else
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
-	printf("recv -> ");
-	print_buff(client->buff_recv);
+	print_receive(client->sock, client->buff_recv.buff, client->buff_recv.len);
 	free(buff_tmp);
 	return (ret);
 }

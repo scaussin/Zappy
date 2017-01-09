@@ -6,6 +6,10 @@ void	exit_error(char *error_log)
 	exit(errno);
 }
 
+/*
+**	Safe mallocating.
+*/
+
 void	*s_malloc(size_t size)
 {
 	void	*ret;
@@ -41,6 +45,10 @@ void	replace_nl(char *str)
 	printf("%s%s%s\n", type_str, log, KRESET);
 }*/
 
+/*
+**	A command finishes by '\n'. This function returns the length until that '\n'
+*/
+
 int		get_len_cmd(char *str)
 {
 	int		len;
@@ -67,21 +75,28 @@ char	*get_cmd_trim(char *str)
 	return strndup(str, len);
 }
 
-t_match_lexer *init_match_lexer()
-{
-	t_match_lexer *match_lexer;
-
-	match_lexer = s_malloc(sizeof(t_match_lexer) * SIZE_MATCH_LEXER);
-	match_lexer[0].name = "avance";
-	match_lexer[0].func = cmd_avance;
-	match_lexer[1].name = "droite";
-	match_lexer[1].func = cmd_droite;
-	return (match_lexer);
-}
-
 void	print_buff(t_buffer buff)
 {
 	printf("buff [%s]\n", buff.buff);
 	printf("start: %d len: %d\n", buff.start, buff.len);
 	fflush(stdout);
 }
+
+/*
+**	Display functions for server prints.
+*/
+
+void print_send(int sock, char *str, int len)
+{
+	printf(KYEL " Sending to sock %d: " KRESET, sock);
+	replace_nl(str);
+	printf("[%*s]\n", len, str);
+}
+
+void print_receive(int sock, char *str, int len)
+{
+	printf(KBLU " Receiving from sock %d: " KRESET, sock);
+	replace_nl(str);
+	printf("[%*s]\n", len, str);
+}
+

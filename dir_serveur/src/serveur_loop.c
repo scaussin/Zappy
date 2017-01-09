@@ -1,5 +1,6 @@
 
 #include "../includes/serveur.h"
+
 void	set_read_fs(t_serveur *serv)
 {
 	t_client_entity	*p_client;
@@ -25,14 +26,20 @@ void	set_read_fs(t_serveur *serv)
 	}
 }
 
-void	main_loop(t_serveur *serv, t_match_lexer *match_lexer)
+/*
+** Central function for server.
+*/
+
+void	main_loop(t_serveur *serv)
 {
+	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
 		set_read_fs(serv);
 
 		// BOUYAKA SELECT IS HERE !!!!!!!!!!
-		if (select(serv->network.sock_max + 1, serv->network.read_fs, serv->network.write_fs, NULL, NULL) < 0)
+		if (select(serv->network.sock_max + 1,
+				serv->network.read_fs, serv->network.write_fs, NULL, NULL) < 0)
 			exit_error("select()");
 
 		// Exit when enter presse
@@ -41,14 +48,43 @@ void	main_loop(t_serveur *serv, t_match_lexer *match_lexer)
 		// Connect new client
 		else if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
 			new_client_connection(serv);
-		// Check commands from clients
+		// Check commands from clients and fill all clients buffers
 		else
 			ckeck_all_clients_communication(serv);
 
-
-		// Todo : exec les commandes clients
-		manage_cmd_clients(serv, match_lexer);
-		
-		exec_cmd_client(serv);//time
+		// Treat datas from buffers previously filled.
+		manage_clients_input(serv);
+		exec_cmd_client(serv); // time
 	}
+}
+
+/*
+**	Redirecting input checking toward corresponding function.
+**	If the client hasnt given its team name, he is not in game,
+**	and his input check is different.
+*/
+
+void manage_clients_input(t_serveur *serv)
+{
+	t_client_entity	*p_client;
+
+	p_client = serv->client_hdl.list_clients;
+	while (p_client)
+	{
+		if (p_client->buff_recv.len > 0) // is there something to read ?
+		{
+			if (!p_client->is_in_game && !p_client->is_gfx)
+			{
+				// check if received TEAM NAME or GRAPHIC for client setting.
+				client_recognition(serv, p_client);
+			}
+			else if (p_client->is_in_game && !p_client->is_gfx)
+			{
+				// client is in game, everything he sends is cmds.
+				lex_and_parse_cmds(p_client, serv->cmd_match_table);
+			}
+		}
+		p_client = p_client->next;
+	}
+
 }

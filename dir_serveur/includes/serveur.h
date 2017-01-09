@@ -27,7 +27,7 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 256
-# define SIZE_MATCH_LEXER 2
+# define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
 
@@ -91,6 +91,8 @@ typedef struct				s_buffer
 
 typedef struct 				s_client_entity
 {
+	int						is_in_game;
+	int						is_gfx;
 	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
@@ -105,17 +107,18 @@ typedef struct 				s_client_hdl
 {
 	int						nb_clients;
 	t_client_entity			*list_clients;
+	t_client_entity			*gfx_client;
 }							t_client_hdl;
 
 /*
 ** ************************ Cmds *****************************
 */
 
-typedef struct 				s_match_lexer
+typedef struct 				s_cmd_match
 {
 	char					*name;
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-}							t_match_lexer;
+}							t_cmd_match;
 
 typedef struct 				s_cmd_hdl
 {
@@ -172,6 +175,8 @@ typedef struct				s_serveur
 	t_client_hdl			client_hdl;
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
+
+	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
 }							t_serveur;
 
 /*
@@ -190,8 +195,10 @@ void						replace_nl(char * str);
 void						logs(int type, char *log);
 int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
-t_match_lexer				*init_match_lexer();
+
 void						print_buff(t_buffer buff);
+void						print_send(int sock, char *str, int len);
+void						print_receive(int sock, char *str, int len);
 
 /*
 ** input_handler.c
@@ -206,7 +213,9 @@ int							regex_match(char *string_to_search, char *regex_str);
 /*
 ** serveur_loop.c
 */
-void						main_loop(t_serveur *serv, t_match_lexer *match_lexer);
+void						set_read_fs(t_serveur *serv);
+void						main_loop(t_serveur *serv);
+void						manage_clients_input(t_serveur *serv);
 
 /*
 ** connection.c
@@ -235,6 +244,12 @@ void						add_client(t_serveur *serv, t_client_entity *client);
 void						remove_client(t_serveur *serv, t_client_entity *client);
 
 /*
+**	client_recognition.c
+*/
+
+void						client_recognition(t_serveur *serv, t_client_entity *client);
+
+/*
 ** team_hdl.c
 */
 t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
@@ -242,11 +257,18 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 /*
 ** cmd_clients_manager.c
 */
-void						manage_cmd_clients(t_serveur *serv, t_match_lexer *lexer_tab);
+void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
+
+void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
+void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
+void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
+
+//		client command execution.
 void						exec_cmd_client(t_serveur *serv);
-void						lexer(t_client_entity *client, t_match_lexer *lexer_tab);
-void						match_lexer(t_match_lexer *lexer_tab, t_client_entity *client, char *cmd);
-void						add_cmd(t_client_entity *client, t_match_lexer *cmd, char *param);
+
+/*
+** src/cmds_functions/
+*/
 void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 
