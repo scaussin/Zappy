@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
 	// Close les connections / free allocated memory.
 	close_all_connections(&serv);
-	free(serv.cmd_match_table);
+	free(serv.cmd_hdl.cmd_match_table);
 
 	return (0);
 }

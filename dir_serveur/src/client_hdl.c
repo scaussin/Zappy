@@ -24,6 +24,10 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	t_client_entity	*current;
 	t_client_entity	*prev;
 
+	if (client->team)
+	{
+		client->team->available_slots += 1;
+	}
 	if (serv->client_hdl.list_clients == client)
 	{
 		serv->client_hdl.list_clients = client->next;

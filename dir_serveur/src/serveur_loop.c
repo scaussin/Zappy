@@ -76,12 +76,13 @@ void manage_clients_input(t_serveur *serv)
 			if (!p_client->is_in_game && !p_client->is_gfx)
 			{
 				// check if received TEAM NAME or GRAPHIC for client setting.
-				client_recognition(serv, p_client);
+				if ((client_recognition(serv, p_client)) == -1)
+					return ;
 			}
 			else if (p_client->is_in_game && !p_client->is_gfx)
 			{
-				// client is in game, everything he sends is cmds.
-				lex_and_parse_cmds(p_client, serv->cmd_match_table);
+				// client is in game and not gfx, everything he sends is cmds.
+				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
 			}
 		}
 		p_client = p_client->next;

@@ -6,7 +6,7 @@
 **	If received GRAPHIC, client is the gfx.
 */
 
-void	client_recognition(t_serveur *serv, t_client_entity *client)
+int		client_recognition(t_serveur *serv, t_client_entity *client)
 {
 	char			*buff;
 	char			*str_to_send;
@@ -25,30 +25,26 @@ void	client_recognition(t_serveur *serv, t_client_entity *client)
 				write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
 				free(str_to_send);
 				printf(KGRN "GFX client recognized\n" KRESET);
+				return (0);
 			}
 			else
 			{
 				printf(KRED "GFX client already set\n" KRESET);
-				// TODO: serveur segfault here. idem en dessous.
-				remove_client(serv, client); // ???
-				disconnect_client(client->sock); // ???
-				client = serv->client_hdl.list_clients; // set ptr back to beginning.
-				return ;
+				disconnect_client(client->sock);
+				remove_client(serv, client);
+				return (-1);
 			}
 		}
 		else
 		{
-			
 			if (!(team = get_team_by_name(serv, buff)))
 			{
-				// TODO: server segfault ici lorsque disconnect player.
 				printf(KRED "Get_team() failed\n" KRESET);
 				write_buffer(&client->buff_send, "UNKNOWN TEAM\n", 10);
-				remove_client(serv, client); // ???
-				disconnect_client(client->sock); // ???
-				client = serv->client_hdl.list_clients; // set ptr back to beginning.
+				disconnect_client(client->sock);
+				remove_client(serv, client);
 				free(buff);
-				return ;
+				return (-1);
 			}
 			// sending first datas; <nb-client>\n<x><y>\n
 			client->is_in_game = 1;
@@ -60,6 +56,8 @@ void	client_recognition(t_serveur *serv, t_client_entity *client)
 
 			// one slot now taken in team.
 			team->available_slots -= 1;
+			return (0);
 		}
 	}
+	return (0);
 }

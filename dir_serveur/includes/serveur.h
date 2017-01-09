@@ -123,7 +123,7 @@ typedef struct 				s_cmd_match
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
-	t_client_entity			*array_cmds;
+	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
 }							t_cmd_hdl;
 
 /*
@@ -176,7 +176,7 @@ typedef struct				s_serveur
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
 
-	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
+	
 }							t_serveur;
 
 /*
@@ -247,7 +247,7 @@ void						remove_client(t_serveur *serv, t_client_entity *client);
 **	client_recognition.c
 */
 
-void						client_recognition(t_serveur *serv, t_client_entity *client);
+int						client_recognition(t_serveur *serv, t_client_entity *client);
 
 /*
 ** team_hdl.c
