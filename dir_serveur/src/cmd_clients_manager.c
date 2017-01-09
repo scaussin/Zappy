@@ -6,9 +6,7 @@
 
 void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 {
-	char *buff;
 	char *cmd;
-	//char *last_end;
 
 	if (client->size_list_cmds >= MAX_LIST_CMD)
 	{
@@ -16,16 +14,11 @@ void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 		printf("[WARNING] : list cmds full on sock: %d\n", client->sock);
 		return ;
 	}
-	buff = read_buffer(&client->buff_recv);
-	cmd = strtok(buff, END); // -> Lexer.
-	while (cmd)
+	while ((cmd = get_first_cmd(&client->buff_recv)))
 	{
 		check_cmd_match(cmd_match_table, client, cmd); // -> Parser.
-		cmd = strtok(NULL, END);
+		free(cmd);
 	}
-	//last_end = strrchr(buff, END); last update len, start
-	if (buff)
-		free(buff);
 }
 
 void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)

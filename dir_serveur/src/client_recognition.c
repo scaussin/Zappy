@@ -8,13 +8,14 @@
 
 int		client_recognition(t_serveur *serv, t_client_entity *client)
 {
-	char			*buff;
+	char			*cmd;
 	char			*str_to_send;
 	t_team_entity	*team;
 
-	if ((buff = read_buffer(&client->buff_recv)))
+	if ((cmd = get_first_cmd(&client->buff_recv)))
 	{
-		if (strcmp(buff, "GRAPHIC\n") == 0)
+		printf(KGRN "okok\n" KRESET);
+		if (strcmp(cmd, "GRAPHIC\n") == 0)
 		{
 			if (!serv->client_hdl.gfx_client)
 			{
@@ -37,27 +38,27 @@ int		client_recognition(t_serveur *serv, t_client_entity *client)
 		}
 		else
 		{
-			if (!(team = get_team_by_name(serv, buff)))
+			if (!(team = get_team_by_name(serv, cmd)))
 			{
 				printf(KRED "Get_team() failed\n" KRESET);
-				write_buffer(&client->buff_send, "UNKNOWN TEAM\n", 10);
+				write_buffer(&client->buff_send, "UNKNOWN TEAM\n", 13);
 				disconnect_client(client->sock);
 				remove_client(serv, client);
-				free(buff);
 				return (-1);
 			}
 			// sending first datas; <nb-client>\n<x><y>\n
 			client->is_in_game = 1;
 			client->team = team;
-			client->buff_recv.len = 0;
 			printf(KGRN "Player client recognized\n" KRESET);
 			asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots, serv->world_hdl.map_x, serv->world_hdl.map_y);
 			write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
-
+			free(str_to_send);
 			// one slot now taken in team.
 			team->available_slots -= 1;
 			return (0);
-		}
+		}	
+		free(cmd);
 	}
+	printf(KGRN "elseokok\n" KRESET);
 	return (0);
 }

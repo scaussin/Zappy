@@ -87,7 +87,7 @@ int		read_client(t_client_entity *client)
 		perror("recv()");
 	else
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
-	print_receive(client->sock, client->buff_recv.buff, client->buff_recv.len);
+	print_receive(client->sock, buff_tmp, client->buff_recv.len);
 	free(buff_tmp);
 	return (ret);
 }
@@ -143,3 +143,28 @@ char	*read_buffer(t_buffer *buff)
 	return (ret_buff);
 }
 
+/*
+**	Read buffer until first \n and return cmd. update start and len
+**	return address must be free
+*/
+
+char	*get_first_cmd(t_buffer *buffer)
+{
+	char *buff;
+	char *end;
+	int len_cmd;
+
+	buff = read_buffer(buffer);
+	printf("buff:%s", buff);
+	end = strstr(buff, END);
+	if (end)
+	{
+		printf("end:\\%s", end);
+		end[1] = 0;
+		len_cmd = (end - buff) + LEN_END;
+		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;
+		buffer->len -= len_cmd;
+		return (buff);
+	}
+	return (NULL);
+}

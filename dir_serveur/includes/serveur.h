@@ -30,6 +30,7 @@
 # define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
+# define LEN_END 1
 
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
@@ -235,6 +236,7 @@ t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *cl
 int							write_buffer(t_buffer *buff, char *to_write, int size);
 char						*read_buffer(t_buffer *buff);
 void						write_client(t_client_entity *client);
+char						*get_first_cmd(t_buffer *buffer);
 
 /*
 ** client_hdl.c

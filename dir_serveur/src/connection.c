@@ -19,7 +19,6 @@ void new_client_connection(t_serveur *serv)
 {
 	SOCKET			c_sock;
 	t_client_entity	*client;
-	char			*bienvenue_msg;
 
 	// Debug Print
 	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);
@@ -32,8 +31,7 @@ void new_client_connection(t_serveur *serv)
 	client = create_client(c_sock);
 
 	// Sending BIENVENUE\n message.
-	asprintf(&bienvenue_msg, "BIENVENUE\n");
-	write_buffer(&client->buff_send, bienvenue_msg, strlen(bienvenue_msg));
+	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
 
 	// Set network Info
 	serv->network.sock_max = c_sock > serv->network.sock_max ? c_sock : serv->network.sock_max;
