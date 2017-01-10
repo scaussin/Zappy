@@ -47,7 +47,7 @@ void		disconnect_flagged_clients(t_serveur *serv)
 			remove_client(serv, p_client);
 			p_client = serv->client_hdl.list_clients;
 		}
-		if (p_client) // if no client left, segfault.
+		if (p_client) // protection against solo client disconnecting.
 			p_client = p_client->next;
 	}
 }
