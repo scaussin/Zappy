@@ -9,8 +9,8 @@
 
 void		check_all_clients_communication(t_serveur *serv)
 {
-	t_client_entity	*p_client;
-	int ret_read;
+	t_client_entity		*p_client;
+	int					ret_read;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
@@ -25,6 +25,30 @@ void		check_all_clients_communication(t_serveur *serv)
 		if (FD_ISSET(p_client->sock, serv->network.write_fs))
 			write_client(p_client);
 		p_client = p_client->next;
+	}
+}
+
+/*
+**	Will check if a client needs to be disconnected and removed.
+**	If yes, we start the loop again to not miss any other 
+**	players disconnecting.
+*/
+
+void		disconnect_flagged_clients(t_serveur *serv)
+{
+	t_client_entity		*p_client;
+
+	p_client = serv->client_hdl.list_clients;
+	while (p_client)
+	{
+		if (p_client->is_disconnecting == 1)
+		{
+			disconnect_client(p_client->sock);
+			remove_client(serv, p_client);
+			p_client = serv->client_hdl.list_clients;
+		}
+		if (p_client) // if no client left, segfault.
+			p_client = p_client->next;
 	}
 }
 
@@ -62,7 +86,7 @@ void		write_client(t_client_entity *client)
 **	Read the client socket with recv if select() caught modifications.
 */
 
-int		read_client(t_client_entity *client)
+int			read_client(t_client_entity *client)
 {
 	int		ret;
 	int		size_read;
@@ -96,7 +120,7 @@ int		read_client(t_client_entity *client)
 **	Write into an actual buffer -> preparing for the select() pass.
 */
 
-int		write_buffer(t_buffer *buff, char *to_write, int size)
+int			write_buffer(t_buffer *buff, char *to_write, int size)
 {
 	int		i;
 
@@ -123,7 +147,7 @@ int		write_buffer(t_buffer *buff, char *to_write, int size)
 **	Else, it will return NULL.
 */
 
-char	*read_buffer(t_buffer *buff)
+char		*read_buffer(t_buffer *buff)
 {
 	char	*ret_buff;
 	int		i;
@@ -144,22 +168,22 @@ char	*read_buffer(t_buffer *buff)
 }
 
 /*
-**	Read buffer until first \n and return cmd. update start and len
-**	return address must be free
+**	Read buffer until first \n and return cmd. Updates 'start' and 'len' variables.
+**	Returned pointer must be freed.
 */
 
-char	*get_first_cmd(t_buffer *buffer)
+char		*get_first_cmd(t_buffer *buffer)
 {
 	char *buff;
 	char *end;
 	int len_cmd;
 
 	buff = read_buffer(buffer);
-	printf("buff:%s", buff);
+	//printf("buff:%s", buff);
 	end = strstr(buff, END);
 	if (end)
 	{
-		printf("end:\\%s", end);
+		//printf("end:\\%s", end);
 		end[1] = 0;
 		len_cmd = (end - buff) + LEN_END;
 		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;

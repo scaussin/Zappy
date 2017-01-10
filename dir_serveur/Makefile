@@ -10,7 +10,7 @@ src/cmd_clients_init.c \
 src/cmd_clients_manager.c \
 src/input_handler.c \
 src/client_hdl.c \
-src/client_recognition.c \
+src/client_authentification.c \
 src/team_hdl.c \
 src/serveur_data.c \
 src/serveur_loop.c \

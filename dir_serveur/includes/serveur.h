@@ -92,8 +92,12 @@ typedef struct				s_buffer
 
 typedef struct 				s_client_entity
 {
+	// Status flags
 	int						is_in_game;
 	int						is_gfx;
+	int						is_disconnecting;
+
+	// Client variables
 	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
@@ -101,6 +105,9 @@ typedef struct 				s_client_entity
 	t_buffer				buff_send;
 	int						size_list_cmds;
 	t_list_cmds_entity		*list_cmds;
+
+
+	// link to next
 	struct s_client_entity	*next;
 }							t_client_entity;
 
@@ -230,6 +237,7 @@ void						close_all_connections(t_serveur *serv);
 ** communication.c
 */
 void						check_all_clients_communication(t_serveur *serv);
+void						disconnect_flagged_clients(t_serveur *serv);
 int							read_client(t_client_entity *client);
 t_team_entity				*get_team(t_serveur *serv, char *buff);
 t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
@@ -246,10 +254,13 @@ void						add_client(t_serveur *serv, t_client_entity *client);
 void						remove_client(t_serveur *serv, t_client_entity *client);
 
 /*
-**	client_recognition.c
+**	client_authentification.c
 */
 
-int						client_recognition(t_serveur *serv, t_client_entity *client);
+void							client_authentification(t_serveur *serv, t_client_entity *client);
+void							client_authenticate_gfx(t_serveur *serv, t_client_entity *client);
+void							client_authenticate_player(t_serveur *serv, t_client_entity *client, char *cmd);
+
 
 /*
 ** team_hdl.c

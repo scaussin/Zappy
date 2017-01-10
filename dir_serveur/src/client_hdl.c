@@ -43,7 +43,7 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	}
 	if (!current || current != client)
 	{
-		perror("remove_client() : client not found");
+		perror("remove_client(): client not found");
 		return ;
 	}
 	prev->next = client->next;

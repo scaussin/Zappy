@@ -17,8 +17,8 @@ SOCKET	accept_connection(t_serveur *serv)
 
 void new_client_connection(t_serveur *serv)
 {
-	SOCKET			c_sock;
-	t_client_entity	*client;
+	SOCKET				c_sock;
+	t_client_entity		*client;
 
 	// Debug Print
 	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);

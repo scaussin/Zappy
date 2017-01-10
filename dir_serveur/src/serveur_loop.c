@@ -15,6 +15,9 @@ void	set_read_fs(t_serveur *serv)
 	// Surveille le endpoint pour new connection
 	FD_SET(serv->network.sock_serveur, serv->network.read_fs);
 
+	// Si un ou plusieurs clients sont marques pour deconnection.
+	disconnect_flagged_clients(serv);
+
 	// Surveille tous les client
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
@@ -76,8 +79,9 @@ void manage_clients_input(t_serveur *serv)
 			if (!p_client->is_in_game && !p_client->is_gfx)
 			{
 				// check if received TEAM NAME or GRAPHIC for client setting.
-				if ((client_recognition(serv, p_client)) == -1)
-					return ;
+				client_authentification(serv, p_client);
+				// note : if client is invalid, he will be marked for disconnection
+				// and get disconnected at next server turn.
 			}
 			else if (p_client->is_in_game && !p_client->is_gfx)
 			{
