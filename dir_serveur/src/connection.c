@@ -15,42 +15,25 @@ SOCKET	accept_connection(t_serveur *serv)
 	return (c_sock);
 }
 
-
-
 void new_client_connection(t_serveur *serv)
 {
-	SOCKET			c_sock;
-	t_client_entity	*client;
-	t_team_entity	*team;
-	char			*buff;
+	SOCKET				c_sock;
+	t_client_entity		*client;
 
 	// Debug Print
-	buff = (char *)s_malloc(sizeof(char) * BUFF_SIZE);
-	sprintf(buff, "New client connection process started");
-	printf("%s%s%s\n", KGRN, buff, KRESET);
+	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);
 
 	// Accept connection
 	if ((c_sock = accept_connection(serv)) < 0)
-	{
-		free(buff);
 		return ;
-	}
 
-	// Create Client
+	// Create Client and send "BIENVENU\n"
 	client = create_client(c_sock);
 
-	// Welcome comm and Get team
-	if (!(team = new_client_communication(serv, client))
-		|| team->available_slots < 1)
-	{
-		disconnect_client(c_sock);
-		free(buff);
-		return;
-	}
+	// Sending BIENVENUE\n message.
+	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
 
-	// Set team and network Info
-	team->available_slots -= 1;
-	client->team = team;
+	// Set network Info
 	serv->network.sock_max = c_sock > serv->network.sock_max ? c_sock : serv->network.sock_max;
 
 	printf("sock_max: %d\n", serv->network.sock_max);
@@ -58,10 +41,7 @@ void new_client_connection(t_serveur *serv)
 	add_client(serv, client);
 
 	// Debug Print
-	memset((void *)buff, 0, BUFF_SIZE);
-	sprintf(buff, "New client connected, sock : %d", client->sock);
-	printf("%s%s%s\n", KGRN, buff, KRESET);
-	free(buff);
+	printf("%sNew client connected, sock : %d%s\n", KGRN, client->sock, KRESET);
 }
 
 void disconnect_client(SOCKET c_sock)

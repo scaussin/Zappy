@@ -7,10 +7,18 @@ t_client_entity	*create_client(SOCKET sock)
 	new_client = (t_client_entity *)s_malloc(sizeof(t_client_entity));
 	memset((void *)new_client, 0, sizeof(t_client_entity));
 	new_client->sock = sock;
-	new_client->player.level = 3;
+
+	// set client program status variables.
+	new_client->is_in_game = 0;
+	new_client->is_gfx = 0;
+	new_client->level = 0;
+
+	// set player game starting datas
+	new_client->player.level = 0;
 	new_client->player.pos.x = 5;
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;
+
 	return (new_client);
 }
 
@@ -25,6 +33,10 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	t_client_entity	*current;
 	t_client_entity	*prev;
 
+	if (client->team)
+	{
+		client->team->available_slots += 1;
+	}
 	if (serv->client_hdl.list_clients == client)
 	{
 		serv->client_hdl.list_clients = client->next;
@@ -40,7 +52,7 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	}
 	if (!current || current != client)
 	{
-		perror("remove_client() : client not found");
+		perror("remove_client(): client not found");
 		return ;
 	}
 	prev->next = client->next;

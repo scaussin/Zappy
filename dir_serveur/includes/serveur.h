@@ -27,6 +27,10 @@
 # define KRESET "\x1B[0m"
 
 # define BUFF_SIZE 256
+# define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
+# define MAX_LIST_CMD 10
+# define END "\n"
+# define LEN_END 1
 
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
@@ -41,7 +45,6 @@ typedef enum				e_dir
 	RIGHT,
 	DOWN,
 	LEFT
-
 }							t_dir;
 
 typedef struct				s_pos
@@ -49,6 +52,10 @@ typedef struct				s_pos
 	int						x;
 	int						y;
 }							t_pos;
+
+typedef struct s_serveur t_serveur;
+typedef struct s_client_entity t_client_entity;
+
 
 /*
 ** ************************ Network **************************
@@ -59,6 +66,7 @@ typedef struct 				s_network_data
 	SOCKET					sock_serveur;
 	SOCKET					sock_max;
 	fd_set					*read_fs;
+	fd_set					*write_fs;
 	int						max_clients;
 }							t_network_data;
 
@@ -81,6 +89,8 @@ typedef struct 				s_team_hdl
 /*
 ** ************************ Client **************************
 */
+
+// Player belonging to the client.
 typedef struct				s_player
 {
 	int						level;
@@ -88,45 +98,68 @@ typedef struct				s_player
 	t_dir					dir;
 }							t_player;
 
+
+typedef struct 				s_list_cmds_entity
+{
+	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	char					*param;
+	int						time;
+	t_list_cmds_entity		*next;
+}							t_list_cmds_entity;
+
+typedef struct				s_buffer
+{
+	char					buff[BUFF_SIZE];
+	int						start;
+	int						len;
+}							t_buffer;
+
 typedef struct 				s_client_entity
 {
+	// Status flags
+	int						is_in_game;
+	int						is_gfx;
+	int						is_disconnecting;
+
+	// Client program variables
+	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
-	char					buff[BUFF_SIZE];
-	int						start_buff;
-	int						len_buff;
-	int						nb_pending_cmds;
-	t_list_cmds_entity		*list_pending_cmds;
-	t_player				player;
-	struct s_client_entity	*next;
 
+	t_buffer				buff_recv;
+	t_buffer				buff_send;
+	int						size_list_cmds;
+	t_list_cmds_entity		*list_cmds;
+
+	// Client Player variables.
+	t_player				player;
+
+	// link to next
+	struct s_client_entity	*next;
 }							t_client_entity;
 
 typedef struct 				s_client_hdl
 {
 	int						nb_clients;
 	t_client_entity			*list_clients;
+	t_client_entity			*gfx_client;
 }							t_client_hdl;
 
 /*
 ** ************************ Cmds *****************************
 */
-typedef struct 				s_cmd_entity
+
+typedef struct 				s_cmd_match
 {
 	char					*name;
-	int						available_slots;
-}							t_cmd_entity;
-
-typedef struct 				s_list_cmds_entity
-{
-	t_cmd_entity			*cmd;
-	t_list_cmds_entity		*next;
-}							t_list_cmds_entity;
+	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+}							t_cmd_match;
 
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
-	t_cmd_entity			*array_cmds;
+	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
+
 }							t_cmd_hdl;
 
 /*
@@ -178,6 +211,8 @@ typedef struct				s_serveur
 	t_client_hdl			client_hdl;
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
+
+	
 }							t_serveur;
 
 /*
@@ -198,6 +233,10 @@ int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
 int							modulo(int a, int b);
 
+void						print_buff(t_buffer buff);
+void						print_send(int sock, char *str, int len);
+void						print_receive(int sock, char *str, int len);
+
 /*
 ** input_handler.c
 */
@@ -211,7 +250,9 @@ int							regex_match(char *string_to_search, char *regex_str);
 /*
 ** serveur_loop.c
 */
+void						set_read_fs(t_serveur *serv);
 void						main_loop(t_serveur *serv);
+void						manage_clients_input(t_serveur *serv);
 
 /*
 ** connection.c
@@ -224,10 +265,15 @@ void						close_all_connections(t_serveur *serv);
 /*
 ** communication.c
 */
-void						ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs);
+void						check_all_clients_communication(t_serveur *serv);
+void						disconnect_flagged_clients(t_serveur *serv);
 int							read_client(t_client_entity *client);
 t_team_entity				*get_team(t_serveur *serv, char *buff);
 t_team_entity				*new_client_communication(t_serveur * serv, t_client_entity *client);
+int							write_buffer(t_buffer *buff, char *to_write, int size);
+char						*read_buffer(t_buffer *buff);
+void						write_client(t_client_entity *client);
+char						*get_first_cmd(t_buffer *buffer);
 
 /*
 ** client_hdl.c
@@ -237,22 +283,42 @@ void						add_client(t_serveur *serv, t_client_entity *client);
 void						remove_client(t_serveur *serv, t_client_entity *client);
 
 /*
+**	client_authentification.c
+*/
+
+void						client_authentification(t_serveur *serv, t_client_entity *client);
+void						client_authenticate_gfx(t_serveur *serv, t_client_entity *client);
+void						client_authenticate_player(t_serveur *serv, t_client_entity *client, char *cmd);
+
+
+/*
 ** team_hdl.c
 */
+
 t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 
 /*
 ** cmd_clients_manager.c
 */
-void						manage_cmd_clients(t_serveur *serv);
-void						get_cmd_client(t_serveur *serv, t_client_entity *client);
+
+void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
+
+void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
+void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
+void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
+
+// client command execution.
+void						exec_cmd_client(t_serveur *serv);
 
 /*
-** see.c
+** src/cmds_functions/
 */
-void	cmd_see(t_serveur *serv, t_client_entity *client);
-void	get_see_case_positions(t_serveur *serv, t_player *player);
-int		get_nb_case(int level);
-void	fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+
+void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						cmd_voir(t_serveur *serv, t_client_entity *client);
+void							get_voir_case_positions(t_serveur *serv, t_player *player);
+int								get_nb_case(int level);
+void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 
 #endif

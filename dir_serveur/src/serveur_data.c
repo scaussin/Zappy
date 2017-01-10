@@ -39,10 +39,10 @@ void	init_serveur(t_serveur *serv)
 	serv->network.sock_serveur = sock;
 	serv->network.sock_max = sock;
 	serv->network.read_fs = (fd_set *)s_malloc((sizeof(fd_set)));
+	serv->network.write_fs = (fd_set *)s_malloc((sizeof(fd_set)));
 
 	// Client infos
 	serv->client_hdl.nb_clients = 0;
 	serv->client_hdl.list_clients = NULL;
-
-	// Gamme infos
+	serv->client_hdl.gfx_client = NULL;
 }

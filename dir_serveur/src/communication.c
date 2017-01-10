@@ -1,121 +1,194 @@
 #include "../includes/serveur.h"
 
-void ckeck_all_clients_communication(t_serveur *serv, fd_set *read_fs)
-{
-	t_client_entity	*p_client;
-	int ret_read;
+/*
+**	For each client, check if there is something to read on the socket.
+**	If there is, put the content into the client's circular buffer.
+**
+**	Also check if there is something to read on their buffers.
+*/
 
-	//printf("start_checked");
+void		check_all_clients_communication(t_serveur *serv)
+{
+	t_client_entity		*p_client;
+	int					ret_read;
+
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (FD_ISSET(p_client->sock, read_fs)
+		if (FD_ISSET(p_client->sock, serv->network.read_fs)
 			&& !(ret_read = read_client(p_client)))
 		{
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			return ;
 		}
+		if (FD_ISSET(p_client->sock, serv->network.write_fs))
+			write_client(p_client);
 		p_client = p_client->next;
 	}
 }
 
-int   read_client(t_client_entity*client)
-{
-	int   ret;
-	int   i_loop;
-	int   i_buff;
-	char  buffer[BUFF_SIZE + 1];
+/*
+**	Will check if a client needs to be disconnected and removed.
+**	If yes, we start the loop again to not miss any other 
+**	players disconnecting.
+*/
 
-	ret = 0;
-	memset(buffer, 0, BUFF_SIZE + 1);
-	if ((ret = recv(client->sock, buffer, BUFF_SIZE, 0)) < 0)
+void		disconnect_flagged_clients(t_serveur *serv)
+{
+	t_client_entity		*p_client;
+
+	p_client = serv->client_hdl.list_clients;
+	while (p_client)
 	{
-		perror("recv()");
-		ret = 0;
+		if (p_client->is_disconnecting == 1)
+		{
+			disconnect_client(p_client->sock);
+			remove_client(serv, p_client);
+			p_client = serv->client_hdl.list_clients;
+		}
+		if (p_client) // protection against solo client disconnecting.
+			p_client = p_client->next;
 	}
-	else if (!ret)
+}
+
+/*
+**	Write on client socket with recv if select() caught modifications.
+*/
+
+void		write_client(t_client_entity *client)
+{
+	char	*buff_tmp;
+	int		ret_send;
+
+	buff_tmp = read_buffer(&client->buff_send);
+	while (1)
+	{
+		ret_send = send(client->sock, buff_tmp, client->buff_send.len, 0);
+		if (ret_send == -1 && (errno == EAGAIN || errno == EINTR))
+			continue;
+		else
+			break ;
+	}
+	print_send(client->sock, buff_tmp, client->buff_send.len);
+	if (buff_tmp)
+		free(buff_tmp);
+	if (ret_send == -1)
+		perror("send()");
+	if (ret_send > 0)
+	{
+		client->buff_send.start = (client->buff_send.start + ret_send) % BUFF_SIZE;
+		client->buff_send.len -= ret_send;
+	}
+}
+
+/*
+**	Read the client socket with recv if select() caught modifications.
+*/
+
+int			read_client(t_client_entity *client)
+{
+	int		ret;
+	int		size_read;
+	char	*buff_tmp;
+
+	size_read = BUFF_SIZE - client->buff_recv.len;
+	if (size_read == 0)
+	{
+		perror("read buffer full");
 		return (0);
-
-	buffer[ret] = '\0';
-	printf("Recu : %s\n", buffer);
-
-	i_loop = 0;
-	i_buff = client->start_buff;
-	while (i_loop < ret)
-	{
-		client->buff[i_buff % BUFF_SIZE] = buffer[i_loop];
-		i_loop++;
-		i_buff++;
 	}
-	client->len_buff += ret;
-	if (client->len_buff > BUFF_SIZE)
-		client->len_buff = BUFF_SIZE;
-
-	return(ret);
+	buff_tmp = s_malloc(size_read);
+	while (1)
+	{
+		ret = recv(client->sock, buff_tmp, size_read, 0);
+		if (ret == -1 && (errno == EAGAIN || errno == EINTR))
+			continue;
+		else
+			break ;
+	}	
+	if (ret == -1)
+		perror("recv()");
+	else
+		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
+	print_receive(client->sock, buff_tmp, client->buff_recv.len);
+	free(buff_tmp);
+	return (ret);
 }
 
-t_team_entity	*get_team(t_serveur *serv, char *buff)
+/*
+**	Write into an actual buffer -> preparing for the select() pass.
+*/
+
+int			write_buffer(t_buffer *buff, char *to_write, int size)
 {
-	char			*t_name;
-	t_team_entity	*team;
+	int		i;
 
-	if (!(t_name = get_cmd_trim(buff)))
+	if (size)
 	{
-		return (NULL);
+		i = 0;
+		if (buff->len + size > BUFF_SIZE)
+		{
+			perror("buffer full");
+			return (0);
+		}
+		while (i < size)
+		{
+			buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
+			i++;
+		}
+		buff->len += i;
 	}
-
-	team = get_team_by_name(serv, t_name);
-	free(t_name);
-	return (team);
+	return (size);
 }
 
-t_team_entity	*new_client_communication(t_serveur *serv, t_client_entity *client)
+/*
+**	Read from buffer -> will only get datas if select() caught modifications.
+**	Else, it will return NULL.
+*/
+
+char		*read_buffer(t_buffer *buff)
 {
-	char			*buff;
-	char			*to_print;
-	int				ret;
-	t_team_entity	*team;
+	char	*ret_buff;
+	int		i;
 
-	buff = (char *)s_malloc(sizeof(char) * BUFF_SIZE);
-
-	// Send Bienvenue
-	if (send(client->sock, "BIENVENUE\n", strlen("BIENVENUE\n"), 0) < 0)
-		exit_error("send()");
-	printf("Send : BIENVENUE*\n");
-
-	// Recv an verify Team Name
-	if ((ret = recv(client->sock, buff, BUFF_SIZE - 1, 0)) < 0)
-		exit_error("recv()");
-	buff[ret] = '\0';					//
-	to_print = strdup(buff);			//	FOR DEBUG PRINT
-	replace_nl(to_print);				//
-	printf("Recv : %s\n", to_print);	//
-	if (!(team = get_team(serv, buff)))
+	ret_buff = NULL;
+	if (buff->len > 0)
 	{
-		printf("Get_team() failed\n");
-		if (send(client->sock, "UNKNOWN TEAM\n",
-			strlen("UNKNOWN TEAM\n"), 0) < 0)
-			exit_error("send()");
-		free(buff);
-		free(to_print);
-		return (NULL);
+		ret_buff = s_malloc(buff->len + 1);
+		bzero(ret_buff, buff->len + 1);
+		i = 0;
+		while (i < buff->len)
+		{
+			ret_buff[i] = buff->buff[(buff->start + i) % BUFF_SIZE];
+			i++;
+		}
 	}
+	return (ret_buff);
+}
 
-	// Format Send buff ans send
-	memset((void *)buff, 0, BUFF_SIZE);
-	sprintf(buff, "%d\n", team->available_slots);
-	if (send(client->sock, buff, strlen(buff), 0) < 0)
-		exit_error("send()");
-	printf("Send : %d*\n", team->available_slots);
+/*
+**	Read buffer until first \n and return cmd. Updates 'start' and 'len' variables.
+**	Returned pointer must be freed.
+*/
 
-	memset((void *)buff, 0, BUFF_SIZE);
-	sprintf(buff, "%d %d\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
-	if (send(client->sock, buff, strlen(buff), 0) < 0)
-		exit_error("send()");
-	printf("Send : %d %d*\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
+char		*get_first_cmd(t_buffer *buffer)
+{
+	char *buff;
+	char *end;
+	int len_cmd;
 
-	free(buff);
-	free(to_print);
-	return (team);
+	buff = read_buffer(buffer);
+	//printf("buff:%s", buff);
+	end = strstr(buff, END);
+	if (end)
+	{
+		//printf("end:\\%s", end);
+		end[1] = 0;
+		len_cmd = (end - buff) + LEN_END;
+		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;
+		buffer->len -= len_cmd;
+		return (buff);
+	}
+	return (NULL);
 }

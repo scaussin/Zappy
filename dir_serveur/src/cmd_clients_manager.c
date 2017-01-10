@@ -1,52 +1,92 @@
 #include "../includes/serveur.h"
 
-void manage_cmd_clients(t_serveur *serv)
+/*
+**	buff_recv to t_list_cmds_entity
+*/
+
+void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
+{
+	char *cmd;
+
+	if (client->size_list_cmds >= MAX_LIST_CMD)
+	{
+		client->buff_recv.len = 0;
+		printf("[WARNING] : list cmds full on sock: %d\n", client->sock);
+		return ;
+	}
+	while ((cmd = get_first_cmd(&client->buff_recv)))
+	{
+		check_cmd_match(cmd_match_table, client, cmd); // -> Parser.
+		free(cmd);
+	}
+}
+
+void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
+{
+	int i = 0;
+
+	while (i < SIZE_CMD_MATCH_TABLE)
+	{
+		if (strcmp(cmd_match_table[i].name, cmd) == 0)
+		{
+			add_cmd(client, &cmd_match_table[i], cmd);
+			return ;
+		}
+		i++;
+	}
+	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
+}
+
+void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
+{
+	t_list_cmds_entity	*last;
+	t_list_cmds_entity	*new_cmd;
+
+	new_cmd = s_malloc(sizeof(t_list_cmds_entity));
+	new_cmd->func = cmd->func;
+	new_cmd->time = -1;
+	new_cmd->param = strdup(param);
+	new_cmd->next = NULL;
+	if (!client->list_cmds)
+		client->list_cmds = new_cmd;
+	else
+	{
+		last = client->list_cmds;
+		while (last && last->next)
+		{
+			last = last->next;
+		}
+		last->next = new_cmd;
+	}
+	client->size_list_cmds += 1;
+}
+
+
+void	exec_cmd_client(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (p_client->len_buff > 0)
-			get_cmd_client(serv, p_client);
+		if (p_client->list_cmds)
+		{
+			if (p_client->list_cmds->time == -1)//start cmd
+			{
+				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+			}
+			else if (p_client->list_cmds->time == 0)//end cmd
+			{
+				if (p_client->list_cmds->param)
+					free(p_client->list_cmds->param);
+				p_client->list_cmds = p_client->list_cmds->next;
+				p_client->size_list_cmds -= 1;
+			}
+			else// decremente time
+			{
+				p_client->list_cmds->time -= 1;
+			}
+		}
 		p_client = p_client->next;
-	}
-}
-
-void get_cmd_client(t_serveur *serv, t_client_entity *client)
-{
-	int		i_loop;
-	int		i_buff;
-	char	*to_process;
-	char	*to_print;
-
-	to_process = (char *)s_malloc((BUFF_SIZE + 1) * sizeof(char));
-	memset(to_process, 0, BUFF_SIZE + 1);
-	i_loop = 0;
-	i_buff = client->start_buff;
-	while (i_loop < client->len_buff)
-	{
-		to_process[i_loop] = client->buff[i_buff % BUFF_SIZE];
-		i_loop++;
-		i_buff++;
-	}
-	client->start_buff = (i_buff % BUFF_SIZE);
-	client->len_buff = 0;
-
-	to_print = strdup(to_process);			//
-	replace_nl(to_print);					//	Debug Print
-	printf("cmd read : %s\n", to_print);	//
-	/*printf("*state buffer :\n");
-	write(1, client->buff, BUFF_SIZE);
-	printf("*\n");*/
-
-	if (strcmp(to_process, "VOIR\n") == 0)
-	{
-		printf("%sCommande VOIR requested%s\n", KYEL, KRESET);
-		cmd_see(serv, client);
-	}
-	else
-	{
-		printf("%sCommande inconnue%s\n", KYEL, KRESET);
 	}
 }
