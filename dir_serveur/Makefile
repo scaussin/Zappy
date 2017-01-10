@@ -13,10 +13,12 @@ src/client_hdl.c \
 src/client_authentification.c \
 src/team_hdl.c \
 src/serveur_data.c \
+src/terrain_generation.c \
 src/serveur_loop.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
 src/cmds_functions/cmd_voir.c
+
 
 OBJ = $(SRC:.c=.o)
 

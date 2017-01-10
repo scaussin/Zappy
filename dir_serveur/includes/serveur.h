@@ -7,6 +7,7 @@
 # include <errno.h>
 # include <unistd.h>
 # include <stdio.h>
+# include <time.h>
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -166,24 +167,22 @@ typedef struct 				s_cmd_hdl
 ** ************************ World struct ***************************** => Game board
 */
 
-typedef enum				e_item_type
+typedef struct				s_case_ressources
 {
-	FOOD,
-	MINERALS
-
-}							t_item_type;
-
-typedef struct				s_world_item
-{
-	t_item_type 			type;// type -> nourriture ou mineral
-	//
-}							t_world_item;
+	int						food;
+	int						linemate;
+	int						deraumere;
+	int						sibur;
+	int						mendiane;
+	int						phiras;
+	int						thystame;
+}							t_case_ressources;
 
 typedef struct				s_world_case
 {
 	// une case contient:
 	t_client_entity			*players;// players
-	t_world_item			*items;// items
+	t_case_ressources		ressources;// items
 
 
 }							t_world_case;
@@ -246,6 +245,15 @@ void						parse_input(int argc, char **argv);
 void						fill_input(t_serveur *serv, int argc, char **argv);
 void						error_in_args(int pos, char *str);
 int							regex_match(char *string_to_search, char *regex_str);
+
+/*
+** terrain_generation.c
+*/
+void						init_terrain(t_serveur *serv);
+void						allocate_world_board(t_world_hdl *world_hdl);
+void						set_world_board_cases(t_world_hdl *world_hdl);
+void						generate_ressources(t_world_hdl *world_hdl);
+void						print_world_board(t_world_hdl *world_hdl);
 
 /*
 ** serveur_loop.c
