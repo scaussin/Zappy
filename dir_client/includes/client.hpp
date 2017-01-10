@@ -2,6 +2,7 @@
 # define CLIENT_HPP
 
 // General includes
+# include <unistd.h>
 # include <stdlib.h>
 # include <iostream>
 # include <sstream>
@@ -9,6 +10,8 @@
 # include <stdio.h>
 # include <regex>
 # include <errno.h>
+# include <vector>
+# include <list>
 
 // Connection includes.
 # include <sys/socket.h>
