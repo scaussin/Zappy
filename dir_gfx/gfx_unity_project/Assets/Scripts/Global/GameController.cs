@@ -25,42 +25,74 @@ public class GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
-		GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
-
-		// Starting state for the player:
-		InMainMenu = true;
-		SelectingServerInfos = true;
-		InGame = false;
-		DisablePlayerCameraControl ();
-	}
+        GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
+        GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
+        
+        // Starting state for the player:
+        ActivateMainMenuInput();
+    }
 
 	// Update is called once per frame
 	void Update () {
 		
 	}
 
-	// hostname and port selected, lets try to connect to the server ...
+    /// <summary>
+    /// Transition facilitating method. Puts the MainMenu up, and allows the entering of input.
+    /// </summary>
+    public void ActivateMainMenuInput()
+    {
+        GameManager.instance.MainMenuController.gameObject.transform.Find("MainPanel").gameObject.SetActive(true);
+        InMainMenu = true;
+        SelectingServerInfos = true;
+        GameManager.instance.MainMenuController.CanEnterInput = true;
+        InGame = false;
+        DisablePlayerCameraControl();
+    }
+
+	/// <summary>
+    /// Used when MainMenuController fires the event when the user enters an address and a port and presses enter.
+    /// </summary>
 	public void		OnServerInfoEntered()
 	{
-		// desactivate menu.
-		GameManager.instance.MainMenuController.gameObject.transform.Find ("MainPanel").gameObject.SetActive (false);
+        // desactivate menu.
+        GameManager.instance.MainMenuController.CanEnterInput = false;
+        GameManager.instance.MainMenuController.gameObject.transform.Find ("MainPanel").gameObject.SetActive (false);
 		InMainMenu = false;
 		SelectingServerInfos = false;
-		GameManager.instance.ConnectionManager.ConnectToServer (GameManager.instance.Hostname, GameManager.instance.Port);
+        GameManager.instance.ConnectionManager.ConnectToServer ();
 	}
 
+    /// <summary>
+    /// Used when ConnectionManager fires the event when the connection did not work. Gets the menu back up.
+    /// </summary>
+    public void     OnConnectionFailedAction()
+    {
+        ActivateMainMenuInput();
+        GameManager.instance.MainMenuController.ResponseText.color = Color.red;
+        GameManager.instance.MainMenuController.ResponseText.text = "- Failed to connect to server -";
+    }
 
+    /// <summary>
+    /// Called when connection is successful and the client is authentified. Starts spawning the world blocks.
+    /// </summary>
 	public void		OnGfxAuthentifiedAction()
 	{
-		GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
+        CameraViewControl.GetComponent<CameraViewControl>().gameObject.SetActive(true);
+        GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
 	}
 
-	// Camera control.
+	/// <summary>
+    /// Disable user's camera control. We don't want the user to be able to move at certain moments.
+    /// </summary>
 	public void		DisablePlayerCameraControl()
 	{
 		CameraViewControl.GetComponent<CameraViewControl> ().enabled = false;
 	}
 
+    /// <summary>
+    /// Enable user's camera control. When called, the user can now move the camera with the corresponding keys.
+    /// </summary>
 	public void		EnablePlayerCameraControl()
 	{
 		CameraViewControl.GetComponent<CameraViewControl> ().enabled = true;

@@ -23,8 +23,13 @@ public class ConnectionManager : MonoBehaviour
 	/// </summary>
 	public UnityEvent					OnConnectionWithServer;
 
-	// public
-	[HideInInspector]
+    /// <summary>
+	/// Invoked when the client could not connect to the server. Will allow the GameController to reput the menu in front.
+	/// </summary>
+    public UnityEvent                   OnConnectionFailed;
+
+    // public
+    [HideInInspector]
 	public int							ServerPort;
 	public bool							IsConnected = false;
     public bool                 		IsAuthenticated = false;
@@ -108,8 +113,12 @@ public class ConnectionManager : MonoBehaviour
 	/// </summary>
 	/// <param name="port">Port.</param>
 	/// <param name="hostname">Hostname.</param>
-	public void		ConnectToServer(string port, string hostname)
+	public void		ConnectToServer()
 	{
+        // Get server info from GM.
+        string port = GameManager.instance.Port;
+        string hostname = GameManager.instance.Hostname;
+
         try
         {
             // -------------- Set the connection datas.
@@ -133,6 +142,8 @@ public class ConnectionManager : MonoBehaviour
             if (!ClientSocket.Connected)
             {
                 Debug.Log("Unable to connect to host");
+                IsConnected = false;
+                OnConnectionFailed.Invoke();
             }
 			ClientSocket.ReceiveTimeout = 1000;
 
@@ -148,6 +159,7 @@ public class ConnectionManager : MonoBehaviour
         catch (System.Exception e)
         {
             IsConnected = false;
+            OnConnectionFailed.Invoke();
             Debug.Log("Error" + e.ToString());
         }
 
