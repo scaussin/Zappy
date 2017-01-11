@@ -39,3 +39,4 @@ void	ClientPlayer::InitGameDatas(ClientConnection &SentConnection)
 	std::cout << "Life Units: " << this->LifeUnits << std::endl;
 	std::cout << "Inventory size: " << this->Inventory.size() << std::endl;
 }
+

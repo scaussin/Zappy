@@ -17,6 +17,9 @@ class ClientPlayer
 		std::list<std::string>					Inventory;
 		std::list<std::string>					Vision;
 
+		ClientBuffer							bufferRecv;
+		ClientBuffer							bufferSend;
+
 		ClientPlayer();
 		~ClientPlayer();
 

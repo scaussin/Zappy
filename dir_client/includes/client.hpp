@@ -20,23 +20,25 @@
 # include <fcntl.h>
 # include <sys/time.h>
 
-# define MSG_BUFSIZE 128
-
+# define BUFF_SIZE 128
+# define END "\n"
+# define LEN_END 1
+/*
 // Connection related structure.
-typedef struct			s_ConnectionSettings
+typedef struct			s_CommunicationSettings
 {
 	std::string				TeamName;
 	int						Port;
 	std::string				HostName;
 
 
-}							t_ConnectionSettings;
+}							t_CommunicationSettings;*/
 
 // Class definitions.
 class ClientInputHandler; // handle and check args.
 class ClientConnection; // communicate with the server.
 class ClientPlayer; // the actual game player.
-
+class ClientBuffer;
 class ClientController; // main controller.
 
 
@@ -45,7 +47,7 @@ class ClientController; // main controller.
 # include "ClientInputHandler.hpp"
 # include "ClientConnection.hpp"
 # include "ClientPlayer.hpp"
-
+# include "ClientBuffer.hpp"
 # include "ClientController.hpp"
 
 

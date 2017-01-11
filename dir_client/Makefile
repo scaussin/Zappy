@@ -4,9 +4,10 @@ HEADER = includes/ClientMain.hpp
 
 SRC = src/main.cpp \
 src/ClientInputHandler.cpp \
-src/ClientConnection.cpp \
+src/ClientCommunication.cpp \
 src/ClientPlayer.cpp \
 src/CustomException.cpp \
+src/ClientBuffer.cpp \
 src/ClientController.cpp
 
 
