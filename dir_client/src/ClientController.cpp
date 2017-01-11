@@ -4,7 +4,6 @@
 ClientController::ClientController()
 {
 	std::cout << KCYN "Client Controller starting..." KRESET << std::endl;
-	IsConnected = false;
 }
 
 // Default destructor
@@ -29,10 +28,12 @@ void	ClientController::OnInitialize(int argc, char **argv)
 	catch (CustomException &e)
 	{
 		std::cout << KRED << e.what() << KRESET << std::endl;
-		std::cout << std::endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]" << KRESET << std::endl;
+		// print usage.
+		std::cout << std::endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]"
+					<< KRESET << std::endl;
 		return ;
 	}
-	
+
 	//------------------------------------------------------//
 	// II. try to connect to serveur						//
 	//------------------------------------------------------//
@@ -41,11 +42,39 @@ void	ClientController::OnInitialize(int argc, char **argv)
 		// ClientConnection.cpp
 		Connection.DisplayInfos();
 		Connection.SetMockMode(false);
-		Connection.Connect();
+		Connection.Connect(); // also handles first data exchange.(FirstDialog)
 	}
 	catch (CustomException &e)
 	{
 		std::cout << KRED << e.what() << KRESET << std::endl;
 		return ;
+	}
+}
+
+// --------------------------------------------------------------------------------	//
+// Called just before the main loop: the client is connected to the server.			//
+//																					//
+// --------------------------------------------------------------------------------	//
+void	ClientController::OnGameStart()
+{
+	std::cout << KCYN "- OnGameStart called -" KRESET << std::endl;
+
+	// Set the player datas and makes a print;
+	Player.InitGameDatas(Connection);
+}
+
+// --------------------------------------------------------------------------------	//
+// The main loop																	//
+//																					//
+// --------------------------------------------------------------------------------	//
+void	ClientController::MainLoop()
+{
+	bool	running = true;
+
+	// Main loop
+	std::cout << KCYN "- Main loop starting -" KRESET << std::endl;
+	while (running)
+	{
+
 	}
 }
