@@ -13,7 +13,9 @@ public class MsgBroadcastController : MonoBehaviour
 {
 	public WorldManager		WorldManager;
 
-	public UnityEvent		OnServerConnection;
+	/// <summary>
+	/// The ConnectionManager fires this event when it receives a msg, then put it in CurrentReceivedMsg.
+	/// </summary>
 	public UnityEvent		OnMsgReception;
 	public string			CurrentReceivedMsg;
 	public bool				HasMsgToSend;
@@ -22,7 +24,6 @@ public class MsgBroadcastController : MonoBehaviour
 	void Awake()
 	{
 		WorldManager = GameObject.Find("World").gameObject.GetComponent<WorldManager> ();
-		OnServerConnection = new UnityEvent ();
 		OnMsgReception = new UnityEvent ();
 	}
 
@@ -30,18 +31,12 @@ public class MsgBroadcastController : MonoBehaviour
 	void Start()
 	{
 		OnMsgReception.AddListener (OnMsgReceptionAction);
-		OnServerConnection.AddListener (OnServerConnectionAction);
 	}
-	
+
 	// Update is called once per frame
 	void Update()
 	{
 		
-	}
-
-	public void OnServerConnectionAction()
-	{
-
 	}
 
 	public void OnMsgReceptionAction()

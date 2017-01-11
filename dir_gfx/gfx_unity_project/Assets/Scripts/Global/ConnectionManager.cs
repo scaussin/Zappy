@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Text;
 using System.Net;
@@ -7,27 +8,42 @@ using System.Text.RegularExpressions;
 
 public class ConnectionManager : MonoBehaviour
 {
-    public Socket              	 ClientSocket;
+	/// <summary>
+	/// The only client socket. Is connected to the server with hostname and port.
+	/// </summary>
+    public Socket              	 		ClientSocket;
+
+	/// <summary>
+	/// Event invoked when the client is connected to the server and authentified as zappy-gfx connection.
+	/// </summary>
+	public UnityEvent					OnAuthentificationDone;
+
+	/// <summary>
+	/// Invoked when the client is connected to the server, not yet authentified. (server may not be the correct one) 
+	/// </summary>
+	public UnityEvent					OnConnectionWithServer;
 
 	// public
 	[HideInInspector]
-	public int						ServerPort;
-	public bool						IsConnected = false;
-    public bool                 	IsAuthenticated = false;
-	public bool						IsAuthMsgSend = false;
+	public int							ServerPort;
+	public bool							IsConnected = false;
+    public bool                 		IsAuthenticated = false;
+	public bool							IsAuthMsgSend = false;
 
 	// private
-	private byte[]					buffer = new byte[100];
-	private string					retString;
-	private MsgBroadcastController	MsgBroadcastController;
+	private byte[]						buffer = new byte[100];
+	private string						retString;
+	private MsgBroadcastController		MsgBroadcastController;
 
-	// Use this for initialization
-	void Start () {
-		MsgBroadcastController = GameManager.instance.MsgBroadcastController;
+	void Awake()
+	{
+		OnAuthentificationDone = new UnityEvent ();
 	}
 
-	void Awake() {
-		
+	// Use this for initialization
+	void Start()
+	{
+		MsgBroadcastController = GameManager.instance.MsgBroadcastController;
 	}
 	
 	/// <summary>
@@ -35,7 +51,8 @@ public class ConnectionManager : MonoBehaviour
 	/// All received messages are sent to the MsgBroadcastController,
 	/// except for the starting authentification dialog.
 	/// </summary>
-	void Update () {
+	void Update()
+	{
 	    if (IsConnected)
         {
             // Use the SelectWrite enumeration to obtain Socket status.
@@ -85,8 +102,9 @@ public class ConnectionManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Connects to server. Will set ConnectionManager's ClientStream to the corresponding server
-	/// Every Call to ReadMsg() and SendMsg() will use the ClientStream set in this method. 
+	/// Connects to server. Will set ConnectionManager's ClientSocket to the corresponding server
+	/// Every Call to ReadMsg() and SendMsg() will use the ClientSocket set in this method.
+	/// Also send event calls on Connection with server, and authentification success with server.
 	/// </summary>
 	/// <param name="port">Port.</param>
 	/// <param name="hostname">Hostname.</param>
@@ -119,10 +137,11 @@ public class ConnectionManager : MonoBehaviour
 			ClientSocket.ReceiveTimeout = 1000;
 
             Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
+			OnConnectionWithServer.Invoke();
 			if (ClientSocket.Poll(1000, SelectMode.SelectRead))
 			{
 				string ReceivedMsg = ReadMsg();
-				Debug.Log("Receiveid: " + ReceivedMsg);
+				Debug.Log("Received: " + ReceivedMsg);
 			}
 			IsConnected = true;
         }
@@ -138,16 +157,18 @@ public class ConnectionManager : MonoBehaviour
 	private void AuthReception(string receivedMsg)
 	{
 		// check if server sent world size
-		Regex rgx = new Regex("^msz \\d+ \\d+");
+		Regex rgx = new Regex("^msz (\\d+) (\\d+)\\n");
+
 		Match match = rgx.Match(receivedMsg);
-		if (match.Success) {
+		if (match.Success && match.Groups.Count == 3)
+		{
+			GroupCollection groups = match.Groups;
+			GameManager.instance.WorldSettings.WorldX = int.Parse(groups[1].Value);
+			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
+
 			Debug.Log ("Success - Received world size - Gfx authentified");
 			IsAuthenticated = true;
-
-			// fill world size settings
-			string[] arr = receivedMsg.Split(" "[0]);
-			GameManager.instance.WorldSettings.WorldX = int.Parse(arr[1]);
-			GameManager.instance.WorldSettings.WorldY = int.Parse(arr[2]);
+			OnAuthentificationDone.Invoke ();
 		}
 		else
 		{
@@ -165,7 +186,9 @@ public class ConnectionManager : MonoBehaviour
 
 	private string ReadMsg()
 	{
-		ClientSocket.Receive(buffer);
+		int ret;
+		ret = ClientSocket.Receive(buffer);
+		buffer [ret] = 0;
 		retString = Encoding.ASCII.GetString(buffer);
 		return retString;
 	}

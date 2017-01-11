@@ -13,12 +13,11 @@ public class GameManager : MonoBehaviour {
 	public WorldSettings			WorldSettings;
 	public KeyManager				KeyManager;
 
-
-
 	[Header("Program Control Manager references")] // program actors.
 	public GameController			GameController;
 	public MsgBroadcastController	MsgBroadcastController;
 	public WorldManager				WorldManager;
+	public MainMenuController		MainMenuController;
 
 	void Awake()
 	{
@@ -42,27 +41,23 @@ public class GameManager : MonoBehaviour {
 		GameController = GameObject.Find("GameController").GetComponent<GameController> ();
 		MsgBroadcastController = GameObject.Find("MsgBroadcastController").gameObject.GetComponent<MsgBroadcastController> ();
 		WorldManager = GameObject.Find("World").gameObject.GetComponent<WorldManager> ();
+		MainMenuController = GameObject.Find("UI").transform.Find("MainMenuCanvas").GetComponent<MainMenuController> ();
 	}
 
 	// Use this for initialization
 	void Start () {
-		ConnectionManager.ConnectToServer (Port, Hostname);
-		if (!ConnectionManager.IsConnected)
-		{
-			Debug.Log ("Error during connection to server");
-		}
-		else
-		{
-			Debug.Log ("Connected to server");
-		}
+//		ConnectionManager.ConnectToServer (Port, Hostname);
+//		if (!ConnectionManager.IsConnected)
+//		{
+//			Debug.Log ("Error during connection to server");
+//		}
+//		else
+//		{
+//			Debug.Log ("Connected to server");
+//		}
 
 //		GameObject prefab = (GameObject)Resources.Load("Prefabs/Actors/Player") as GameObject;
 //		GameObject newplayer = (GameObject)Instantiate(prefab, transform.position, Quaternion.identity);
 //		newplayer.transform.parent = GameObject.Find ("World").transform;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 }
