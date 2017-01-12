@@ -18,6 +18,7 @@ ClientController::ClientController(int argc, char **argv)
 	try
 	{
 		communication->connectToServer();
+		std::cout << KGRN << "connected" << KRESET << std::endl;
 	}
 	catch (CustomException &e)
 	{
@@ -38,6 +39,7 @@ void	ClientController::mainLoop()
 			communication->initFd();
 			communication->doSelect();
 			communication->checkFd();
+			communication->manageRecv();
 		}
 		catch (CustomException &e)
 		{

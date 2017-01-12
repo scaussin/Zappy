@@ -16,7 +16,10 @@ class ClientCommunication
 		void					manageRecv();
 		void					pullData();
 		void					pushData();
-		void					parseStartMsg(std::string msg, int *teamSlots, int *posX, int *posY);
+		void					clientAuthentication();
+		void					replaceEnd(std::string &str);
+		void					parseTeamSlots(std::string msg, int *teamSlots);
+		void					parseWorldSize(std::string msg, int *worldSizeX, int *worldSizeY);
 		//void					displayInfos();
 
 		bool					isConnected;
@@ -28,8 +31,8 @@ class ClientCommunication
 
 	private:
 		int						stateProcessAuth;
-		fd_set					*read_fs;
-		fd_set					*write_fs;
+		fd_set					read_fs;
+		fd_set					write_fs;
 		int						port;
 		std::string				hostName;
 		int						sock;

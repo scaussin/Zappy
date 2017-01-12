@@ -23,10 +23,12 @@ std::string ClientBuffer::getFirstMsg()
 	std::size_t found = buff.find(END);
 	if (found != std::string::npos)
 	{
-		buff.substr(0, found);
-		std::size_t lenCmd = buff.size() + LEN_END;
+		buff = buff.substr(0, found + LEN_END);
+		std::size_t lenCmd = buff.size();
 		erase(lenCmd);
 	}
+	else
+		buff.clear();
 	return (buff);
 }
 
@@ -37,7 +39,7 @@ void ClientBuffer::pushMsg(std::string msg)
 
 std::string ClientBuffer::getBuffer()
 {
-	std::string	retBuff(len + 1, 0);
+	std::string	retBuff(len, 0);
 	int			i;
 
 	if (len > 0)

@@ -20,34 +20,34 @@ ClientCommunication::~ClientCommunication()
 
 void	ClientCommunication::initFd()
 {
-	FD_ZERO(read_fs);
-	FD_ZERO(write_fs);
+	FD_ZERO(&read_fs);
+	FD_ZERO(&write_fs);
 	
 	// Surveille l'entrée standard pour exit propre quand enter presse
-	FD_SET(STDIN_FILENO, read_fs);
+	FD_SET(STDIN_FILENO, &read_fs);
 
 	/*
 		TODO: if disconnecting
 	*/
 
-	FD_SET(sock, read_fs);
+	FD_SET(sock, &read_fs);
 	if (bufferSend.getLen() > 0)
-		FD_SET(sock, write_fs);
+		FD_SET(sock, &write_fs);
 }
 
 void	ClientCommunication::doSelect()
 {
-	if (select(sock + 1, read_fs, write_fs, NULL, NULL) < 0)
+	if (select(sock + 1, &read_fs, &write_fs, NULL, NULL) < 0)
 		throw (CustomException("select() error"));
 }
 
 void	ClientCommunication::checkFd()
 {
-	if (FD_ISSET(STDIN_FILENO, read_fs))
+	if (FD_ISSET(STDIN_FILENO, &read_fs))
 		disconnect();
-	if (FD_ISSET(sock, read_fs))
+	if (FD_ISSET(sock, &read_fs))
 		pullData();//read from server
-	if (FD_ISSET(sock, write_fs))
+	if (FD_ISSET(sock, &write_fs))
 		pushData();//write to server
 }
 
@@ -55,18 +55,47 @@ void	ClientCommunication::manageRecv()
 {
 	if (bufferRecv.getLen() == 0)
 		return ;
-	std::string msg = bufferRecv.getFirstMsg();
-	if (stateProcessAuth == 0 && msg.compare("BIENVENUE\n") == 0)
+	if (isAuthenticate)
 	{
-		bufferSend.pushMsg(player->teamName);
-		stateProcessAuth = 1;
+		std::string msg = bufferRecv.getFirstMsg();
+		//TODO ;)
 	}
-	if (stateProcessAuth == 1)
+	else
+		clientAuthentication();
+}
+
+void	ClientCommunication::clientAuthentication()
+{
+	if (stateProcessAuth == 0) // BIENVENUE/n
+	{
+		std::string msg = bufferRecv.getFirstMsg();
+		if (msg.compare("BIENVENUE\n") == 0)
+		{
+			bufferSend.pushMsg(player->teamName + "\n");
+			stateProcessAuth = 1;
+		}
+	}
+	if (stateProcessAuth == 1 && bufferRecv.getLen() > 0) // <slot_number>\n
+	{		
+		try
+		{
+			std::string msg = bufferRecv.getFirstMsg();
+			parseTeamSlots(msg, &player->teamSlots);
+			stateProcessAuth = 2;
+		}
+		catch (CustomException &e)
+		{
+			std::cout << KRED << e.what() << KRESET << std::endl;
+		}
+	}
+	if (stateProcessAuth == 2 && bufferRecv.getLen() > 0) // <x_position> <y_position>\n
 	{
 		try
 		{
-			parseStartMsg(msg, &player->teamSlots, &player->posX, &player->posY);
-			stateProcessAuth = 2;
+			std::string msg = bufferRecv.getFirstMsg();
+			parseWorldSize(msg, &player->worldSizeX, &player->worldSizeY);
+			std::cout << KGRN << "client authenticated" << KRESET << std::endl;
+			player->printStat();
 			isAuthenticate = true;
 		}
 		catch (CustomException &e)
@@ -76,6 +105,14 @@ void	ClientCommunication::manageRecv()
 	}
 }
 
+void	ClientCommunication::replaceEnd(std::string &str)
+{
+	size_t start_pos;
+	while ((start_pos = str.find(END)) != std::string::npos)
+	{
+		str.replace(start_pos, LEN_END, "*");
+	}
+}
 void	ClientCommunication::connectToServer()
 {
 	struct hostent		*host;
@@ -94,10 +131,8 @@ void	ClientCommunication::connectToServer()
 		sin.sin_port = htons(port);
 		sin.sin_addr.s_addr = inet_addr(hostName.c_str());
 		if (connect(sock, (const struct sockaddr *)&(sin), sizeof(sin)) == -1)
-		{
 			throw (CustomException("connect() error: cannot connect to hostname"));
-			exit (-1);
-		}
+		isConnected = true;
 	}
 	else
 		std::cout << "Client already connected" << std::endl;
@@ -107,29 +142,36 @@ void	ClientCommunication::connectToServer()
 ** parse : <slot_number>\n<x_position> <y_position>\n
 ** TODO: check error
 */
-void	ClientCommunication::parseStartMsg(std::string msg, int *teamSlots, int *posX, int *posY)
+
+void	ClientCommunication::parseTeamSlots(std::string msg, int *teamSlots)
 {
-	char	*splittedString;
+	std::regex expression("^([0-9]+)\n$");
+	std::smatch matches;
 
-	if (!(splittedString = strtok((char *)msg.c_str(), " \n")))
-		throw (CustomException("Error while getting slot number"));
+	if(std::regex_search(msg, matches, expression))
+	{
+		*teamSlots = strtol(matches[0].str().c_str(), NULL, 10);
+	} 
+	else
+		throw (CustomException("error parse team slots"));
+}
 
-	*teamSlots = strtol(splittedString, NULL, 10);
-	if (!(splittedString = strtok(NULL, " \n")))
-		throw (CustomException("Error while getting x starting position"));
+void	ClientCommunication::parseWorldSize(std::string msg, int *worldSizeX, int *worldSizeY)
+{
+	std::regex expression("^([0-9]+) ([0-9]+)\n$");
+	std::smatch matches;
 
-	*posX = strtol(splittedString, NULL, 10);
-	if (!(splittedString = strtok(NULL, " \n")))
-		throw (CustomException("Error while getting y starting position"));
-
-	*posY = strtol(splittedString, NULL, 10);
-	if (*teamSlots <= 0)
-		throw (CustomException("No slot available in team or team does not exist."));
+	if(std::regex_search(msg, matches, expression))
+	{
+		*worldSizeX = strtol(matches[1].str().c_str(), NULL, 10);
+		*worldSizeY = strtol(matches[2].str().c_str(), NULL, 10);
+	} 
+	else
+		throw (CustomException("client auth fail"));
 }
 
 void	ClientCommunication::disconnect()
 {
-	
 	if (isConnected)
 	{
 		isConnected = false;
@@ -157,7 +199,8 @@ void	ClientCommunication::pushData()
 		else
 			break ;
 	}
-	std::cout << "send: " << buffTmp.substr(0, retSend) << std::endl;
+	replaceEnd(buffTmp = buffTmp.substr(0, retSend));
+	std::cout << KYEL << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << std::endl;
 	if (retSend == -1)
 		throw (CustomException("send error"));
 	if (retSend > 0)
@@ -192,8 +235,9 @@ void	ClientCommunication::pullData()
 		throw (CustomException("recv error"));
 	else
 		bufferRecv.pushBuffer(buffRecv, retRecv);
-	buffRecv[retRecv] = 0;
-	std::cout << "recv: " << buffRecv << std::endl;
+	std::string recvStr(buffRecv, retRecv);
+	replaceEnd(recvStr);
+	std::cout << KBLU << " Receiving to server: "<< KRESET << "["<< recvStr << "]" << std::endl;
 	delete[] buffRecv;
 }
 

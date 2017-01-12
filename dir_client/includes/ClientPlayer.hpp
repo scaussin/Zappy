@@ -9,9 +9,11 @@ class ClientPlayer
 		ClientPlayer(std::string teamName);
 		~ClientPlayer();
 
+		void						printStat();
+
 		std::string					teamName;
-		int							posX;
-		int							posY;
+		int							worldSizeX;
+		int							worldSizeY;
 		int							teamSlots;
 
 	private:

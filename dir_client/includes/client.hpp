@@ -10,7 +10,9 @@
 # include <stdio.h>
 # include <regex>
 # include <errno.h>
+# include <algorithm>
 # include <vector>
+# include <regex.h>
 # include <list>
 
 // Connection includes.

@@ -17,8 +17,11 @@ ClientPlayer::ClientPlayer(std::string _teamName) : teamName(_teamName)
 ClientPlayer::~ClientPlayer()
 {}
 
-/*	std::cout << KGRN << "Player Game datas:" << KRESET << std::endl;
-std::cout << "World size: " << this->World_x << "x " << this->World_y << "y " << std::endl;
-std::cout << "Level: " << this->Level << std::endl;
-std::cout << "Life Units: " << this->LifeUnits << std::endl;
-std::cout << "Inventory size: " << this->Inventory.size() << std::endl;*/
+void	ClientPlayer::printStat()
+{
+	std::cout << KGRN << "Player Game datas:" << KRESET << std::endl;
+	std::cout << "  World size: " << worldSizeX << "x " << worldSizeY << "y " << std::endl;
+	std::cout << "  Team: " << teamName << " - Level: " << level << std::endl;
+	std::cout << "  Life Units: " << lifeUnits << std::endl;
+	std::cout << "  Inventory size: " << inventory.size() << std::endl;
+}
