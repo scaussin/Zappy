@@ -11,7 +11,7 @@ ClientBuffer::~ClientBuffer()
 {}
 
 /*
-**	return first cmd whithout end char.
+**	return first cmd whithout end char ('\n').
 */
 std::string ClientBuffer::getFirstCmd()
 {
@@ -19,7 +19,7 @@ std::string ClientBuffer::getFirstCmd()
 	char *end;
 	int lenCmd;
 
-	buff = get_buffer();
+	buff = getBuffer();
 	std::size_t found = buff.find(END);
 	if (found != std::string::npos)
 	{
@@ -71,7 +71,7 @@ void	ClientBuffer::pushBuffer(char *to_write, int size)
 		if (len + size > BUFF_SIZE)
 		{
 			throw (CustomException("Buffer full"));
-			return (0);
+			return ;
 		}
 		while (i < size)
 		{

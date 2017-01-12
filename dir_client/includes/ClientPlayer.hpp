@@ -6,25 +6,17 @@
 class ClientPlayer
 {
 	public:
-		ClientConnection						*Connection;
-
-		int										World_x;
-		int										World_y;
-
-		int										Level;
-		int										LifeUnits;
-
-		std::list<std::string>					Inventory;
-		std::list<std::string>					Vision;
-
-		ClientBuffer							bufferRecv;
-		ClientBuffer							bufferSend;
-
 		ClientPlayer();
 		~ClientPlayer();
+		void						init(int x, int y);
 
-		void		InitGameDatas(ClientConnection &SentConnection);
-
+	private:
+		int							posX;
+		int							posY;
+		int							level;
+		int							lifeUnits;
+		std::list<std::string>		inventory;
+		std::list<std::string>		vision;
 };
 
 #endif

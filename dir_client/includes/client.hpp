@@ -36,7 +36,7 @@ typedef struct			s_CommunicationSettings
 
 // Class definitions.
 class ClientInputHandler; // handle and check args.
-class ClientConnection; // communicate with the server.
+class ClientCommunication; // communicate with the server.
 class ClientPlayer; // the actual game player.
 class ClientBuffer;
 class ClientController; // main controller.
@@ -45,7 +45,7 @@ class ClientController; // main controller.
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
-# include "ClientConnection.hpp"
+# include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
 # include "ClientBuffer.hpp"
 # include "ClientController.hpp"

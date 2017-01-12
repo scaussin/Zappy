@@ -1,7 +1,7 @@
 
 #include "../includes/serveur.h"
 
-void	set_read_fs(t_serveur *serv)
+void	init_fd(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 
@@ -32,13 +32,12 @@ void	set_read_fs(t_serveur *serv)
 /*
 ** Central function for server.
 */
-
 void	main_loop(t_serveur *serv)
 {
 	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
-		set_read_fs(serv);
+		init_fd(serv);
 
 		// BOUYAKA SELECT IS HERE !!!!!!!!!!
 		if (select(serv->network.sock_max + 1,

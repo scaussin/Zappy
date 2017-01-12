@@ -258,7 +258,7 @@ void						print_world_board(t_world_hdl *world_hdl);
 /*
 ** serveur_loop.c
 */
-void						set_read_fs(t_serveur *serv);
+void						init_fd(t_serveur *serv);
 void						main_loop(t_serveur *serv);
 void						manage_clients_input(t_serveur *serv);
 
