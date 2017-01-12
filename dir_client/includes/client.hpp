@@ -48,6 +48,7 @@ class ClientController; // main controller.
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
+# include "ClientCommande.hpp"
 # include "ClientBuffer.hpp"
 # include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"

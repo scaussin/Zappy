@@ -25,3 +25,14 @@ void	ClientPlayer::printStat()
 	std::cout << "  Life Units: " << lifeUnits << std::endl;
 	std::cout << "  Inventory size: " << inventory.size() << std::endl;
 }
+
+void	ClientPlayer::avance()
+{
+	bufferSend->pushMsg("avance\n");
+	cmdWaitingResult.push_back(&ClientCommande::avanceRes);
+}
+
+void	ClientPlayer::avanceRes(std::string response)
+{
+	std::cout << "exec avance ok" << std::endl;
+}

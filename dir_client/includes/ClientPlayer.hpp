@@ -3,7 +3,7 @@
 
 # include "Client.hpp"
 
-class ClientPlayer
+class ClientPlayer : public ClientCommande
 {
 	public:
 		ClientPlayer(std::string teamName);
@@ -16,7 +16,11 @@ class ClientPlayer
 		int							worldSizeY;
 		int							teamSlots;
 
+		virtual void				avance();
+
 	private:
+		virtual void				avanceRes(std::string response);
+
 		int							level;
 		int							lifeUnits;
 		std::list<std::string>		inventory;

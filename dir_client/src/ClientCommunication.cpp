@@ -46,7 +46,10 @@ void	ClientCommunication::checkFd()
 	if (FD_ISSET(STDIN_FILENO, &read_fs))
 		disconnect();
 	if (FD_ISSET(sock, &read_fs))
-		pullData();//read from server
+	{
+		if (pullData() == 0)//read from server
+			disconnect();
+	}
 	if (FD_ISSET(sock, &write_fs))
 		pushData();//write to server
 }
@@ -58,7 +61,12 @@ void	ClientCommunication::manageRecv()
 	if (isAuthenticate)
 	{
 		std::string msg = bufferRecv.getFirstMsg();
-		//TODO ;)
+		if (msg.compare("mort\n") == 0)
+		{
+			//TODO ;)
+		}
+		else
+			player->receiveResponse(msg);
 	}
 	else
 		clientAuthentication();
@@ -94,9 +102,11 @@ void	ClientCommunication::clientAuthentication()
 		{
 			std::string msg = bufferRecv.getFirstMsg();
 			parseWorldSize(msg, &player->worldSizeX, &player->worldSizeY);
+			player->bufferSend = &bufferSend;
 			std::cout << KGRN << "client authenticated" << KRESET << std::endl;
 			player->printStat();
 			isAuthenticate = true;
+			player->avance();
 		}
 		catch (CustomException &e)
 		{
@@ -113,6 +123,7 @@ void	ClientCommunication::replaceEnd(std::string &str)
 		str.replace(start_pos, LEN_END, "*");
 	}
 }
+
 void	ClientCommunication::connectToServer()
 {
 	struct hostent		*host;
@@ -142,7 +153,6 @@ void	ClientCommunication::connectToServer()
 ** parse : <slot_number>\n<x_position> <y_position>\n
 ** TODO: check error
 */
-
 void	ClientCommunication::parseTeamSlots(std::string msg, int *teamSlots)
 {
 	std::regex expression("^([0-9]+)\n$");
@@ -210,7 +220,7 @@ void	ClientCommunication::pushData()
 /*
 ** receive data server
 */
-void	ClientCommunication::pullData()
+int		ClientCommunication::pullData()
 {
 	int		retRecv;
 	int		sizeRead;
@@ -219,8 +229,8 @@ void	ClientCommunication::pullData()
 	sizeRead = BUFF_SIZE - bufferRecv.getLen();
 	if (sizeRead == 0)
 	{
-		throw (CustomException("buffer full"));
-		return ;
+		throw (CustomException("buffer full")); //not catched
+		return -1;
 	}
 	buffRecv = new char[sizeRead];
 	while (1)
@@ -239,6 +249,7 @@ void	ClientCommunication::pullData()
 	replaceEnd(recvStr);
 	std::cout << KBLU << " Receiving to server: "<< KRESET << "["<< recvStr << "]" << std::endl;
 	delete[] buffRecv;
+	return (retRecv);
 }
 
 /*
