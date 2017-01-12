@@ -27,7 +27,7 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define BUFF_SIZE 256
+# define BUFF_SIZE 4096
 # define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
@@ -56,6 +56,7 @@ typedef struct				s_pos
 
 typedef struct s_serveur t_serveur;
 typedef struct s_client_entity t_client_entity;
+typedef struct s_world_case t_world_case;
 
 
 /*
@@ -97,6 +98,7 @@ typedef struct				s_player
 	int						level;
 	t_pos					pos;
 	t_dir					dir;
+	t_world_case			*cur_case;
 }							t_player;
 
 
@@ -123,7 +125,6 @@ typedef struct 				s_client_entity
 	int						is_disconnecting;
 
 	// Client program variables
-	int						level;
 	SOCKET					sock;
 	t_team_entity			*team;
 
@@ -180,11 +181,8 @@ typedef struct				s_case_ressources
 
 typedef struct				s_world_case
 {
-	// une case contient:
-	t_client_entity			*players;// players
+	// A case is associated to a player.cur_case pointer.
 	t_case_ressources		ressources;// items
-
-
 }							t_world_case;
 
 typedef struct 				s_world_hdl
@@ -234,6 +232,7 @@ int							modulo(int a, int b);
 
 void						print_buff(t_buffer buff);
 void						print_send(int sock, char *str, int len);
+void						print_send_gfx(char *str);
 void						print_receive(int sock, char *str, int len);
 
 /*
@@ -284,9 +283,17 @@ void						write_client(t_client_entity *client);
 char						*get_first_cmd(t_buffer *buffer);
 
 /*
+** communication_gfx.c
+*/
+
+void						push_gfx_msg(t_serveur *serv, char *msg);
+void						send_current_world_state(t_serveur *serv, t_client_entity *gfx_client);
+
+/*
 ** client_hdl.c
 */
 t_client_entity				*create_client(SOCKET sock);
+void						set_client_player_datas(t_client_entity *new_client);
 void						add_client(t_serveur *serv, t_client_entity *client);
 void						remove_client(t_serveur *serv, t_client_entity *client);
 
@@ -317,6 +324,13 @@ void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
 
 // client command execution.
 void						exec_cmd_client(t_serveur *serv);
+
+/*
+**	Player handling (inside client_entity)
+*/
+
+void						assign_random_player_position(t_serveur *serv, t_player *player);
+
 
 /*
 ** src/cmds_functions/

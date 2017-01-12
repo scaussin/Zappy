@@ -35,7 +35,7 @@ void	init_terrain(t_serveur *serv)
 
 	generate_ressources(&serv->world_hdl);
 
-	print_world_board(&serv->world_hdl); //
+	// print_world_board(&serv->world_hdl); // Print the world map and resources.
 
 	printf(KGRN "Terrain generated successfully.\n" KRESET);
 
@@ -71,7 +71,6 @@ void	set_world_board_cases(t_world_hdl *world_hdl)
 	{
 		while (x < world_hdl->map_x)
 		{
-			world_hdl->world_board[y][x].players = NULL;
 			world_hdl->world_board[y][x].ressources.food = 0;
 			world_hdl->world_board[y][x].ressources.linemate = 0;
 			world_hdl->world_board[y][x].ressources.deraumere = 0;

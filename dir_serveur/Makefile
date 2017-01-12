@@ -5,6 +5,7 @@ HEADER = includes/serveur.h
 SRC = src/serveur_main.c \
 src/connection.c \
 src/communication.c \
+src/communication_gfx.c \
 src/tools.c \
 src/cmd_clients_init.c \
 src/cmd_clients_manager.c \
@@ -15,6 +16,7 @@ src/team_hdl.c \
 src/serveur_data.c \
 src/terrain_generation.c \
 src/serveur_loop.c \
+src/player_handler.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
 src/cmds_functions/cmd_voir.c

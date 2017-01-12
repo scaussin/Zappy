@@ -102,6 +102,13 @@ void print_send(int sock, char *str, int len)
 	printf("[%*s]\n", len, str);
 }
 
+void print_send_gfx(char *str)
+{
+	printf(KMAG " Sending to gfx : " KRESET);
+	replace_nl(str);
+	printf("[%*s]\n", (int)strlen(str), str);
+}
+
 void print_receive(int sock, char *str, int len)
 {
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);

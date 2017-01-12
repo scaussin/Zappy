@@ -11,15 +11,19 @@ t_client_entity	*create_client(SOCKET sock)
 	// set client program status variables.
 	new_client->is_in_game = 0;
 	new_client->is_gfx = 0;
-	new_client->level = 0;
 
 	// set player game starting datas
+	set_client_player_datas(new_client);
+	return (new_client);
+}
+
+void			set_client_player_datas(t_client_entity *new_client)
+{
 	new_client->player.level = 0;
 	new_client->player.pos.x = 5;
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;
-
-	return (new_client);
+	new_client->player.cur_case = NULL;
 }
 
 void			add_client(t_serveur *serv, t_client_entity *client)

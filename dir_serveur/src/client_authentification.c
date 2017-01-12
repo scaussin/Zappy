@@ -32,17 +32,15 @@ void	client_authentification(t_serveur *serv, t_client_entity *client)
 
 void	client_authenticate_gfx(t_serveur *serv, t_client_entity *client)
 {
-	char			*str_to_send;
+//	char			*str_to_send;
 	
 	if (!serv->client_hdl.gfx_client)
 	{
 		serv->client_hdl.gfx_client = client;
 		client->is_gfx = 1;
 
-		// sending world size;
-		asprintf(&str_to_send, "msz %d %d\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
-		write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
-		free(str_to_send);
+		send_current_world_state(serv, client);
+		//free(str_to_send);
 		printf(KGRN "GFX client recognized\n" KRESET);
 		return ;
 	}
@@ -85,6 +83,19 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		free(str_to_send);
 		// one slot now taken in team.
 		team->available_slots -= 1;
+
+		// assign player pos et send msg to gfx
+		assign_random_player_position(serv, &(client->player));
+		// send "pnw #n X Y O L N\n"
+		asprintf(&str_to_send, "pnw %d %d %d %d %d %s\n",
+			client->sock,
+			client->player.pos.x,
+			client->player.pos.y,
+			client->player.dir + 1, // +1 cause enum start at 0, and gfx protocol wants 1;
+			client->player.level,
+			client->team->name);
+		push_gfx_msg(serv, str_to_send);
+		print_send_gfx(str_to_send);
 	}
 	else
 	{

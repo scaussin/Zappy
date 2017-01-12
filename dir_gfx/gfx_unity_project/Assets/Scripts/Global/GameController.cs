@@ -26,8 +26,8 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
-        GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
-        
+        //GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
+		GameManager.instance.MsgBroadcastController.OnWorldSizeReceived.AddListener (OnWorldSizeReceivedAction);
         // Starting state for the player:
         ActivateMainMenuInput();
     }
@@ -71,15 +71,17 @@ public class GameController : MonoBehaviour {
         ActivateMainMenuInput();
         GameManager.instance.MainMenuController.ResponseText.color = Color.red;
         GameManager.instance.MainMenuController.ResponseText.text = "- Failed to connect to server -";
+		DisablePlayerCameraControl ();
     }
 
     /// <summary>
     /// Called when connection is successful and the client is authentified. Starts spawning the world blocks.
     /// </summary>
-	public void		OnGfxAuthentifiedAction()
+	public void		OnWorldSizeReceivedAction()
 	{
         CameraViewControl.GetComponent<CameraViewControl>().gameObject.SetActive(true);
         GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
+		EnablePlayerCameraControl ();
 	}
 
 	/// <summary>

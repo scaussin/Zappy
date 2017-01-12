@@ -16,7 +16,7 @@ public class ConnectionManager : MonoBehaviour
 	/// <summary>
 	/// Event invoked when the client is connected to the server and authentified as zappy-gfx connection.
 	/// </summary>
-	public UnityEvent					OnAuthentificationDone;
+	//public UnityEvent					OnAuthentificationDone;
 
 	/// <summary>
 	/// Invoked when the client is connected to the server, not yet authentified. (server may not be the correct one) 
@@ -36,13 +36,17 @@ public class ConnectionManager : MonoBehaviour
 	public bool							IsAuthMsgSend = false;
 
 	// private
-	private byte[]						buffer = new byte[100];
+	public int							msg_size = 2048;
+	public CircularBuffer				buffer_recv = new CircularBuffer();
+	public CircularBuffer				buffer_send = new CircularBuffer();
+
+	//private byte[]					buffer = new byte[4096];
 	private string						retString;
 	private MsgBroadcastController		MsgBroadcastController;
 
 	void Awake()
 	{
-		OnAuthentificationDone = new UnityEvent ();
+		//OnAuthentificationDone = new UnityEvent ();
 	}
 
 	// Use this for initialization
@@ -70,40 +74,44 @@ public class ConnectionManager : MonoBehaviour
 					IsConnected = false;
 					return ;
 				}
-
-				// Authentification process - read second message after GRAPHIC\n sent;
-				if (!IsAuthenticated && IsAuthMsgSend)
-				{
-					string receivedMsg = ReadMsg ();
-					Debug.Log ("Received: [" + receivedMsg + "]");
-					AuthReception (receivedMsg); // will confirm the auth.
-				}
-				else
-				{
-					// When authentified, msg are transmitted to MsgBroadcastController for parsing.
-					MsgBroadcastController.CurrentReceivedMsg = ReadMsg();
-					MsgBroadcastController.OnMsgReception.Invoke ();
-				}
+				ReadMsg ();
             }
 			else if (ClientSocket.Poll(100, SelectMode.SelectWrite))
 			{
-				// Authentification process - write part;
-				if (!IsAuthenticated && !IsAuthMsgSend) {
-					Debug.Log ("Send: GRAPHIC*");
-					SendMsg ("GRAPHIC\n");
-					IsAuthMsgSend = true;
-				}
-				else if (MsgBroadcastController.HasMsgToSend)
-				{
-					SendMsg (MsgBroadcastController.MsgToSend);
-					MsgBroadcastController.HasMsgToSend = false;
-				}
+				SendMsg ();
 			}
 			else if (ClientSocket.Poll(100, SelectMode.SelectError))
             {
                 Debug.Log("This Socket has an error.");
             }
         }
+	}
+
+	// to send msg to server, use ConnectionManager.buffer_send.pushMsg(string);
+	// this function will send at the appropriated moment.
+	private void SendMsg()
+	{
+		int		sizeToSend;
+		byte[]	bytesToSend;
+
+		if ((sizeToSend = buffer_send.getLen()) > 0)
+		{
+			bytesToSend = buffer_send.ExtractBufferBytes ();
+			ClientSocket.Send(bytesToSend, 0, sizeToSend, SocketFlags.None);
+			Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString(bytesToSend) + "]");
+		}
+	}
+
+	private void ReadMsg()
+	{
+		int					ret;
+		byte[]				buffer = new byte[msg_size];
+
+		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
+		Debug.Log (System.Text.Encoding.UTF8.GetString (buffer));
+		buffer_recv.pushBytes (buffer, ret);
+
+		return ;
 	}
 
 	/// <summary>
@@ -149,11 +157,6 @@ public class ConnectionManager : MonoBehaviour
 
             Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
 			OnConnectionWithServer.Invoke();
-			if (ClientSocket.Poll(1000, SelectMode.SelectRead))
-			{
-				string ReceivedMsg = ReadMsg();
-				Debug.Log("Received: " + ReceivedMsg);
-			}
 			IsConnected = true;
         }
         catch (System.Exception e)
@@ -180,7 +183,7 @@ public class ConnectionManager : MonoBehaviour
 
 			Debug.Log ("Success - Received world size - Gfx authentified");
 			IsAuthenticated = true;
-			OnAuthentificationDone.Invoke ();
+//			OnAuthentificationDone.Invoke ();
 		}
 		else
 		{
@@ -188,22 +191,7 @@ public class ConnectionManager : MonoBehaviour
 		}
 	}
     
-	// to send msg to server, use the MsgBroadcastController. Because the msg must be sent
-	// according to the select status.
-    private void SendMsg(string msg)
-	{
-		byte[] toBytes = Encoding.ASCII.GetBytes(msg);
-        ClientSocket.Send(toBytes);
-	}
 
-	private string ReadMsg()
-	{
-		int ret;
-		ret = ClientSocket.Receive(buffer);
-		buffer [ret] = 0;
-		retString = Encoding.ASCII.GetString(buffer);
-		return retString;
-	}
 }
 
 /*

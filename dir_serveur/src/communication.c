@@ -18,6 +18,9 @@ void		check_all_clients_communication(t_serveur *serv)
 		if (FD_ISSET(p_client->sock, serv->network.read_fs)
 			&& !(ret_read = read_client(p_client)))
 		{
+			// check gfx clear
+			if (p_client->is_gfx == 1)
+				serv->client_hdl.gfx_client = NULL;
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			return ;
@@ -43,6 +46,9 @@ void		disconnect_flagged_clients(t_serveur *serv)
 	{
 		if (p_client->is_disconnecting == 1)
 		{
+			// check gfx clear
+			if (p_client->is_gfx == 1)
+				serv->client_hdl.gfx_client = NULL;
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			p_client = serv->client_hdl.list_clients;
