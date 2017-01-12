@@ -13,7 +13,7 @@ ClientBuffer::~ClientBuffer()
 /*
 **	return first cmd whithout end char ('\n').
 */
-std::string ClientBuffer::getFirstCmd()
+std::string ClientBuffer::getFirstMsg()
 {
 	std::string buff;
 	char *end;
@@ -28,6 +28,11 @@ std::string ClientBuffer::getFirstCmd()
 		erase(lenCmd);
 	}
 	return (buff);
+}
+
+void ClientBuffer::pushMsg(std::string msg)
+{
+	pushBuffer((char *)msg.c_str(), msg.size());
 }
 
 std::string ClientBuffer::getBuffer()

@@ -19,6 +19,7 @@
 # include <netdb.h>
 # include <fcntl.h>
 # include <sys/time.h>
+# include <netdb.h>
 
 # define BUFF_SIZE 128
 # define END "\n"
@@ -36,18 +37,18 @@ typedef struct			s_CommunicationSettings
 
 // Class definitions.
 class ClientInputHandler; // handle and check args.
+class ClientBuffer;
 class ClientCommunication; // communicate with the server.
 class ClientPlayer; // the actual game player.
-class ClientBuffer;
 class ClientController; // main controller.
 
 
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
+# include "ClientBuffer.hpp"
 # include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
-# include "ClientBuffer.hpp"
 # include "ClientController.hpp"
 
 

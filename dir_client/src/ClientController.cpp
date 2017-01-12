@@ -5,8 +5,8 @@ ClientController::ClientController(int argc, char **argv)
 	//std::cout << KCYN "Client Controller starting..." KRESET << std::endl;
 	try
 	{
-		player = new ClientPlayer();
 		inputHandler = new ClientInputHandler(argc, argv);
+		player = new ClientPlayer(inputHandler->teamName);
 		communication = new ClientCommunication(inputHandler->hostName, inputHandler->port, player);
 	}
 	catch (CustomException &e)
@@ -17,7 +17,7 @@ ClientController::ClientController(int argc, char **argv)
 	}
 	try
 	{
-		communication->connect();
+		communication->connectToServer();
 	}
 	catch (CustomException &e)
 	{

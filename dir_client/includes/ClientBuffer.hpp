@@ -8,10 +8,11 @@ class ClientBuffer
 	public:
 		ClientBuffer();
 		~ClientBuffer();
-		std::string	getFirstCmd();
+		std::string	getFirstMsg();
 		std::string	getBuffer();
 		void		erase(int len);
 		int			getLen();
+		void		pushMsg(std::string msg);
 		void		pushBuffer(char *to_write, int len);
 
 	private:

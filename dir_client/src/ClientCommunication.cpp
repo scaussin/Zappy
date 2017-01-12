@@ -12,6 +12,7 @@ ClientCommunication::ClientCommunication(std::string _hostName, int _port, Clien
 	isConnected = false;
 	isAuthenticate = false;
 	sock = -1;
+	stateProcessAuth = 0;
 }
 
 ClientCommunication::~ClientCommunication()
@@ -45,19 +46,44 @@ void	ClientCommunication::checkFd()
 	if (FD_ISSET(STDIN_FILENO, read_fs))
 		disconnect();
 	if (FD_ISSET(sock, read_fs))
-		pullData();
+		pullData();//read from server
 	if (FD_ISSET(sock, write_fs))
-		pushData();
+		pushData();//write to server
 }
 
-void	ClientCommunication::connect()
+void	ClientCommunication::manageRecv()
+{
+	if (bufferRecv.getLen() == 0)
+		return ;
+	std::string msg = bufferRecv.getFirstMsg();
+	if (stateProcessAuth == 0 && msg.compare("BIENVENUE\n") == 0)
+	{
+		bufferSend.pushMsg(player->teamName);
+		stateProcessAuth = 1;
+	}
+	if (stateProcessAuth == 1)
+	{
+		try
+		{
+			parseStartMsg(msg, &player->teamSlots, &player->posX, &player->posY);
+			stateProcessAuth = 2;
+			isAuthenticate = true;
+		}
+		catch (CustomException &e)
+		{
+			std::cout << KRED << e.what() << KRESET << std::endl;
+		}
+	}
+}
+
+void	ClientCommunication::connectToServer()
 {
 	struct hostent		*host;
 	
 	if (!isConnected)
 	{
 		//std::cout << KCYN "- Connection attempt... -" KRESET << std::endl;
-		if ((host = gethostbyname(hostName)))
+		if ((host = gethostbyname(hostName.c_str())))
 			hostName = inet_ntoa(*((struct in_addr **)(host->h_addr_list))[0]);
 
 		proto = getprotobyname("tcp");
@@ -76,105 +102,30 @@ void	ClientCommunication::connect()
 	else
 		std::cout << "Client already connected" << std::endl;
 }
-/*
-void	ClientCommunication::dialogStart()
-{
-	struct timeval		timeout;
-	fd_set				readSet;
-	int					select_ret;
-
-	// First batch of data reception
-	std::cout << KCYN "- Awaiting server response... -" KRESET << std::endl;
-	timeout.tv_sec = 3; // seconds.
-	timeout.tv_usec = 0; // milliseconds.
-	FD_ZERO(&readSet);
-	FD_SET(sock, &readSet);
-	select_ret = select(sock + 1, &readSet, NULL, NULL, &timeout);
-	if (select_ret == -1)
-	{
-		perror("Select");
-		throw (CustomException("Select error"));
-	}
-	if (FD_ISSET(sock, &readSet))
-	{
-		std::string		receivedString = ReceiveMessage();
-		std::cout << KBLU << "Received: " << KRESET << receivedString << std::endl;
-		// Is it the right server ?
-		if (receivedString.compare("BIENVENUE\n") == 0)
-		{
-			std::cout << KYEL << "Sending team name: " << KRESET << Settings.TeamName << std::endl;
-			SendMessage(Settings.TeamName + "\n");
-
-			// Receiving first datas.
-			receivedString = ReceiveMessage();
-			timeou
-			std::cout << KBLU << "Received: " << KRESET << receivedString << std::endl;
-
-			// Recuperating : <slot_number>\n<x_position> <y_position>\n
-			char	*splittedString;
-			// getting slot number.
-			if (!(splittedString = strtok((char *)receivedString.c_str(), " \n")))
-			{
-				throw (CustomException("Error while getting slot number"));
-			}
-			TeamSlots = strtol(splittedString, NULL, 10);
-			// getting X start position.
-			if (!(splittedString = strtok(NULL, " \n")))
-			{
-				throw (CustomException("Error while getting x starting position"));
-			}
-			Startx = strtol(splittedString, NULL, 10);
-			// getting Y start position.
-			if (!(splittedString = strtok(NULL, " \n")))
-			{
-				throw (CustomException("Error while getting y starting position"));
-			}
-			Starty = strtol(splittedString, NULL, 10);
-			std::cout << "Nb of slots received: " << TeamSlots << std::endl;
-			if (TeamSlots <= 0)
-			{
-				throw (CustomException("No slot available in team or team does not exist."));
-			}
-		}
-		else
-		{
-			throw (CustomException("Wrong starting message received (incorrect server?)"));
-		}
-	}
-	else
-	{
-		throw (CustomException("Connection timed out (the server did not answer). Closing client..."));
-	}
-	std::cout << KGRN "First dialog with server successful: Zappy server recognized" KRESET << std::endl;
-}*/
 
 /*
-// Recuperating : <slot_number>\n<x_position> <y_position>\n
-	char	*splittedString;
-	// getting slot number.
-	if (!(splittedString = strtok((char *)receivedString.c_str(), " \n")))
-	{
-		throw (CustomException("Error while getting slot number"));
-	}
-	TeamSlots = strtol(splittedString, NULL, 10);
-	// getting X start position.
-	if (!(splittedString = strtok(NULL, " \n")))
-	{
-		throw (CustomException("Error while getting x starting position"));
-	}
-	Startx = strtol(splittedString, NULL, 10);
-	// getting Y start position.
-	if (!(splittedString = strtok(NULL, " \n")))
-	{
-		throw (CustomException("Error while getting y starting position"));
-	}
-	Starty = strtol(splittedString, NULL, 10);
-	std::cout << "Nb of slots received: " << TeamSlots << std::endl;
-	if (TeamSlots <= 0)
-	{
-		throw (CustomException("No slot available in team or team does not exist."));
-	}
+** parse : <slot_number>\n<x_position> <y_position>\n
+** TODO: check error
 */
+void	ClientCommunication::parseStartMsg(std::string msg, int *teamSlots, int *posX, int *posY)
+{
+	char	*splittedString;
+
+	if (!(splittedString = strtok((char *)msg.c_str(), " \n")))
+		throw (CustomException("Error while getting slot number"));
+
+	*teamSlots = strtol(splittedString, NULL, 10);
+	if (!(splittedString = strtok(NULL, " \n")))
+		throw (CustomException("Error while getting x starting position"));
+
+	*posX = strtol(splittedString, NULL, 10);
+	if (!(splittedString = strtok(NULL, " \n")))
+		throw (CustomException("Error while getting y starting position"));
+
+	*posY = strtol(splittedString, NULL, 10);
+	if (*teamSlots <= 0)
+		throw (CustomException("No slot available in team or team does not exist."));
+}
 
 void	ClientCommunication::disconnect()
 {
@@ -200,7 +151,7 @@ void	ClientCommunication::pushData()
 	buffTmp = bufferSend.getBuffer();
 	while (1)
 	{
-		retSend = send(sock, buffTmp.c_str(), bufferSend.getLen, 0);
+		retSend = send(sock, buffTmp.c_str(), bufferSend.getLen(), 0);
 		if (retSend == -1 && (errno == EAGAIN || errno == EINTR))
 			continue;
 		else
@@ -222,7 +173,7 @@ void	ClientCommunication::pullData()
 	int		sizeRead;
 	char	*buffRecv;
 
-	sizeRead = BUFF_SIZE - bufferRecv.getLen;
+	sizeRead = BUFF_SIZE - bufferRecv.getLen();
 	if (sizeRead == 0)
 	{
 		throw (CustomException("buffer full"));

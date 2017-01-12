@@ -6,13 +6,15 @@
 class ClientPlayer
 {
 	public:
-		ClientPlayer();
+		ClientPlayer(std::string teamName);
 		~ClientPlayer();
-		void						init(int x, int y);
 
-	private:
+		std::string					teamName;
 		int							posX;
 		int							posY;
+		int							teamSlots;
+
+	private:
 		int							level;
 		int							lifeUnits;
 		std::list<std::string>		inventory;
