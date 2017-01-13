@@ -11,6 +11,7 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
+//<sys/time.h>
 # include <arpa/inet.h>
 # include <syslog.h>
 
@@ -104,7 +105,7 @@ typedef struct 				s_list_cmds_entity
 {
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	char					*param;
-	int						time;
+	clock_t					clock_end;
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -154,13 +155,13 @@ typedef struct 				s_cmd_match
 {
 	char					*name;
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	int						time;
 }							t_cmd_match;
 
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
 	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
-
 }							t_cmd_hdl;
 
 /*
@@ -183,8 +184,6 @@ typedef struct				s_world_case
 	// une case contient:
 	t_client_entity			*players;// players
 	t_case_ressources		ressources;// items
-
-
 }							t_world_case;
 
 typedef struct 				s_world_hdl
@@ -192,10 +191,7 @@ typedef struct 				s_world_hdl
 	int						map_x;
 	int						map_y;
 	double					t_unit;
-
-
 	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
-
 }							t_world_hdl;
 
 
@@ -311,9 +307,9 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 
 void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
 
-void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
-void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
-void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
+void						lex_and_parse_cmds(t_serveur *serv, t_client_entity *client, t_cmd_match *cmd_match_table);
+void						check_cmd_match(t_serveur *serv, t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
+void						add_cmd(t_serveur *serv, t_client_entity *client, t_cmd_match *cmd, char *param);
 
 // client command execution.
 void						exec_cmd_client(t_serveur *serv);

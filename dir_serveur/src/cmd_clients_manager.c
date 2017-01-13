@@ -4,7 +4,7 @@
 **	buff_recv to t_list_cmds_entity
 */
 
-void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
+void	lex_and_parse_cmds(t_serveur *serv, t_client_entity *client, t_cmd_match *cmd_match_table)
 {
 	char *cmd;
 
@@ -16,12 +16,12 @@ void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 	}
 	while ((cmd = get_first_cmd(&client->buff_recv)))
 	{
-		check_cmd_match(cmd_match_table, client, cmd); // -> Parser.
+		check_cmd_match(serv, cmd_match_table, client, cmd); // -> Parser.
 		free(cmd);
 	}
 }
 
-void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
+void	check_cmd_match(t_serveur *serv, t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
 {
 	int i = 0;
 
@@ -29,7 +29,7 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 	{
 		if (strcmp(cmd_match_table[i].name, cmd) == 0)
 		{
-			add_cmd(client, &cmd_match_table[i], cmd);
+			add_cmd(serv, client, &cmd_match_table[i], cmd);
 			return ;
 		}
 		i++;
@@ -38,14 +38,14 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
 }
 
-void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
+void	add_cmd(t_serveur *serv, t_client_entity *client, t_cmd_match *cmd, char *param)
 {
 	t_list_cmds_entity	*last;
 	t_list_cmds_entity	*new_cmd;
 
 	new_cmd = s_malloc(sizeof(t_list_cmds_entity));
 	new_cmd->func = cmd->func;
-	new_cmd->time = -1;
+	new_cmd->clock_end = clock() + (CLOCKS_PER_SEC * cmd->time * serv->world_hdl.t_unit);
 	new_cmd->param = strdup(param);
 	new_cmd->next = NULL;
 	if (!client->list_cmds)
@@ -66,15 +66,19 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 void	exec_cmd_client(t_serveur *serv)
 {
 	t_client_entity	*p_client;
+	clock_t t;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
 		if (p_client->list_cmds)
 		{
-			if (p_client->list_cmds->time == -1)//start cmd
+			t = clock();
+			if (p_client->list_cmds->clock_end <= t)//start cmd
 			{
+				printf(KBLU "Lag: %f seconds" KRESET, ((float)(t - p_client->list_cmds->clock_end) / CLOCKS_PER_SEC);
 				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+				
 			}
 			else if (p_client->list_cmds->time == 0)//end cmd
 			{

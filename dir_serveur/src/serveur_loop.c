@@ -34,28 +34,36 @@ void	init_fd(t_serveur *serv)
 */
 void	main_loop(t_serveur *serv)
 {
+	int		ret_select;
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 100;
+
 	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
 		init_fd(serv);
 
-		// BOUYAKA SELECT IS HERE !!!!!!!!!!
-		if (select(serv->network.sock_max + 1,
-				serv->network.read_fs, serv->network.write_fs, NULL, NULL) < 0)
+		ret_select =  select(serv->network.sock_max + 1, serv->network.read_fs,
+			serv->network.write_fs, NULL, &timeout);
+		if (ret_select < 0) //wake up select : error
 			exit_error("select()");
+		else if (ret_select > 0) //wake up select : event read or write
+		{
+			// Exit when enter presse
+			if (FD_ISSET(STDIN_FILENO, serv->network.read_fs))
+				return;
+			// Connect new client
+			else if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
+				new_client_connection(serv);
+			// Check commands from clients and fill all clients buffers
+			else
+				check_all_clients_communication(serv);
 
-		// Exit when enter presse
-		if (FD_ISSET(STDIN_FILENO, serv->network.read_fs))
-			return;
-		// Connect new client
-		else if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
-			new_client_connection(serv);
-		// Check commands from clients and fill all clients buffers
-		else
-			check_all_clients_communication(serv);
-
-		// Treat datas from buffers previously filled.
-		manage_clients_input(serv);
+			// Treat datas from buffers previously filled.
+			manage_clients_input(serv);
+		}
+		
 		exec_cmd_client(serv); // time
 	}
 }
@@ -85,7 +93,7 @@ void manage_clients_input(t_serveur *serv)
 			else if (p_client->is_in_game && !p_client->is_gfx)
 			{
 				// client is in game and not gfx, everything he sends is cmds.
-				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
+				lex_and_parse_cmds(serv, p_client, serv->cmd_hdl.cmd_match_table);
 			}
 		}
 		p_client = p_client->next;
