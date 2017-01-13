@@ -11,7 +11,6 @@ using UnityEngine.Events;
 /// </summary>
 public class MsgBroadcastController : MonoBehaviour
 {
-	public WorldManager			WorldManager;
 	public ConnectionManager	ConnectionManager;
 
 	public UnityEvent			OnWorldSizeReceived;
@@ -32,7 +31,6 @@ public class MsgBroadcastController : MonoBehaviour
 
 	void Awake()
 	{
-		WorldManager = GameObject.Find("World").gameObject.GetComponent<WorldManager> ();
 		ConnectionManager = GameManager.instance.ConnectionManager;
 
 		OnWorldSizeReceived =  new UnityEvent ();
@@ -57,20 +55,12 @@ public class MsgBroadcastController : MonoBehaviour
 	{
 		if (IsReceiving)
 		{
-			CurrentReceivedMsg = ConnectionManager.buffer_recv.getMsg (); // lexing here
-			if (CurrentReceivedMsg != null) {
+			while ((CurrentReceivedMsg = ConnectionManager.buffer_recv.getMsg ()) != null) // lexing here
+			{
 				//Debug.Log ("Msg received: [" + CurrentReceivedMsg + "]");
-				//LexMsg ();
 				ParseMsg (CurrentReceivedMsg);
 			}
 		}
-	}
-
-	public void LexMsg()
-	{
-		CurrentReceivedMsg = CurrentReceivedMsg.Trim ();
-		LexedMsg = CurrentReceivedMsg.Split ("\n"[0]);
-		//LexedMsg = Regex.Split (CurrentReceivedMsg, @"(?<=[\n])");
 	}
 
 	public void ParseMsg(string msg)
@@ -99,7 +89,7 @@ public class MsgBroadcastController : MonoBehaviour
 		}
 
 		// check server time unit msg
-		rgx = new Regex("^sgt ([0-9]*\\.?[0-9]+)$");
+		rgx = new Regex("^sgt ([0-9]*\\.?[0-9]+)$"); // floated point number.
 		match = rgx.Match(msg);
 		if (match.Success && match.Groups.Count == 2)
 		{
@@ -109,10 +99,17 @@ public class MsgBroadcastController : MonoBehaviour
 			Debug.Log ("Success - Received World Time unit");
 			OnWorldTimeUnitReceived.Invoke();
 		}
+
+		// get case content
+		// example: bct 6 9 9 1 5 1 4
+		rgx = new Regex("^bct \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			// Use the game controller for action. This class should not access directly WorldManager.
+			GameManager.instance.GameController.SetWorldBlockRessources (msg);
+		}
 	}
-
-
-
 
 
 	/// <summary>

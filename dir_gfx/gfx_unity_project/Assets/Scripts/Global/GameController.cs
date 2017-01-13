@@ -10,6 +10,7 @@ using UnityEngine.Events;
 /// It's the transition box !
 /// </summary>
 public class GameController : MonoBehaviour {
+	[Header("references to other controller")]
 	GameObject			CameraViewControl;
 
 	// Player states.
@@ -28,6 +29,7 @@ public class GameController : MonoBehaviour {
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
         //GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
 		GameManager.instance.MsgBroadcastController.OnWorldSizeReceived.AddListener (OnWorldSizeReceivedAction);
+
         // Starting state for the player:
         ActivateMainMenuInput();
     }
@@ -82,6 +84,11 @@ public class GameController : MonoBehaviour {
         CameraViewControl.GetComponent<CameraViewControl>().gameObject.SetActive(true);
         GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
 		EnablePlayerCameraControl ();
+	}
+
+	public void		SetWorldBlockRessources(string msg)
+	{
+		GameManager.instance.WorldManager.ItemSpawner.SetBlockRessources (msg);
 	}
 
 	/// <summary>

@@ -27,7 +27,7 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define BUFF_SIZE 4096
+# define BUFF_SIZE 100000
 # define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"

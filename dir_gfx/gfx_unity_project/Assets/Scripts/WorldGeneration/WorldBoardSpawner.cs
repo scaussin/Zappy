@@ -1,41 +1,56 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class WorldBoardSpawner : MonoBehaviour {
 
-
 	[Header("Associated objects")]
-	public GameObject			BlockPrefab;
-	public GameObject			ZeroPoint;
-	public GameObject			BlockContainer;
+	public GameObject					BlockPrefab;
+	public GameObject					ZeroPoint;
+	public GameObject					BlockContainer;
+
+
+	[System.Serializable]
+	public class WorldBoard
+	{
+		public List<GameObject> Row;
+	}
 
 	[Header("Access to each spawned block")]
-	public List<GameObject>		Blocks;
+	public List <WorldBoard> Blocks_col;
 
 
-	public int					map_size_x;
-	public int					map_size_y;
+	public int							map_size_x;
+	public int							map_size_y;
+
+	public UnityEvent					OnWorldBoardSpawned;
 
 	// spawn required variables.
-	private int					cur_y;
-	private int					cur_x;
+	private int							cur_y;
+	private int							cur_x;
 
-	private Vector3				spawn_location;
+	private Vector3						spawn_location;
 
-	private float				x_base_offset;
-	private float				z_base_offset;
+	private float						x_base_offset;
+	private float						z_base_offset;
 
 	// Use this for initialization
 	void Awake () {
 		ZeroPoint = transform.Find("ZeroPoint").gameObject;
 		BlockContainer = transform.Find("BlockContainer").gameObject;
 		BlockPrefab = Resources.Load ("Prefabs/World/Block") as GameObject;
+		OnWorldBoardSpawned = new UnityEvent ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public BlockObject	GetBlockObject(int x, int y)
+	{
+		return (Blocks_col [y].Row [x].GetComponent<BlockObject> ());
 	}
 
 	/// <summary>
@@ -58,20 +73,21 @@ public class WorldBoardSpawner : MonoBehaviour {
 		x_base_offset = GameManager.instance.WorldSettings.BlockSize + GameManager.instance.WorldSettings.BlockSpacing;
 		z_base_offset = GameManager.instance.WorldSettings.BlockSize + GameManager.instance.WorldSettings.BlockSpacing;
 
-
-
 		spawn_location = ZeroPoint.transform.position;
 
 		Debug.Log ("Spawning World Blocks!!");
 		// ---- Actual block spawn.
+		Blocks_col = new List<WorldBoard> ();
 		while (cur_y < map_size_y)
 		{
+			Blocks_col.Add(new WorldBoard ());
+			Blocks_col [cur_y].Row = new List<GameObject> ();
 			while (cur_x < map_size_x)
 			{
 				// location is set through additionning variables -> faster calculation method.
 				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location, Quaternion.identity, BlockContainer.transform);
+				Blocks_col[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
-				Blocks.Add (new_block);
 				cur_x++;
 				spawn_location.x += x_base_offset;
 			}
@@ -81,8 +97,6 @@ public class WorldBoardSpawner : MonoBehaviour {
 			spawn_location.x = ZeroPoint.transform.position.x;
 			spawn_location.z += z_base_offset;
 		}
-
-
-
+		OnWorldBoardSpawned.Invoke ();
 	}
 }

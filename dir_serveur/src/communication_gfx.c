@@ -38,7 +38,9 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 	{
 		while (x < serv->world_hdl.map_x)
 		{
-			asprintf(&msg, "bct %d %d %d %d %d %d %d\n",
+			asprintf(&msg, "bct %d %d %d %d %d %d %d %d %d\n",
+				x,
+				y,
 				world_board[y][x].ressources.food,
 				world_board[y][x].ressources.linemate,
 				world_board[y][x].ressources.deraumere,
