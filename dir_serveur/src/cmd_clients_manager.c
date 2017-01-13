@@ -74,22 +74,13 @@ void	exec_cmd_client(t_serveur *serv)
 		if (p_client->list_cmds)
 		{
 			t = clock();
-			if (p_client->list_cmds->clock_end <= t)//start cmd
+			if (p_client->list_cmds->clock_end <= t)//exec cmd
 			{
-				printf(KBLU "Lag: %f seconds" KRESET, ((float)(t - p_client->list_cmds->clock_end) / CLOCKS_PER_SEC);
+				printf(KBLU "Lag: %f seconds" KRESET, ((float)(t - p_client->list_cmds->clock_end)) / CLOCKS_PER_SEC);
 				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
-				
-			}
-			else if (p_client->list_cmds->time == 0)//end cmd
-			{
 				if (p_client->list_cmds->param)
 					free(p_client->list_cmds->param);
 				p_client->list_cmds = p_client->list_cmds->next;
-				p_client->size_list_cmds -= 1;
-			}
-			else// decremente time
-			{
-				p_client->list_cmds->time -= 1;
 			}
 		}
 		p_client = p_client->next;
