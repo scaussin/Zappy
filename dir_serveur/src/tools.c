@@ -106,5 +106,5 @@ void print_receive(int sock, char *str, int len)
 {
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);
 	replace_nl(str);
-	printf("[%*s]\n", len, str);
+	printf("[%.*s] len: %d\n", len, str, len);
 }

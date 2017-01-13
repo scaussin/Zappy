@@ -8,9 +8,14 @@
 	|------------> +x
 */
 
-void	cmd_voir(t_serveur *serv, t_client_entity *client)
+
+void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
 {
-	get_voir_case_positions(serv, &(client->player));
+	(void) param;
+	(void) serv;
+	//get_voir_case_positions(serv, &(client->player));
+	write_buffer(&client_cur->buff_send, "OK\n", 3);
+	client_cur->list_cmds->time = 0;
 }
 
 void	get_voir_case_positions(t_serveur *serv, t_player *player)

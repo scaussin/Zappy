@@ -156,13 +156,13 @@ char		*read_buffer(t_buffer *buff)
 	if (buff->len > 0)
 	{
 		ret_buff = s_malloc(buff->len + 1);
-		bzero(ret_buff, buff->len + 1);
 		i = 0;
 		while (i < buff->len)
 		{
 			ret_buff[i] = buff->buff[(buff->start + i) % BUFF_SIZE];
 			i++;
 		}
+		ret_buff[buff->len] = 0;
 	}
 	return (ret_buff);
 }
@@ -178,13 +178,9 @@ char		*get_first_cmd(t_buffer *buffer)
 	char *end;
 	int len_cmd;
 
-	buff = read_buffer(buffer);
-	//printf("buff:%s", buff);
-	end = strstr(buff, END);
-	if (end)
+	if ((buff = read_buffer(buffer)) && (end = strstr(buff, END)))
 	{
-		//printf("end:\\%s", end);
-		end[1] = 0;
+		end[LEN_END] = 0;
 		len_cmd = (end - buff) + LEN_END;
 		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;
 		buffer->len -= len_cmd;

@@ -2,7 +2,7 @@
 
 //------------------------------------------------------------------------------//
 //																				//
-//		This class takes care of the actual gameplay.							//
+//		player action and manage commande callback 								//
 //																				//
 //																				//
 //------------------------------------------------------------------------------//
@@ -14,12 +14,12 @@ ClientCommande::ClientCommande()
 ClientCommande::~ClientCommande()
 {}
 
-
-
-void	ClientCommande::receiveResponse(std::string response)
+/*
+** execute the first callback function.
+*/
+void	ClientCommande::receiveCallbackCommande(std::string response)
 {
-	(this->*cmdWaitingResult.front())(response);
-	//(this->*i->func)(token);
-	cmdWaitingResult.pop_front();
+	(this->*stackCallbackCommandes.front())(response);
+	stackCallbackCommandes.pop_front();
 }
 

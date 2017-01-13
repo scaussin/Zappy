@@ -41,17 +41,24 @@ void	ClientCommunication::doSelect()
 		throw (CustomException("select() error"));
 }
 
-void	ClientCommunication::checkFd()
+int		ClientCommunication::checkFd()
 {
 	if (FD_ISSET(STDIN_FILENO, &read_fs))
+	{
 		disconnect();
+		return (-1);
+	}
 	if (FD_ISSET(sock, &read_fs))
 	{
 		if (pullData() == 0)//read from server
+		{
 			disconnect();
+			return (-1);
+		}
 	}
 	if (FD_ISSET(sock, &write_fs))
 		pushData();//write to server
+	return (1);
 }
 
 void	ClientCommunication::manageRecv()
@@ -66,7 +73,7 @@ void	ClientCommunication::manageRecv()
 			//TODO ;)
 		}
 		else
-			player->receiveResponse(msg);
+			player->receiveCallbackCommande(msg);
 	}
 	else
 		clientAuthentication();
@@ -106,7 +113,14 @@ void	ClientCommunication::clientAuthentication()
 			std::cout << KGRN << "client authenticated" << KRESET << std::endl;
 			player->printStat();
 			isAuthenticate = true;
+
 			player->avance();
+			player->avance();
+			player->droite();
+			player->avance();
+			player->gauche();
+			player->avance();
+			player->voir();
 		}
 		catch (CustomException &e)
 		{
@@ -230,7 +244,7 @@ int		ClientCommunication::pullData()
 	if (sizeRead == 0)
 	{
 		throw (CustomException("buffer full")); //not catched
-		return -1;
+		return (-1);
 	}
 	buffRecv = new char[sizeRead];
 	while (1)
@@ -247,7 +261,7 @@ int		ClientCommunication::pullData()
 		bufferRecv.pushBuffer(buffRecv, retRecv);
 	std::string recvStr(buffRecv, retRecv);
 	replaceEnd(recvStr);
-	std::cout << KBLU << " Receiving to server: "<< KRESET << "["<< recvStr << "]" << std::endl;
+	std::cout << KBLU << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << std::endl;
 	delete[] buffRecv;
 	return (retRecv);
 }

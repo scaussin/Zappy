@@ -34,6 +34,7 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 		}
 		i++;
 	}
+	return ;
 	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
 }
 

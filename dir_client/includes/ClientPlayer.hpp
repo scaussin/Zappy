@@ -17,9 +17,15 @@ class ClientPlayer : public ClientCommande
 		int							teamSlots;
 
 		virtual void				avance();
+		virtual void				droite();
+		virtual void				gauche();
+		virtual void				voir();
 
 	private:
-		virtual void				avanceRes(std::string response);
+		virtual void				avanceCallback(std::string response);
+		virtual void				droiteCallback(std::string response);
+		virtual void				gaucheCallback(std::string response);
+		virtual void				voirCallback(std::string response);
 
 		int							level;
 		int							lifeUnits;

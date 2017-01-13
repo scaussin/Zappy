@@ -38,7 +38,8 @@ void	ClientController::mainLoop()
 		{
 			communication->initFd();
 			communication->doSelect();
-			communication->checkFd();
+			if (communication->checkFd() == -1)
+				break ;
 			communication->manageRecv();
 		}
 		catch (CustomException &e)

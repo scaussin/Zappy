@@ -12,7 +12,7 @@ class ClientCommunication
 		void					disconnect();
 		void					initFd();
 		void					doSelect();
-		void					checkFd();
+		int						checkFd();
 		void					manageRecv();
 		int						pullData();
 		void					pushData();
@@ -28,27 +28,6 @@ class ClientCommunication
 
 		ClientBuffer			bufferRecv;
 		ClientBuffer			bufferSend;
-/*
-typedef struct	sMatchValue
-{
-	std::regex regex;
-	eValueType type;
-	sMatchValue(std::regex reg, eValueType value) : regex(reg), type(value)
-	{
-	}
-}				tMatchValue;
-
-typedef struct	sCheckInstr
-		{
-			eInstrType type;
-			void (Parser::*func)(tToken *);
-			sCheckInstr(eInstrType type, void (Parser::*funct)(tToken *)) :type(type), func(funct)
-			{
-			}
-		}
-
-		std::vector<tCheckValue> _checkValue;*/
-
 
 	private:
 		int						stateProcessAuth;

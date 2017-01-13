@@ -29,10 +29,47 @@ void	ClientPlayer::printStat()
 void	ClientPlayer::avance()
 {
 	bufferSend->pushMsg("avance\n");
-	cmdWaitingResult.push_back(&ClientCommande::avanceRes);
+	stackCallbackCommandes.push_back(&ClientCommande::avanceCallback);
 }
 
-void	ClientPlayer::avanceRes(std::string response)
+void	ClientPlayer::droite()
+{
+	bufferSend->pushMsg("gauche\n");
+	stackCallbackCommandes.push_back(&ClientCommande::droiteCallback);
+}
+
+void	ClientPlayer::gauche()
+{
+	bufferSend->pushMsg("gauche\n");
+	stackCallbackCommandes.push_back(&ClientCommande::gaucheCallback);
+}
+
+void	ClientPlayer::voir()
+{
+	bufferSend->pushMsg("voir\n");
+	stackCallbackCommandes.push_back(&ClientCommande::voirCallback);
+}
+
+/*
+** Methodes callback
+*/
+
+void	ClientPlayer::avanceCallback(std::string response)
 {
 	std::cout << "exec avance ok" << std::endl;
+}
+
+void	ClientPlayer::droiteCallback(std::string response)
+{
+	std::cout << "exec droite ok" << std::endl;
+}
+
+void	ClientPlayer::gaucheCallback(std::string response)
+{
+	std::cout << "exec gauche ok" << std::endl;
+}
+
+void	ClientPlayer::voirCallback(std::string response)
+{
+	std::cout << "exec voir ok" << std::endl;
 }

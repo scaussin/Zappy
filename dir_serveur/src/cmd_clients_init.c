@@ -16,4 +16,8 @@ void		init_cmd_match_table(t_serveur *serv)
 	serv->cmd_hdl.cmd_match_table[0].func = cmd_avance;
 	serv->cmd_hdl.cmd_match_table[1].name = "droite\n";
 	serv->cmd_hdl.cmd_match_table[1].func = cmd_droite;
+	serv->cmd_hdl.cmd_match_table[2].name = "gauche\n";
+	serv->cmd_hdl.cmd_match_table[2].func = cmd_gauche;
+	serv->cmd_hdl.cmd_match_table[3].name = "voir\n";
+	serv->cmd_hdl.cmd_match_table[3].func = cmd_voir;
 }
