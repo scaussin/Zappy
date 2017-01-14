@@ -35,7 +35,7 @@ void	init_terrain(t_serveur *serv)
 
 	generate_ressources(&serv->world_hdl);
 
-	print_world_board(&serv->world_hdl); //
+	//print_world_board(&serv->world_hdl); 
 
 	printf(KGRN "Terrain generated successfully.\n" KRESET);
 

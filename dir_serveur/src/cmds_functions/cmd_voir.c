@@ -14,7 +14,6 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 	(void) param;
 	(void) serv;
 	//get_voir_case_positions(serv, &(client->player));
-	client_cur->list_cmds->clock_end = clock() + (CLOCKS_PER_SEC * 7 * serv->world_hdl.t_unit);
 	write_buffer(&client_cur->buff_send, "OK\n", 3);
 }
 

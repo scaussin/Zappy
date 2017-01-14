@@ -34,11 +34,12 @@ void	init_fd(t_serveur *serv)
 */
 void	main_loop(t_serveur *serv)
 {
-	int		ret_select;
-	struct timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 100;
+	int				ret_select;
+	struct timeval	timeout;
 
+	//serv->world_hdl.t_unit
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 50; // 1 000 000 micro sec == 1 sec
 	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
@@ -63,7 +64,8 @@ void	main_loop(t_serveur *serv)
 			// Treat datas from buffers previously filled.
 			manage_clients_input(serv);
 		}
-		
+		//printf(KYEL "." KRESET);
+		//fflush(stdout);
 		exec_cmd_client(serv); // time
 	}
 }
@@ -93,7 +95,7 @@ void manage_clients_input(t_serveur *serv)
 			else if (p_client->is_in_game && !p_client->is_gfx)
 			{
 				// client is in game and not gfx, everything he sends is cmds.
-				lex_and_parse_cmds(serv, p_client, serv->cmd_hdl.cmd_match_table);
+				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
 			}
 		}
 		p_client = p_client->next;
