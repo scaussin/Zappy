@@ -115,12 +115,7 @@ void	ClientCommunication::clientAuthentication()
 			isAuthenticate = true;
 
 			player->avance();
-			player->avance();
-			player->droite();
-			player->avance();
-			player->gauche();
-			player->avance();
-			player->voir();
+			
 		}
 		catch (CustomException &e)
 		{

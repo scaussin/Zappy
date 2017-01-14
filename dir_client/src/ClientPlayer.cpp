@@ -57,6 +57,7 @@ void	ClientPlayer::voir()
 void	ClientPlayer::avanceCallback(std::string response)
 {
 	std::cout << "exec avance ok" << std::endl;
+	avance();
 }
 
 void	ClientPlayer::droiteCallback(std::string response)

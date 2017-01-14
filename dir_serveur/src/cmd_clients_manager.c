@@ -74,16 +74,34 @@ int		timespec_is_over(struct timespec time_end)
 	return (0);
 }
 
-void	exec_cmd_client(t_serveur *serv)
+struct timespec	*min_timespec(struct timespec *a, struct timespec *b)
+{
+	if (!a)
+		return (b);
+	if (a->tv_sec == b->tv_sec)
+		return a->tv_nsec < b->tv_nsec ? a : b;
+	else
+		return a->tv_sec < b->tv_sec ? a : b;
+}
+
+/*
+** set time_end of cmd
+** when time_end is over, execute cmd and delete cmd of list_cmds
+** return the lower time_end for optimal select() timeout.
+*/
+
+struct timespec	*exec_cmd_client(t_serveur *serv)
 {
 	t_client_entity	*p_client;
+	struct timespec *lower_time_end;
 
+	lower_time_end = NULL;
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
 		while (p_client->list_cmds)
 		{
-			if (p_client->list_cmds->time_end.tv_sec == 0) // start
+			if (p_client->list_cmds->time_end.tv_sec == 0) // set time_end of cmd
 			{
 				clock_gettime(CLOCK_REALTIME, &p_client->list_cmds->time_end);
 				//printf(KYEL "now: %lu %lu\n" KRESET, p_client->list_cmds->time_end.tv_sec, p_client->list_cmds->time_end.tv_nsec);
@@ -106,10 +124,15 @@ void	exec_cmd_client(t_serveur *serv)
 				if (p_client->list_cmds->param)
 					free(p_client->list_cmds->param);
 				p_client->list_cmds = p_client->list_cmds->next;
+				p_client->size_list_cmds -= 1;
 			}
-			else //time not terminated
+			else //time not terminated - get the lower time_end
+			{
+				lower_time_end = min_timespec(lower_time_end, &p_client->list_cmds->time_end);
 				break ;
+			}
 		}
 		p_client = p_client->next;
 	}
+	return (lower_time_end);
 }

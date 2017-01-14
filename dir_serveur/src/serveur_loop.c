@@ -30,23 +30,75 @@ void	init_fd(t_serveur *serv)
 }
 
 /*
+	struct timeval
+	{
+		long	tv_sec;		// secondes
+		long	tv_usec;	// microsecondes -> 1 000 000 us == 1s
+	};
+	struct timespec
+	{
+		long	tv_sec;		// secondes
+		long	tv_nsec;	// nanosecondes -> 1 000 000 000 ns == 1s
+	};
+*/
+
+struct timespec timespec_diff(struct timespec *start, struct timespec *stop)
+{
+	struct timespec result;
+
+	if ((stop->tv_nsec - start->tv_nsec) < 0) {
+		result.tv_sec = stop->tv_sec - start->tv_sec - 1;
+		result.tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
+	} else {
+		result.tv_sec = stop->tv_sec - start->tv_sec;
+		result.tv_nsec = stop->tv_nsec - start->tv_nsec;
+	}
+	return result;
+}
+
+struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end)
+{
+	struct timespec now;
+
+	if (!lower_time_end) // no cmd in progress : timeout is useless
+	{
+		printf(KYEL "timeout select: NULL (sleeping)\n" KRESET);
+		return (NULL);
+	}
+	clock_gettime(CLOCK_REALTIME, &now);
+	if (min_timespec(&now, lower_time_end) == &now)
+	{
+		now = timespec_diff(&now, lower_time_end);
+		//printf(KYEL "diff: %lds %ldns\n" KRESET, now.tv_sec, now.tv_nsec);
+		timeout->tv_usec = (now.tv_nsec / 1000);
+		timeout->tv_sec = now.tv_sec;// + ((now.tv_nsec * 1000) / 1000000);
+	}
+	else
+	{
+		timeout->tv_sec = 0;
+		timeout->tv_usec = 0;
+	}
+	printf(KYEL "timeout select: %lds %dus\n" KRESET, timeout->tv_sec, timeout->tv_usec);
+	return (timeout);	
+}
+
+/*
 ** Central function for server.
 */
 void	main_loop(t_serveur *serv)
 {
 	int				ret_select;
 	struct timeval	timeout;
-
-	//serv->world_hdl.t_unit
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 50; // 1 000 000 micro sec == 1 sec
+	struct timespec	*lower_time_end;
+	
+	lower_time_end = NULL;
 	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
 		init_fd(serv);
 
-		ret_select =  select(serv->network.sock_max + 1, serv->network.read_fs,
-			serv->network.write_fs, NULL, &timeout);
+		ret_select =  select(serv->network.sock_max + 1, serv->network.read_fs, 
+			serv->network.write_fs, NULL, set_timeout_select(&timeout, lower_time_end));
 		if (ret_select < 0) //wake up select : error
 			exit_error("select()");
 		else if (ret_select > 0) //wake up select : event read or write
@@ -60,13 +112,12 @@ void	main_loop(t_serveur *serv)
 			// Check commands from clients and fill all clients buffers
 			else
 				check_all_clients_communication(serv);
-
 			// Treat datas from buffers previously filled.
 			manage_clients_input(serv);
 		}
 		//printf(KYEL "." KRESET);
 		//fflush(stdout);
-		exec_cmd_client(serv); // time
+		lower_time_end = exec_cmd_client(serv);
 	}
 }
 

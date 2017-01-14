@@ -315,7 +315,9 @@ void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client,
 void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
 
 // client command execution.
-void						exec_cmd_client(t_serveur *serv);
+struct timespec				*exec_cmd_client(t_serveur *serv);
+int							timespec_is_over(struct timespec time_end);
+struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 
 /*
 ** src/cmds_functions/
