@@ -69,7 +69,7 @@ int		timespec_is_over(struct timespec time_end)
 	struct timespec	now;
 
 	clock_gettime(CLOCK_REALTIME, &now);
-	if (now.tv_sec >= time_end.tv_sec && now.tv_nsec >= time_end.tv_nsec)
+	if (now.tv_sec > time_end.tv_sec || (now.tv_sec == time_end.tv_sec && now.tv_nsec >= time_end.tv_nsec))
 		return (1);
 	return (0);
 }
