@@ -15,15 +15,12 @@ void		check_all_clients_communication(t_serveur *serv)
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (FD_ISSET(p_client->sock, serv->network.read_fs))
+		if (FD_ISSET(p_client->sock, serv->network.read_fs)
+			&& !(ret_read = read_client(p_client)))
 		{
-			ret_read = read_client(p_client);
-			if (ret_read == 0 || ret_read == -1)
-			{
-				disconnect_client(p_client->sock);
-				remove_client(serv, p_client);
-				return ;
-			}
+			disconnect_client(p_client->sock);
+			remove_client(serv, p_client);
+			return ;
 		}
 		if (FD_ISSET(p_client->sock, serv->network.write_fs))
 			write_client(p_client);
@@ -99,7 +96,7 @@ int			read_client(t_client_entity *client)
 	if (size_read == 0)
 	{
 		perror("read buffer full");
-		return (-2);
+		return (0);
 	}
 	buff_tmp = s_malloc(size_read);
 	while (1)
