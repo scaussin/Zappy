@@ -10,7 +10,9 @@
 # include <stdio.h>
 # include <regex>
 # include <errno.h>
+# include <algorithm>
 # include <vector>
+# include <regex.h>
 # include <list>
 
 // Connection includes.
@@ -19,33 +21,37 @@
 # include <netdb.h>
 # include <fcntl.h>
 # include <sys/time.h>
+# include <netdb.h>
 
-# define MSG_BUFSIZE 128
-
+# define BUFF_SIZE 128
+# define END "\n"
+# define LEN_END 1
+/*
 // Connection related structure.
-typedef struct			s_ConnectionSettings
+typedef struct			s_CommunicationSettings
 {
 	std::string				TeamName;
 	int						Port;
 	std::string				HostName;
 
 
-}							t_ConnectionSettings;
+}							t_CommunicationSettings;*/
 
 // Class definitions.
 class ClientInputHandler; // handle and check args.
-class ClientConnection; // communicate with the server.
+class ClientBuffer;
+class ClientCommunication; // communicate with the server.
 class ClientPlayer; // the actual game player.
-
 class ClientController; // main controller.
 
 
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
-# include "ClientConnection.hpp"
+# include "ClientCommande.hpp"
+# include "ClientBuffer.hpp"
+# include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
-
 # include "ClientController.hpp"
 
 

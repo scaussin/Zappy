@@ -1,6 +1,6 @@
 #include "../../includes/serveur.h"
 
-void	cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
+void	cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
 {
 	(void) param;
 	(void) serv;

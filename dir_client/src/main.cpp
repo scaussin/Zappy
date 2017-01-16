@@ -2,17 +2,11 @@
 
 int		main(int argc, char **argv)
 {
-	ClientController		*Client;
+	ClientController	client(argc, argv);
 
-	Client = new ClientController();
-	Client->OnInitialize(argc, argv);
-
-	if (Client->Connection.IsConnected)
+	if (client.communication->isConnected)
 	{
-		Client->OnGameStart();
-		Client->MainLoop();
+		client.mainLoop();	
 	}
-
-	delete Client;
 	return (0);
 }

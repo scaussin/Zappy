@@ -19,6 +19,7 @@ src/serveur_loop.c \
 src/player_handler.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
+src/cmds_functions/cmd_gauche.c \
 src/cmds_functions/cmd_voir.c
 
 

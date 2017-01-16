@@ -9,29 +9,17 @@
 class ClientController
 {
 	public:
-		//--------------------------------//
-		// Attributes.					  //
-		//--------------------------------//
-		//bool					IsConnected; // default false;
+		ClientController(int argc, char **argv);
+		~ClientController();
 
-		//--------------------------------//
-		// Methods						  //
-		//--------------------------------//
-		ClientController(); // Default constructor
-		~ClientController(); // Default destructor
+		void					startGame();
+		void					mainLoop();
 
-		void		OnInitialize(int argc, char **argv); // handle input and connection to serveur
-
-		void		OnGameStart();
-		void		MainLoop();
-
-		//--------------------------------//
-		// Sub classes references.		  //
-		//--------------------------------//
-		ClientInputHandler		InputHandler;
-		ClientConnection		Connection;	// will handle every server related discussion.
-		ClientPlayer			Player;
-
+		ClientInputHandler		*inputHandler;
+		ClientCommunication		*communication;	// will handle every server related discussion.
+		ClientPlayer			*player;
+		
+	private:
 };
 
 #endif

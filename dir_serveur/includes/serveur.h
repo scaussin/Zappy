@@ -11,8 +11,11 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
+//<sys/time.h>
 # include <arpa/inet.h>
 # include <syslog.h>
+
+#include <inttypes.h>  
 
 /*
 **	color in text;
@@ -27,8 +30,10 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define BUFF_SIZE 100000
-# define SIZE_CMD_MATCH_TABLE 2 // corresponds to the number of client available cmds.
+
+# define BUFF_SIZE 256
+
+# define SIZE_CMD_MATCH_TABLE 4 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
 # define LEN_END 1
@@ -106,7 +111,8 @@ typedef struct 				s_list_cmds_entity
 {
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	char					*param;
-	int						time;
+	int						duration_cmd;
+	struct timespec			time_end;
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -155,13 +161,13 @@ typedef struct 				s_cmd_match
 {
 	char					*name;
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	int						duration_cmd;
 }							t_cmd_match;
 
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
 	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
-
 }							t_cmd_hdl;
 
 /*
@@ -190,10 +196,7 @@ typedef struct 				s_world_hdl
 	int						map_x;
 	int						map_y;
 	double					t_unit;
-
-
 	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
-
 }							t_world_hdl;
 
 
@@ -259,7 +262,7 @@ void						print_world_board(t_world_hdl *world_hdl);
 /*
 ** serveur_loop.c
 */
-void						set_read_fs(t_serveur *serv);
+void						init_fd(t_serveur *serv);
 void						main_loop(t_serveur *serv);
 void						manage_clients_input(t_serveur *serv);
 
@@ -325,7 +328,9 @@ void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client,
 void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
 
 // client command execution.
-void						exec_cmd_client(t_serveur *serv);
+struct timespec				*exec_cmd_client(t_serveur *serv);
+int							timespec_is_over(struct timespec time_end);
+struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 
 /*
 **	Player handling (inside client_entity)
@@ -340,7 +345,8 @@ void						assign_random_player_position(t_serveur *serv, t_player *player);
 
 void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-void						cmd_voir(t_serveur *serv, t_client_entity *client);
+void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void							get_voir_case_positions(t_serveur *serv, t_player *player);
 int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
