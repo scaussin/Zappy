@@ -1,6 +1,7 @@
 #ifndef SERVEUR_H
 # define SERVEUR_H
-#define _GNU_SOURCE
+# define _GNU_SOURCE
+
 # include <stdlib.h>
 # include <regex.h>
 # include <string.h>
