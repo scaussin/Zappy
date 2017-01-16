@@ -32,15 +32,11 @@ void	client_authentification(t_serveur *serv, t_client_entity *client)
 
 void	client_authenticate_gfx(t_serveur *serv, t_client_entity *client)
 {
-//	char			*str_to_send;
-	
 	if (!serv->client_hdl.gfx_client)
 	{
 		serv->client_hdl.gfx_client = client;
 		client->is_gfx = 1;
-
-		send_current_world_state(serv, client);
-		//free(str_to_send);
+		send_current_world_state(serv, client); // see communication_gfx.c
 		printf(KGRN "GFX client recognized\n" KRESET);
 		return ;
 	}

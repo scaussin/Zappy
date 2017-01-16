@@ -252,6 +252,8 @@ void						init_terrain(t_serveur *serv);
 void						allocate_world_board(t_world_hdl *world_hdl);
 void						set_world_board_cases(t_world_hdl *world_hdl);
 void						generate_ressources(t_world_hdl *world_hdl);
+void						generate_ressources_flat(t_world_hdl *world_hdl, int x, int y);
+void						generate_ressources_diced(t_world_hdl *world_hdl, int x, int y);
 void						print_world_board(t_world_hdl *world_hdl);
 
 /*

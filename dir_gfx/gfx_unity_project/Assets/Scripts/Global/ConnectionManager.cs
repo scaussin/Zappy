@@ -138,7 +138,7 @@ public class ConnectionManager : MonoBehaviour
 
             // Connect to a remote device.
             // Establish the remote endpoint for the socket.
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            // IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = IPAddress.Parse(hostname);
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, ServerPort);
 
