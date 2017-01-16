@@ -17,6 +17,11 @@
 
 #include <inttypes.h>  
 
+# ifdef __MACH__
+#  include <mach/clock.h>
+#  include <mach/mach.h>
+# endif
+
 /*
 **	color in text;
 */
@@ -318,6 +323,12 @@ void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
 struct timespec				*exec_cmd_client(t_serveur *serv);
 int							timespec_is_over(struct timespec time_end);
 struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
+
+/*
+**	clock.c
+*/
+
+void						get_time(struct timespec *ts);
 
 /*
 ** src/cmds_functions/

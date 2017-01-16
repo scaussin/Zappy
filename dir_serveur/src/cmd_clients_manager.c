@@ -68,7 +68,7 @@ int		timespec_is_over(struct timespec time_end)
 {
 	struct timespec	now;
 
-	clock_gettime(CLOCK_REALTIME, &now);
+	get_time(&now);
 	if (now.tv_sec > time_end.tv_sec || (now.tv_sec == time_end.tv_sec && now.tv_nsec >= time_end.tv_nsec))
 		return (1);
 	return (0);
@@ -103,7 +103,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 		{
 			if (p_client->list_cmds->time_end.tv_sec == 0) // set time_end of cmd
 			{
-				clock_gettime(CLOCK_REALTIME, &p_client->list_cmds->time_end);
+				get_time(&p_client->list_cmds->time_end);
 				//printf(KYEL "now: %lu %lu\n" KRESET, p_client->list_cmds->time_end.tv_sec, p_client->list_cmds->time_end.tv_nsec);
 				p_client->list_cmds->time_end.tv_nsec += (serv->world_hdl.t_unit - (int)serv->world_hdl.t_unit) * 1000000000;
 				if (p_client->list_cmds->time_end.tv_nsec > 1000000000)
@@ -118,7 +118,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 			{
 				//execute cmd and delete cmd_entity
 				struct timespec	now;
-				clock_gettime(CLOCK_REALTIME, &now);
+				get_time(&now);
 				printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
 				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
 				if (p_client->list_cmds->param)

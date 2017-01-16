@@ -15,6 +15,7 @@ src/team_hdl.c \
 src/serveur_data.c \
 src/terrain_generation.c \
 src/serveur_loop.c \
+src/clock.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
 src/cmds_functions/cmd_gauche.c \
