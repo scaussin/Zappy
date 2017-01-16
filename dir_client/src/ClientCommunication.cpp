@@ -10,7 +10,7 @@
 ClientCommunication::ClientCommunication(std::string _hostName, int _port, ClientPlayer *_player) : hostName(_hostName), port(_port), player(_player)
 {
 	isConnected = false;
-	isAuthenticate = false;
+	isAuthenticated = false;
 	sock = -1;
 	stateProcessAuth = 0;
 }
@@ -65,7 +65,7 @@ void	ClientCommunication::manageRecv()
 {
 	if (bufferRecv.getLen() == 0)
 		return ;
-	if (isAuthenticate)
+	if (isAuthenticated)
 	{
 		std::string msg = bufferRecv.getFirstMsg();
 		if (msg.compare("mort\n") == 0)
@@ -112,7 +112,7 @@ void	ClientCommunication::clientAuthentication()
 			player->bufferSend = &bufferSend;
 			std::cout << KGRN << "client authenticated" << KRESET << std::endl;
 			player->printStat();
-			isAuthenticate = true;
+			isAuthenticated = true;
 
 			player->avance();
 			

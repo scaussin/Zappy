@@ -7,7 +7,10 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Message broadcast controller. Receive, parse and redirect message to corresponding objects.
+/// Message broadcast controller. Receive, parse and redirect messages.
+/// Will rarely directly access Controller component, such as WorldManager. Instead, it will call
+/// GameController, because the GameController may need to insert others calls,
+/// such as UI calls alongside the reception of the msg.
 /// </summary>
 public class MsgBroadcastController : MonoBehaviour
 {
@@ -67,7 +70,7 @@ public class MsgBroadcastController : MonoBehaviour
 	{
 		Debug.Log ("size : " + msg.Length + ": [" + msg + "]");
 
-		// Check bienvenue.
+		// Check BIENVENUE Message.
 		rgx = new Regex("^BIENVENUE$");
 		match = rgx.Match(CurrentReceivedMsg);
 		if (match.Success) {
@@ -75,7 +78,7 @@ public class MsgBroadcastController : MonoBehaviour
 			PushMsg ("GRAPHIC\n");
 		}
 
-		// check server world size msg
+		// Check server world size msg
 		rgx = new Regex("^msz (\\d+) (\\d+)$");
 		match = rgx.Match(msg);
 		if (match.Success && match.Groups.Count == 3)
@@ -85,11 +88,11 @@ public class MsgBroadcastController : MonoBehaviour
 			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
 
 			Debug.Log ("Success - Received world size");
-			OnWorldSizeReceived.Invoke();
+			OnWorldSizeReceived.Invoke(); // call back to GameController, cause the timing is undetermined.
 		}
 
-		// check server time unit msg
-		rgx = new Regex("^sgt ([0-9]*\\.?[0-9]+)$"); // floated point number.
+		// Check server time unit msg
+		rgx = new Regex("^sgt ([0-9]*\\.?[0-9]+)$"); // floating point number.
 		match = rgx.Match(msg);
 		if (match.Success && match.Groups.Count == 2)
 		{
@@ -100,14 +103,36 @@ public class MsgBroadcastController : MonoBehaviour
 			OnWorldTimeUnitReceived.Invoke();
 		}
 
-		// get case content
+		// Get one case content
 		// example: bct 6 9 9 1 5 1 4
 		rgx = new Regex("^bct \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
-			// Use the game controller for action. This class should not access directly WorldManager.
+			// Use the game controller for action cause it may call other things.
 			GameManager.instance.GameController.SetWorldBlockRessources (msg);
+		}
+
+		// Catch Team name 
+		// "tna N\n" * nbr_equipes
+		rgx = new Regex("^tna (\\w+)$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			// Direct access to data stocking class.
+			GameManager.instance.PlayerManager.PlayerTeams.Add (groups [1].Value);
+		}
+
+		// Catch Player Connection
+		// "pnw #n X Y O L N\n"
+		rgx = new Regex("^pnw \\d+ \\d+ \\d+ \\d+ \\d+ \\w+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			// Use the game controller for action cause it may call other things.
+			GameManager.instance.GameController.OnNewPlayerConnection(msg);
+			Debug.Log ("Caught player connection");
 		}
 	}
 

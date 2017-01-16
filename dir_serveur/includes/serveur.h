@@ -17,6 +17,11 @@
 
 #include <inttypes.h>  
 
+# ifdef __MACH__
+#  include <mach/clock.h>
+#  include <mach/mach.h>
+# endif
+
 /*
 **	color in text;
 */
@@ -31,7 +36,7 @@
 # define KRESET "\x1B[0m"
 
 
-# define BUFF_SIZE 256
+# define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 4 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
@@ -302,6 +307,8 @@ void						set_client_player_datas(t_client_entity *new_client);
 void						add_client(t_serveur *serv, t_client_entity *client);
 void						remove_client(t_serveur *serv, t_client_entity *client);
 
+
+
 /*
 **	client_authentification.c
 */
@@ -310,6 +317,11 @@ void						client_authentification(t_serveur *serv, t_client_entity *client);
 void						client_authenticate_gfx(t_serveur *serv, t_client_entity *client);
 void						client_authenticate_player(t_serveur *serv, t_client_entity *client, char *cmd);
 
+/*
+**	Player handling (inside client_entity)
+*/
+
+void						assign_random_player_position(t_serveur *serv, t_player *player);
 
 /*
 ** team_hdl.c
@@ -333,11 +345,10 @@ int							timespec_is_over(struct timespec time_end);
 struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 
 /*
-**	Player handling (inside client_entity)
+**	clock.c
 */
 
-void						assign_random_player_position(t_serveur *serv, t_player *player);
-
+void						get_time(struct timespec *ts);
 
 /*
 ** src/cmds_functions/

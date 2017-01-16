@@ -80,18 +80,17 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		// one slot now taken in team.
 		team->available_slots -= 1;
 
-		// assign player pos et send msg to gfx
+		// assign player pos and send msg to gfx
 		assign_random_player_position(serv, &(client->player));
-		// send "pnw #n X Y O L N\n"
+		// "pnw #n X Y O L N\n"
 		asprintf(&str_to_send, "pnw %d %d %d %d %d %s\n",
 			client->sock,
 			client->player.pos.x,
 			client->player.pos.y,
-			client->player.dir + 1, // +1 cause enum start at 0, and gfx protocol wants 1;
+			client->player.dir + 1, // +1 cause dir enum start at 0, and gfx protocol wants 1;
 			client->player.level,
 			client->team->name);
 		push_gfx_msg(serv, str_to_send);
-		print_send_gfx(str_to_send);
 	}
 	else
 	{

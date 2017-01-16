@@ -23,7 +23,7 @@ class ClientCommunication
 		//void					displayInfos();
 
 		bool					isConnected;
-		bool					isAuthenticate;
+		bool					isAuthenticated;
 		ClientPlayer			*player;
 
 		ClientBuffer			bufferRecv;

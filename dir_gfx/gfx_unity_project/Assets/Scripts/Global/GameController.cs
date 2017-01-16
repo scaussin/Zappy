@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour {
 	// Player states.
 	public bool			InMainMenu;
 	public bool			SelectingServerInfos;
+	public bool			IsWorldSpawned;
 	public bool			InGame;
 
 	void Awake()
@@ -84,6 +85,7 @@ public class GameController : MonoBehaviour {
         CameraViewControl.GetComponent<CameraViewControl>().gameObject.SetActive(true);
         GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
 		EnablePlayerCameraControl ();
+		IsWorldSpawned = true;
 	}
 
 	public void		SetWorldBlockRessources(string msg)
@@ -105,5 +107,21 @@ public class GameController : MonoBehaviour {
 	public void		EnablePlayerCameraControl()
 	{
 		CameraViewControl.GetComponent<CameraViewControl> ().enabled = true;
+	}
+
+	/// <summary>
+	/// Called by BroadcastManager, because it will also make UI calls.
+	/// </summary>
+	/// <param name="msg">Message.</param>
+	public void OnNewPlayerConnection(string msg)
+	{
+		if (IsWorldSpawned) // we dont want player to spawn on empty ground.
+		{
+			GameManager.instance.WorldManager.ActorSpawner.SpawnNewPlayer (msg);
+		}
+		else
+		{
+			Debug.LogError ("Tried to spawn player on empty world?");
+		}
 	}
 }

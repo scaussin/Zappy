@@ -42,15 +42,16 @@ public class WorldBoardSpawner : MonoBehaviour {
 		BlockPrefab = Resources.Load ("Prefabs/World/Block") as GameObject;
 		OnWorldBoardSpawned = new UnityEvent ();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
+	/// <summary>
+	/// Allows the access to a block and its class attributes, from its position X and Y of the *server* map
+	/// </summary>
+	/// <returns>The block object.</returns>
+	/// <param name="x">The x coordinate. (server map)</param>
+	/// <param name="y">The y coordinate. (server map)</param>
 	public BlockObject	GetBlockObject(int x, int y)
 	{
-		return (Blocks_col [y].Row [x].GetComponent<BlockObject> ());
+		return (Blocks_col[y].Row[x].GetComponent<BlockObject> ());
 	}
 
 	/// <summary>
@@ -69,23 +70,25 @@ public class WorldBoardSpawner : MonoBehaviour {
 		cur_x = 0;
 
 		// Blocks will be separated by a world distance offset.
-		// An additionnal changeable spacing will be added.
-		x_base_offset = GameManager.instance.WorldSettings.BlockSize + GameManager.instance.WorldSettings.BlockSpacing;
-		z_base_offset = GameManager.instance.WorldSettings.BlockSize + GameManager.instance.WorldSettings.BlockSpacing;
-
+		// An additionnal spacing will be added. (can be modified through editor->GameManager)
+		x_base_offset = GameManager.instance.WorldSettings.BlockSize +
+							GameManager.instance.WorldSettings.BlockSpacing;
+		z_base_offset = GameManager.instance.WorldSettings.BlockSize +
+							GameManager.instance.WorldSettings.BlockSpacing;
 		spawn_location = ZeroPoint.transform.position;
 
-		Debug.Log ("Spawning World Blocks!!");
 		// ---- Actual block spawn.
+		Debug.Log ("Spawning World Blocks!!");
 		Blocks_col = new List<WorldBoard> ();
 		while (cur_y < map_size_y)
 		{
 			Blocks_col.Add(new WorldBoard ());
-			Blocks_col [cur_y].Row = new List<GameObject> ();
+			Blocks_col[cur_y].Row = new List<GameObject> ();
 			while (cur_x < map_size_x)
 			{
 				// location is set through additionning variables -> faster calculation method.
-				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location, Quaternion.identity, BlockContainer.transform);
+				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location,
+											Quaternion.identity, BlockContainer.transform);
 				Blocks_col[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
 				cur_x++;

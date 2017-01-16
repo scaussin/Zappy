@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 	public ConnectionManager		ConnectionManager;
 	public WorldSettings			WorldSettings;
 	public KeyManager				KeyManager;
+	public PlayerManager			PlayerManager;
 
 	[Header("Program Control Manager references")] // program actors.
 	public GameController			GameController;
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour {
 		ConnectionManager = this.gameObject.GetComponent<ConnectionManager> ();
 		WorldSettings = this.gameObject.GetComponent<WorldSettings> ();
 		KeyManager = this.gameObject.GetComponent<KeyManager> ();
+		PlayerManager = this.gameObject.GetComponent<PlayerManager> ();
 
 		// Set program control manager references.
 		GameController = GameObject.Find("GameController").GetComponent<GameController> ();

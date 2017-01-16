@@ -65,7 +65,7 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 		printf(KYEL "timeout select: NULL (sleeping)\n" KRESET);
 		return (NULL);
 	}
-	clock_gettime(CLOCK_REALTIME, &now);
+	get_time(&now);
 	if (min_timespec(&now, lower_time_end) == &now)
 	{
 		now = timespec_diff(&now, lower_time_end);
