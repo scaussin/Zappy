@@ -93,6 +93,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 				new_block.isStatic = true;
 				cur_x++;
 				spawn_location.x += x_base_offset;
+				new_block.GetComponent<Animator> ().enabled = true;
 			}
 			cur_y++;
 			cur_x = 0;

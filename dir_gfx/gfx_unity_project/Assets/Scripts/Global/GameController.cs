@@ -124,4 +124,9 @@ public class GameController : MonoBehaviour {
 			Debug.LogError ("Tried to spawn player on empty world?");
 		}
 	}
+
+	public void OnPlayerMovement(string msg)
+	{
+		GameManager.instance.WorldManager.PlayerController.MovePlayer (msg);
+	}
 }

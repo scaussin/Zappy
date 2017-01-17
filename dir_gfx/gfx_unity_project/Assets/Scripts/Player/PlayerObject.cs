@@ -16,39 +16,15 @@ public class PlayerObject : MonoBehaviour {
 	public GameObject	ModelContainer;
 	public GameObject	CameraPoint;
 
-	// Private setters variables.
-	private Vector3		ObjectEulerAngle;
 
-	// Use this for initialization
-	void Start () {
+
+	// Use this for initialization. called just after it is spawned. Its datas are set.
+	void Start ()
+	{
 		CameraPoint = transform.Find ("Points").transform.Find ("CameraPoint").gameObject;
 		ModelContainer = transform.Find ("Model").gameObject;
-		SetOrientation ();
+		GetComponent<PlayerMovement> ().SetOrientation ();
 	}
 
-	/// <summary>
-	/// Sets the orientation. Orientation (N:1, E:2, S:3, O:4)
-	/// For the moment, the rotation is in euler (unrecommended);
-	/// </summary>
-	public void	SetOrientation()
-	{
-		ObjectEulerAngle = transform.localEulerAngles;
-		if (Dir == 1)
-		{
-			ObjectEulerAngle.y = -90;
-		}
-		else if (Dir == 2)
-		{
-			ObjectEulerAngle.y = 0;
-		}
-		else if (Dir == 3)
-		{
-			ObjectEulerAngle.y = 90;
-		}
-		else if (Dir == 4)
-		{
-			ObjectEulerAngle.y = 180;
-		}
-		transform.localEulerAngles = ObjectEulerAngle;
-	}
+
 }

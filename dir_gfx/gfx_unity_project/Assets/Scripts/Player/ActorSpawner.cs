@@ -50,5 +50,6 @@ public class ActorSpawner : MonoBehaviour
 		newPlayer.GetComponent<PlayerObject> ().Level = int.Parse (groups [5].Value);
 		newPlayer.GetComponent<PlayerObject> ().Team = groups [6].Value;
 		GameManager.instance.PlayerManager.ConnectedPlayers.Add(newPlayer.GetComponent<PlayerObject> ());
+		GetComponent<PlayerController> ().Players.Add(newPlayer.GetComponent<PlayerObject> ());
 	}
 }

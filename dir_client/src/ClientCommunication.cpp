@@ -61,6 +61,11 @@ int		ClientCommunication::checkFd()
 	return (1);
 }
 
+/*
+**	Check if there has been any change on the client player buffer
+**	-> has something been received ?
+*/
+
 void	ClientCommunication::manageRecv()
 {
 	if (bufferRecv.getLen() == 0)

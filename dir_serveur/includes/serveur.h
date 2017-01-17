@@ -354,7 +354,7 @@ void						get_time(struct timespec *ts);
 ** src/cmds_functions/
 */
 
-void						cmd_avance(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
