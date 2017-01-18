@@ -9,7 +9,10 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 	public bool				IsAdvancing;
+	public bool				IsRotating;
 	public Vector3			TargetPos;
+	public Vector3			TargetRotation;
+	private Quaternion		TargetRotationQuat;
 
 	// Private setters variables.
 	private Vector3			ObjectEulerAngle;
@@ -34,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
 		playerObjInstance = GetComponent<PlayerObject> ();
 		playerAnimator =  GetComponent<Animator> ();
 		boardZeroPoint = transform.parent.transform.parent.GetComponent<ActorSpawner> ().BoardZeroPoint;
-		GetComponent<Rigidbody> ().freezeRotation = true;
 		timeUnit = GameManager.instance.WorldSettings.TimeUnit;
 	}
 
@@ -53,16 +55,54 @@ public class PlayerMovement : MonoBehaviour
 				playerAnimator.SetBool ("IsMoving", false);
 			}
 		}
+		if (IsRotating)
+		{
+			timeSinceStarted = Time.time - moveStartTime;
+			fracComplete = timeSinceStarted / (advanceDelay * timeUnit);
+			TargetRotationQuat = Quaternion.Euler (TargetRotation);
+			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete);
+			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f) {
+				IsRotating = false;
+			}
+		}
 	}
 
-	// called by manager to init movement.
+	/// <summary>
+	/// Initiate the movement. The public function that will make the player move
+	/// smoothly to its target.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="dir">Dir.</param>
 	public void StartMovement(int x, int y, int dir)
 	{
 		moveStartTime = Time.time;
 		SetTargetWorldPos (x, y, dir);
 		IsAdvancing = true;
+		IsRotating = false;
 	}
 
+	/// <summary>
+	/// Initiate the smooth rotation.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="dir">Dir.</param>
+	public void StartRotation(int x, int y, int dir)
+	{
+		moveStartTime = Time.time;
+		SetTargetWorldRot (x, y, dir);
+		IsAdvancing = false;
+		IsRotating = true;
+	}
+
+	/// <summary>
+	/// Teleport the player to the specified x, y and dir. This method makes an instant
+	/// displacement. Useful for map boundary teleportation.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="dir">Dir.</param>
 	public void Teleport(int x, int y, int dir)
 	{
 		TargetPos = boardZeroPoint.transform.position;
@@ -77,11 +117,12 @@ public class PlayerMovement : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Sets the orientation. Orientation (N:1, E:2, S:3, O:4)
+	/// Update the orientation of the player model from its Dir variable.
+	/// Orientation (N:1, E:2, S:3, O:4)
 	/// For the moment, the rotation is in euler (unrecommended);
 	/// This sets the orientation instantly. Another method does it with a transition.
 	/// </summary>
-	public void	SetOrientation()
+	public void	UpdateOrientation()
 	{
 		dir = playerObjInstance.Dir;
 		ObjectEulerAngle = transform.localEulerAngles;
@@ -128,5 +169,32 @@ public class PlayerMovement : MonoBehaviour
 			TargetPos.z += AdvanceDistance;
 		else if (y < playerObjInstance.Y)
 			TargetPos.z -= AdvanceDistance;
+	}
+
+	/// <summary>
+	/// Sets the target world rotation for the gauche and droite cmds.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="dir">Dir.</param>
+	private void SetTargetWorldRot(int x, int y, int dir)
+	{
+		TargetRotation = transform.localEulerAngles;
+		if (dir == 1)
+		{
+			TargetRotation.y = -90;
+		}
+		else if (dir == 2)
+		{
+			TargetRotation.y = 0;
+		}
+		else if (dir == 3)
+		{
+			TargetRotation.y = 90;
+		}
+		else if (dir == 4)
+		{
+			TargetRotation.y = 180;
+		}
 	}
 }

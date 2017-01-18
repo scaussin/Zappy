@@ -58,6 +58,7 @@ void	ClientPlayer::avanceCallback(std::string response)
 {
 	std::cout << "exec avance ok" << std::endl;
 	avance();
+	gauche();
 }
 
 void	ClientPlayer::droiteCallback(std::string response)

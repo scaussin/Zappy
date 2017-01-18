@@ -120,7 +120,6 @@ void	ClientCommunication::clientAuthentication()
 			isAuthenticated = true;
 
 			player->avance();
-			
 		}
 		catch (CustomException &e)
 		{

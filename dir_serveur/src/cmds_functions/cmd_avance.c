@@ -24,26 +24,26 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 		cur_player->pos.x -= 1;
 	}
 	// Boundary check
-	// x boundaries
 	if (cur_player->pos.x >= serv->world_hdl.map_x)
 		client_cur->player.pos.x = 0;
 	else if (cur_player->pos.x < 0)
 		client_cur->player.pos.x = serv->world_hdl.map_x - 1;
-	
-	// y boundaries
 	if (cur_player->pos.y >= serv->world_hdl.map_y)
 		client_cur->player.pos.y = 0;
 	else if (cur_player->pos.y < 0)
 		client_cur->player.pos.y = serv->world_hdl.map_y - 1;
-
+	// Case assignation
 	cur_player->cur_case = &(serv->world_hdl.
 			world_board[cur_player->pos.y][cur_player->pos.x]);
+
+	// player client response.
 	write_buffer(&client_cur->buff_send, "ok\n", 3);
 	// gfx msg : "ppo #n X Y O\n" 
-	asprintf(&msg, "ppo %d %d %d %d\n",
+	asprintf(&msg, "ppo #%d %d %d %d\n",
 		client_cur->sock,
 		cur_player->pos.x,
 		cur_player->pos.y,
 		cur_player->dir + 1);
 	push_gfx_msg(serv, msg);
+	free(msg);
 }

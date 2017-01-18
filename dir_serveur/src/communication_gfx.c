@@ -88,7 +88,7 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 		if (tmp_client->is_gfx == 0 && tmp_client->is_in_game == 1)
 		{
 			// send "pnw #n X Y O L N\n"
-			asprintf(&msg, "pnw %d %d %d %d %d %s\n",
+			asprintf(&msg, "pnw #%d %d %d %d %d %s\n",
 				tmp_client->sock,
 				tmp_client->player.pos.x,
 				tmp_client->player.pos.y,

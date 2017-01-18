@@ -29,10 +29,13 @@ public class BlockObject : MonoBehaviour
 	public GameObject			PhirasModelObject;
 	public GameObject			ThystameModelObject;
 
+	private Animator			BlockAnimator;
+
 
 	// Use this for initialization
 	void Awake ()
 	{
+		BlockAnimator = GetComponent<Animator>	();
 		Points = transform.Find ("Points").gameObject;
 		RessourcesContainer = transform.Find ("Ressources").gameObject;
 		FoodModelObject = RessourcesContainer.transform.Find ("Food").gameObject;
@@ -90,6 +93,6 @@ public class BlockObject : MonoBehaviour
 	/// </summary>
 	public void DesactivateAnimator()
 	{
-		GetComponent<Animator> ().enabled = false;
+		BlockAnimator.enabled = false;
 	}
 }

@@ -21,8 +21,6 @@ public class MsgBroadcastController : MonoBehaviour
 	public UnityEvent			OnWorldTimeUnitReceived;
 
 	public string				CurrentReceivedMsg;
-	public bool					HasMsgToSend;
-	public string				MsgToSend;
 
 	private string[]			LexedMsg;
 	private Regex				rgx;
@@ -96,23 +94,61 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	public void ParseMsg(string msg)
 	{
-		Debug.Log ("size : " + msg.Length + ": [" + msg + "]");
+		Debug.Log ("Parsing: [" + msg + "]");
 
 		// We dont want to execute every regex parsing method when we found the one we needed.
-		// put the most likely receivable msg at the top.
-		if (CatchBienvenue (msg) ||
-			CatchWorldSize (msg) ||
-			CatchServerTimeUnit (msg) ||
-			CatchCaseContent (msg) ||
-			CatchTeamName (msg) ||
-			CatchPlayerConnection(msg) ||
-			CatchPlayerMovement(msg))
-		{
+		// The most likely receivable msg should at the top.
+		// Optimization pass: we check the first three chars before checking the rest.
+		if (CatchBienvenue (msg))
 			return;
-		}
-
-
-
+		if (msg.StartsWith ("msz") && CatchWorldSize (msg))
+			return;
+		else if (msg.StartsWith ("sgt") && CatchServerTimeUnit (msg))
+			return;
+		else if (msg.StartsWith ("bct") && CatchCaseContent (msg))
+			return;
+		else if (msg.StartsWith ("tna") && CatchTeamName (msg))
+			return;
+		else if (msg.StartsWith ("pnw") && CatchPlayerConnection (msg))
+			return;
+		else if (msg.StartsWith ("ppo") && CatchPlayerMovement (msg))
+			return;
+		else if (msg.StartsWith ("pdi") && CatchPlayerDeath (msg))
+			return;
+		else if (msg.StartsWith ("smg") && CatchServerMessage (msg))
+			return;
+		else if (msg.StartsWith ("plv") && CatchPlayerLevel (msg))
+			return;
+		else if (msg.StartsWith ("pin") && CatchPlayerInventory (msg))
+			return;
+		else if (msg.StartsWith ("pex") && CatchPlayerExpulse (msg))
+			return;
+		else if (msg.StartsWith ("pbc") && CatchPlayerBroadcast (msg))
+			return;
+		else if (msg.StartsWith ("pic") && CatchPlayerIncantation (msg))
+			return;
+		else if (msg.StartsWith ("pie") && CatchIncantationEnd (msg))
+			return;
+		else if (msg.StartsWith ("pfk") && CatchPlayerStartLayEgg (msg))
+			return;
+		else if (msg.StartsWith ("pdr") && CatchPlayerDropRessource (msg))
+			return;
+		else if (msg.StartsWith ("pgt") && CatchPlayerTakeRessource (msg))
+			return;
+		else if (msg.StartsWith ("enw") && CatchPlayerEggLayed (msg))
+			return;
+		else if (msg.StartsWith ("eht") && CatchEggHatched (msg))
+			return;
+		else if (msg.StartsWith ("ebo") && CatchEggPlayerConnection (msg))
+			return;
+		else if (msg.StartsWith ("edi") && CatchHatchedEggDied (msg))
+			return;
+		else if (msg.StartsWith ("seg") && CatchGameOver (msg))
+			return;
+		else if (msg.StartsWith ("suc") && CatchUnknownCmd (msg))
+			return;
+		else if (msg.StartsWith ("sbp") && CatchBadParameterForCmd (msg))
+			return;
 	}
 
 /* *************************************************************************************** 	*
@@ -226,7 +262,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool CatchPlayerConnection(string msg)
 	{
-		rgx = new Regex("^pnw \\d+ \\d+ \\d+ \\d+ \\d+ \\w+$");
+		rgx = new Regex("^pnw #\\d+ \\d+ \\d+ \\d+ \\d+ \\w+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
@@ -245,7 +281,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool CatchPlayerMovement(string msg)
 	{
-		rgx = new Regex("^ppo \\d+ \\d+ \\d+ \\d+$");
+		rgx = new Regex("^ppo #\\d+ \\d+ \\d+ \\d+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
@@ -256,5 +292,312 @@ public class MsgBroadcastController : MonoBehaviour
 		return (false);
 	}
 
+	/// <summary>
+	/// Catchs the player death. Format: "pdi #n\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player death was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerDeath(string msg)
+	{
+		rgx = new Regex("^pdi #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			// Use the game controller for action cause it may call other things.
+			GameManager.instance.GameController.OnPlayerDeath(msg);
+			return (true);
+		}
+		return (false);
+	}
 
+	/// <summary>
+	/// Catchs the server message. Format: "smg M\n"
+	/// </summary>
+	/// <returns><c>true</c>, if server message was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchServerMessage(string msg)
+	{
+		rgx = new Regex("^smg \\w+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnServerMessageReception(msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player level. Format: "plv #n L\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player level was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerLevel(string msg)
+	{
+		rgx = new Regex("^plv #\\d+ \\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerLevelReception (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player inventory. Format: "pin #n X Y q q q q q q q\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player inventory was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerInventory(string msg)
+	{
+		rgx = new Regex("^pin #\\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+ \\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerInventoryReception (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player expulse cmd. Format: "pex #n\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player expulse was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerExpulse(string msg)
+	{
+		rgx = new Regex("^pex #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerExpulseReception (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player broadcast cmd. Format: "pbc #n M\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player broadcast was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerBroadcast(string msg)
+	{
+		rgx = new Regex("^pbc #\\d+ \\w+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerExpulseReception (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player incantation. Format: "pic X Y L #n #n …\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player incantation was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerIncantation(string msg)
+	{
+		rgx = new Regex("^pic \\d+ \\d+ \\d+(?: #\\d+)+$"); // using non capturing group for var arg.
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerIncantation (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the incantation end. Format: "pie X Y R\n" 
+	/// </summary>
+	/// <returns><c>true</c>, if incantation end was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchIncantationEnd(string msg)
+	{
+		rgx = new Regex("^pie \\d+ \\d+ \\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnIncantationEnd (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player lay egg. The egg is not yet layed, but the action is engaged.
+	/// Format: "pfk #n\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player lay egg was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerStartLayEgg(string msg)
+	{
+		rgx = new Regex("^pfk #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerStartLayEgg (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player drop ressource. Format: "pdr #n i\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player drop ressource was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerDropRessource(string msg)
+	{
+		rgx = new Regex("^pdr #\\d+ \\d$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerDropRessource (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player take ressource. Format: "pgt #n i\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player take ressource was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerTakeRessource(string msg)
+	{
+		rgx = new Regex("^pgt #\\d+ \\d$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerTakeRessource (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the player egg layed. The player finished laying its egg. its not yet hatched.
+	/// Format: "enw #e #n X Y\n"
+	/// </summary>
+	/// <returns><c>true</c>, if player egg layed was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchPlayerEggLayed(string msg)
+	{
+		rgx = new Regex("^enw #\\d+ #\\d+ \\d+ \\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnPlayerLayedEgg (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the egg hatched. Format: "eht #e\n"
+	/// </summary>
+	/// <returns><c>true</c>, if egg hatched was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchEggHatched(string msg)
+	{
+		rgx = new Regex("^eht #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnEggHatched (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the egg player connection. Format: "ebo #e\n"
+	/// </summary>
+	/// <returns><c>true</c>, if egg player connection was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchEggPlayerConnection(string msg)
+	{
+		rgx = new Regex("^ebo #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnEggPlayerConnection (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the hatched egg's death. Format: "edi #e\n"
+	/// </summary>
+	/// <returns><c>true</c>, if hatched egg died was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchHatchedEggDied(string msg)
+	{
+		rgx = new Regex("^edi #\\d+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnHatchedEggDeath (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the game over. Format: "seg N\n"
+	/// </summary>
+	/// <returns><c>true</c>, if game over was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchGameOver(string msg)
+	{
+		rgx = new Regex("^seg \\w+$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnGameOver (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the msg for an unknown cmd. Format: "suc\n"
+	/// </summary>
+	/// <returns><c>true</c>, if unknown cmd was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchUnknownCmd(string msg)
+	{
+		rgx = new Regex("^suc$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnUnknownCmdReception (msg);
+			return (true);
+		}
+		return (false);
+	}
+
+	/// <summary>
+	/// Catchs the msg for bad parameter in a cmd. Format: "sbp\n"
+	/// </summary>
+	/// <returns><c>true</c>, if bad parameter for cmd was caught, <c>false</c> otherwise.</returns>
+	/// <param name="msg">Message.</param>
+	private bool	CatchBadParameterForCmd(string msg)
+	{
+		rgx = new Regex("^suc$");
+		match = rgx.Match(msg);
+		if (match.Success)
+		{
+			GameManager.instance.GameController.OnBadParameterForCmd (msg);
+			return (true);
+		}
+		return (false);
+	}
 }

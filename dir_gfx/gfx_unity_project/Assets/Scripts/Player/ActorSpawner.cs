@@ -26,7 +26,7 @@ public class ActorSpawner : MonoBehaviour
 	public void SpawnNewPlayer(string msg)
 	{
 		// "pnw #n X Y O L N\n"
-		Regex rgx = new Regex ("^pnw (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$");
+		Regex rgx = new Regex ("^pnw #(\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$");
 		Match match = rgx.Match (msg);
 		GroupCollection groups = match.Groups;
 
@@ -50,6 +50,6 @@ public class ActorSpawner : MonoBehaviour
 		newPlayer.GetComponent<PlayerObject> ().Level = int.Parse (groups [5].Value);
 		newPlayer.GetComponent<PlayerObject> ().Team = groups [6].Value;
 		GameManager.instance.PlayerManager.ConnectedPlayers.Add(newPlayer.GetComponent<PlayerObject> ());
-		GetComponent<PlayerController> ().Players.Add(newPlayer.GetComponent<PlayerObject> ());
+		//GetComponent<PlayerController> ().Players.Add(newPlayer.GetComponent<PlayerObject> ());
 	}
 }

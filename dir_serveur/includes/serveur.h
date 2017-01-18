@@ -64,10 +64,9 @@ typedef struct				s_pos
 	int						y;
 }							t_pos;
 
-typedef struct s_serveur t_serveur;
-typedef struct s_client_entity t_client_entity;
-typedef struct s_world_case t_world_case;
-
+typedef struct s_serveur			t_serveur;
+typedef struct s_client_entity		t_client_entity;
+typedef struct s_world_case			t_world_case;
 
 /*
 ** ************************ Network **************************
@@ -102,6 +101,17 @@ typedef struct 				s_team_hdl
 ** ************************ Client **************************
 */
 
+// no need to stock food.
+typedef struct				s_player_inventory
+{
+	int						linemate;
+	int						deraumere;
+	int						sibur;
+	int						mendiane;
+	int						phiras;
+	int						thystame;
+}							t_player_inventory;
+
 // Player belonging to the client.
 typedef struct				s_player
 {
@@ -109,6 +119,8 @@ typedef struct				s_player
 	t_pos					pos;
 	t_dir					dir;
 	t_world_case			*cur_case;
+	t_player_inventory		inventory;
+
 }							t_player;
 
 

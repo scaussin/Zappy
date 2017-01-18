@@ -11,6 +11,7 @@ void		check_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity		*p_client;
 	int					ret_read;
+	char				*msg;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
@@ -21,6 +22,14 @@ void		check_all_clients_communication(t_serveur *serv)
 			// check gfx clear
 			if (p_client->is_gfx == 1)
 				serv->client_hdl.gfx_client = NULL;
+			if (p_client->is_in_game == 1)
+			{
+				// gfx msg : "pdi #n\n"
+				asprintf(&msg, "pdi #%d\n",
+					p_client->sock);
+				push_gfx_msg(serv, msg);
+				free(msg);
+			}
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			return ;
@@ -40,6 +49,7 @@ void		check_all_clients_communication(t_serveur *serv)
 void		disconnect_flagged_clients(t_serveur *serv)
 {
 	t_client_entity		*p_client;
+	char				*msg;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
@@ -49,6 +59,14 @@ void		disconnect_flagged_clients(t_serveur *serv)
 			// check gfx clear
 			if (p_client->is_gfx == 1)
 				serv->client_hdl.gfx_client = NULL;
+			if (p_client->is_in_game == 1)
+			{
+				// gfx msg : "pdi #n\n"
+				asprintf(&msg, "pdi #%d\n",
+					p_client->sock);
+				push_gfx_msg(serv, msg);
+				free(msg);
+			}
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			p_client = serv->client_hdl.list_clients;

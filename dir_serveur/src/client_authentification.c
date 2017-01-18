@@ -83,7 +83,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		// assign player pos and send msg to gfx
 		assign_random_player_position(serv, &(client->player));
 		// "pnw #n X Y O L N\n"
-		asprintf(&str_to_send, "pnw %d %d %d %d %d %s\n",
+		asprintf(&str_to_send, "pnw #%d %d %d %d %d %s\n",
 			client->sock,
 			client->player.pos.x,
 			client->player.pos.y,
@@ -91,6 +91,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 			client->player.level,
 			client->team->name);
 		push_gfx_msg(serv, str_to_send);
+		free(str_to_send);
 	}
 	else
 	{

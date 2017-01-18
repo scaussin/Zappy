@@ -23,7 +23,7 @@ public class PlayerObject : MonoBehaviour {
 	{
 		CameraPoint = transform.Find ("Points").transform.Find ("CameraPoint").gameObject;
 		ModelContainer = transform.Find ("Model").gameObject;
-		GetComponent<PlayerMovement> ().SetOrientation ();
+		GetComponent<PlayerMovement> ().UpdateOrientation ();
 	}
 
 

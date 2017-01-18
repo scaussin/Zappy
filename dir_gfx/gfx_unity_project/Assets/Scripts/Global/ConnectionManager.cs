@@ -108,7 +108,7 @@ public class ConnectionManager : MonoBehaviour
 		byte[]				buffer = new byte[msg_size];
 
 		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
-		Debug.Log (System.Text.Encoding.UTF8.GetString (buffer));
+		Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
 		buffer_recv.pushBytes (buffer, ret);
 
 		return ;
