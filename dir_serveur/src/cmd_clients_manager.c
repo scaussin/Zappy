@@ -34,8 +34,8 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 		}
 		i++;
 	}
-	return ;
 	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
+	return ;
 }
 
 void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
@@ -119,7 +119,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 				//execute cmd and delete cmd_entity
 				struct timespec	now;
 				get_time(&now);
-				printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
+				//printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
 				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
 				if (p_client->list_cmds->param)
 					free(p_client->list_cmds->param);
