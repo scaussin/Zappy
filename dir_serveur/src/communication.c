@@ -110,8 +110,10 @@ int			read_client(t_client_entity *client)
 	if (ret == -1)
 		perror("recv()");
 	else
+	{
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
-	print_receive(client->sock, buff_tmp, client->buff_recv.len);
+		print_receive(client->sock, buff_tmp, ret);
+	}
 	free(buff_tmp);
 	return (ret);
 }
