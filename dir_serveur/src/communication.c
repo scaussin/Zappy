@@ -180,7 +180,7 @@ char		*get_first_cmd(t_buffer *buffer)
 	char *end;
 	int len_cmd;
 
-	if ((buff = read_buffer(buffer)) && (end = strstr(buff, END)))
+	if ((buff = read_buffer(buffer)) && (end = memchr(buff, CHAR_END, buffer->len)))
 	{
 		end[LEN_END] = 0;
 		len_cmd = (end - buff) + LEN_END;

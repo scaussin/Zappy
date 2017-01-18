@@ -40,6 +40,7 @@
 # define SIZE_CMD_MATCH_TABLE 4 // corresponds to the number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
+# define CHAR_END '\n'
 # define LEN_END 1
 
 typedef int                 SOCKET;
