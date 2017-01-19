@@ -24,6 +24,7 @@ void			set_client_player_datas(t_client_entity *new_client)
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;
 	new_client->player.cur_case = NULL;
+	new_client->player.inventory.food = 0;
 	new_client->player.inventory.linemate = 0;
 	new_client->player.inventory.deraumere = 0;
 	new_client->player.inventory.sibur = 0;
