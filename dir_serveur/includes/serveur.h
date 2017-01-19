@@ -377,6 +377,7 @@ int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
+int								try_to_take_res(int *client_res, int *ressource, int res_nb);
 void						cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
