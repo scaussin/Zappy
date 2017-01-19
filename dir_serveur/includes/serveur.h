@@ -101,9 +101,9 @@ typedef struct 				s_team_hdl
 ** ************************ Client **************************
 */
 
-// no need to stock food.
 typedef struct				s_player_inventory
 {
+	int						food;
 	int						linemate;
 	int						deraumere;
 	int						sibur;
