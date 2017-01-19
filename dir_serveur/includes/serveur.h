@@ -38,7 +38,7 @@
 
 # define BUFF_SIZE 4096
 
-# define SIZE_CMD_MATCH_TABLE 4 // corresponds to the number of client available cmds.
+# define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
 # define LEN_END 1
@@ -373,5 +373,13 @@ void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, c
 void							get_voir_case_positions(t_serveur *serv, t_player *player);
 int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 
 #endif

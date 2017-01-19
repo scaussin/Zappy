@@ -21,7 +21,15 @@ src/clock.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
 src/cmds_functions/cmd_gauche.c \
-src/cmds_functions/cmd_voir.c
+src/cmds_functions/cmd_voir.c \
+src/cmds_functions/cmd_inventaire.c \
+src/cmds_functions/cmd_prend.c \
+src/cmds_functions/cmd_pose.c \
+src/cmds_functions/cmd_expulse.c \
+src/cmds_functions/cmd_broadcast.c \
+src/cmds_functions/cmd_incantation.c \
+src/cmds_functions/cmd_fork.c \
+src/cmds_functions/cmd_connect_nbr.c
 
 
 OBJ = $(SRC:.c=.o)
