@@ -21,13 +21,5 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 		inventory->phiras,
 		inventory->thystame);
 	write_buffer(&client_cur->buff_send, msg, strlen(msg));
-	/*asprintf(&client_cur->buff_send, "{nourriture %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d}\n",  // nourriture ??
-		inventory->food,
-		inventory->linemate,
-		inventory->deraumere,
-		inventory->sibur,
-		inventory->mendiane,
-		inventory->phiras,
-		inventory->thystame);*/
 	free(msg);
 }
