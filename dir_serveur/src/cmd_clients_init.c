@@ -30,11 +30,11 @@ void		init_cmd_match_table(t_serveur *serv)
 	serv->cmd_hdl.cmd_match_table[4].func = cmd_inventaire;
 	serv->cmd_hdl.cmd_match_table[4].duration_cmd = 1;
 
-	serv->cmd_hdl.cmd_match_table[5].name = "prend\n";
+	serv->cmd_hdl.cmd_match_table[5].name = "prend"; // no \n cause of args.
 	serv->cmd_hdl.cmd_match_table[5].func = cmd_prend;
 	serv->cmd_hdl.cmd_match_table[5].duration_cmd = 7;
 
-	serv->cmd_hdl.cmd_match_table[6].name = "pose\n";
+	serv->cmd_hdl.cmd_match_table[6].name = "pose"; // no \n cause of args.
 	serv->cmd_hdl.cmd_match_table[6].func = cmd_pose;
 	serv->cmd_hdl.cmd_match_table[6].duration_cmd = 7;
 
@@ -42,7 +42,7 @@ void		init_cmd_match_table(t_serveur *serv)
 	serv->cmd_hdl.cmd_match_table[7].func = cmd_expulse;
 	serv->cmd_hdl.cmd_match_table[7].duration_cmd = 7;
 
-	serv->cmd_hdl.cmd_match_table[8].name = "broadcast\n";
+	serv->cmd_hdl.cmd_match_table[8].name = "broadcast"; // no \n cause of args.
 	serv->cmd_hdl.cmd_match_table[8].func = cmd_broadcast;
 	serv->cmd_hdl.cmd_match_table[8].duration_cmd = 7;
 

@@ -14,28 +14,43 @@ void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 		printf("[WARNING] : list cmds full on sock: %d\n", client->sock);
 		return ;
 	}
-	while ((cmd = get_first_cmd(&client->buff_recv)))
+	while ((cmd = get_first_cmd(&client->buff_recv))) // -> Buffer lexer.
 	{
 		check_cmd_match(cmd_match_table, client, cmd); // -> Parser.
 		free(cmd);
 	}
 }
 
+/*
+**	Parser for cmd. This will parse only n chars from the cmd, depending on
+**	if there is a space in the cmd.
+**	(example : for "prend 2", we only want to parse "prend").
+*/
+
 void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
 {
-	int i = 0;
+	int		i = 0;
+	char	*arg_cmd;
+	int		nb_of_parsed_chars;
 
+	// Check for arguments
+	if ((arg_cmd = strchr(cmd, ' ')))
+		nb_of_parsed_chars = arg_cmd - cmd;
+	else
+		nb_of_parsed_chars = strlen(cmd);
+
+	// Parsing
 	while (i < SIZE_CMD_MATCH_TABLE)
 	{
-		if (strcmp(cmd_match_table[i].name, cmd) == 0)
+		if (strncmp(cmd_match_table[i].name, cmd, nb_of_parsed_chars) == 0)
 		{
 			add_cmd(client, &cmd_match_table[i], cmd);
 			return ;
 		}
 		i++;
 	}
+	printf(KMAG "[Serveur]: Unknown command: %s on sock: %d\n" KRESET, cmd, client->sock);
 	return ;
-	printf("[WARNING] : Unknown command: %s on sock: %d\n", cmd, client->sock);
 }
 
 void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
@@ -119,7 +134,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 				//execute cmd and delete cmd_entity
 				struct timespec	now;
 				get_time(&now);
-				printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
+				//printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
 				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
 				if (p_client->list_cmds->param)
 					free(p_client->list_cmds->param);

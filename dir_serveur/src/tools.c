@@ -19,13 +19,16 @@ void	*s_malloc(size_t size)
 	return (ret);
 }
 
-void	replace_nl(char *str)
+void	replace_nl(char *str, int len)
 {
-	while (*str)
+	int i;
+
+	i = 0;
+	while (i < len)
 	{
-		if (*str == '\n')
-			*str = '*';
-		str++;
+		if (str[i] == '\n')
+			str[i] = '*';
+		i++;
 	}
 }
 
@@ -98,20 +101,21 @@ void	print_buff(t_buffer buff)
 void print_send(int sock, char *str, int len)
 {
 	printf(KYEL " Sending to sock %d: " KRESET, sock);
-	replace_nl(str);
+	replace_nl(str, len);
 	printf("[%*s]\n", len, str);
 }
 
 void print_send_gfx(char *str)
 {
 	printf(KMAG " Sending to gfx : " KRESET);
-	replace_nl(str);
+	//replace_nl(str);
 	printf("[%*s]\n", (int)strlen(str), str);
 }
 
 void print_receive(int sock, char *str, int len)
 {
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);
-	replace_nl(str);
-	printf("[%.*s] len: %d\n", len, str, len);
+	replace_nl(str, len);
+	//write(1, str, len);
+	printf("[%*s] len: %d\n", len, str, len);
 }
