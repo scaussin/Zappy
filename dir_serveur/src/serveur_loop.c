@@ -62,7 +62,7 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 
 	if (!lower_time_end) // no cmd in progress : timeout is useless
 	{
-		printf(KYEL "timeout select: NULL (sleeping)\n" KRESET);
+		//printf(KYEL "timeout select: NULL (sleeping)\n" KRESET);
 		return (NULL);
 	}
 	get_time(&now);
@@ -78,7 +78,7 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 		timeout->tv_sec = 0;
 		timeout->tv_usec = 0;
 	}
-	printf(KYEL "timeout select: %lds %dus\n" KRESET, timeout->tv_sec, timeout->tv_usec);
+	//printf(KYEL "timeout select: %06lds %06ldus\n" KRESET, timeout->tv_sec, (long)timeout->tv_usec);
 	return (timeout);	
 }
 

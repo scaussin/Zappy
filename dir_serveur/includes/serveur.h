@@ -1,5 +1,6 @@
 #ifndef SERVEUR_H
 # define SERVEUR_H
+# define _GNU_SOURCE
 
 # include <stdlib.h>
 # include <regex.h>
@@ -41,6 +42,7 @@
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
+# define CHAR_END '\n'
 # define LEN_END 1
 
 typedef int                 SOCKET;
@@ -244,7 +246,7 @@ void						fill_team_info(t_serveur *serv);
 */
 void						exit_error(char *error_log);
 void						*s_malloc(size_t size);
-void						replace_nl(char * str);
+void						replace_nl(char * str, int len);
 void						logs(int type, char *log);
 int							get_len_cmd(char *str);
 char						*get_cmd_trim(char *str);
