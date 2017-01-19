@@ -7,10 +7,12 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 	(void)serv;
 	(void)client_cur;
 	(void)param;
-	t_player	*cur_player;
+	t_player				*cur_player;
 	t_client_entity			*list_clients;
-	char		*msg;
+	char					*msg;
+	int						nb_client_with_client_cur;
 
+	nb_client_with_client_cur = 0;
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
 
@@ -18,6 +20,7 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 	push_gfx_msg(serv, msg);
 	free(msg);
 
+	// bouger les client qui sont sur la meme case que client_cur
 	while (list_clients)
 	{
 		if (list_clients->is_in_game == 1
@@ -29,13 +32,15 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 			)
 		{
 			avance_client_in_cur_direction(serv, list_clients, cur_player->dir);
-		}
-		// player client response.
-		//write_buffer(&client_cur->buff_send, "expul\n", 6);
+			nb_client_with_client_cur++;
+		}	
 		list_clients = list_clients->next;
 	}
 
-	write_buffer(&client_cur->buff_send, "ok\n", 3);
+	if (nb_client_with_client_cur == 0)
+		write_buffer(&client_cur->buff_send, "ko\n", 3);
+	else
+		write_buffer(&client_cur->buff_send, "ok\n", 3);
 }
 
 static void	avance_client_in_cur_direction(t_serveur *serv, t_client_entity *client, int dir)
