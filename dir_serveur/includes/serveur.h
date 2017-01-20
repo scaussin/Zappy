@@ -156,6 +156,7 @@ typedef struct 				s_client_entity
 {
 	// Status flags
 	int						is_in_game;
+	int						is_player_dead;
 	int						is_gfx;
 	int						is_disconnecting;
 
@@ -373,6 +374,8 @@ struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 */
 
 void						get_time(struct timespec *ts);
+struct timespec				timespec_diff(struct timespec *start, struct timespec *stop);
+struct timeval				*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end);
 
 /*
 ** src/cmds_functions/
@@ -386,10 +389,13 @@ void							get_voir_case_positions(t_serveur *serv, t_player *player);
 int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
+int							parse_ressource_index(char *param);
 void						cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
 int								try_to_take_res(t_player *client, int res_nb);
 void						cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
+int								try_to_drop_ressource(t_player *player, int res_nb);
 void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
+void							expulse_client_in_dir(t_serveur *serv, t_client_entity *client, int dir);
 void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);

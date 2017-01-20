@@ -11,6 +11,7 @@ t_client_entity	*create_client(SOCKET sock)
 	// set client program status variables.
 	new_client->is_in_game = 0;
 	new_client->is_gfx = 0;
+	new_client->is_player_dead = 0;
 
 	// set player game starting datas
 	set_client_player_datas(new_client);

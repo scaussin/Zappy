@@ -1,18 +1,14 @@
 #include "../../includes/serveur.h"
 
-static void	avance_client_in_cur_direction(t_serveur *serv, t_client_entity *client, int dir);
-
 void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
-	(void)serv;
-	(void)client_cur;
-	(void)param;
+	(void)					param;
 	t_player				*cur_player;
 	t_client_entity			*list_clients;
 	char					*msg;
-	int						nb_client_with_client_cur;
+	int						nb_client_expulsed;
 
-	nb_client_with_client_cur = 0;
+	nb_client_expulsed = 0;
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
 
@@ -28,47 +24,35 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 			&& list_clients->is_disconnecting == 0
 			&& list_clients->player.pos.x == cur_player->pos.x
 			&& list_clients->player.pos.y == cur_player->pos.y
-			&& &(list_clients->player) != cur_player
-			)
+			&& &(list_clients->player) != cur_player)
 		{
-			avance_client_in_cur_direction(serv, list_clients, cur_player->dir);
-			nb_client_with_client_cur++;
+			expulse_client_in_dir(serv, list_clients, cur_player->dir);
+			nb_client_expulsed++;
 		}	
 		list_clients = list_clients->next;
 	}
 
-	if (nb_client_with_client_cur == 0)
+	if (nb_client_expulsed == 0)
 		write_buffer(&client_cur->buff_send, "ko\n", 3);
 	else
 		write_buffer(&client_cur->buff_send, "ok\n", 3);
 }
 
-static void	avance_client_in_cur_direction(t_serveur *serv, t_client_entity *client, int dir)
+void	expulse_client_in_dir(t_serveur *serv, t_client_entity *client, int dir)
 {
-	(void) serv;
-	(void) client;
-	(void) dir;
 	t_player	*player;
 	char		*msg;
 	char		*msg_client;
 
 	player = &(client->player);
-	if (dir == 0) // north
-	{
+	if (dir == UP) // 0 north
 		player->pos.y += 1;
-	}
-	else if (dir == 1) // east
-	{
+	else if (dir == RIGHT) // 1 east
 		player->pos.x += 1;
-	}
-	else if (dir == 2) // south
-	{
+	else if (dir == DOWN) // 2 south
 		player->pos.y -= 1;
-	}
-	else if (dir == 3) // west
-	{
+	else if (dir == LEFT) // 3 west
 		player->pos.x -= 1;
-	}
 	// Boundary check
 	if (player->pos.x >= serv->world_hdl.map_x)
 		client->player.pos.x = 0;
