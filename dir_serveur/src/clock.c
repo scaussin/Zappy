@@ -29,28 +29,41 @@ void get_time(struct timespec *ts)
 #endif
 }
 
+/*
+**	Substraction of two times.
+*/
+
 struct timespec timespec_diff(struct timespec *start, struct timespec *stop)
 {
 	struct timespec result;
 
-	if ((stop->tv_nsec - start->tv_nsec) < 0) {
+	if ((stop->tv_nsec - start->tv_nsec) < 0)
+	{
 		result.tv_sec = stop->tv_sec - start->tv_sec - 1;
 		result.tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
-	} else {
+	}
+	else
+	{
 		result.tv_sec = stop->tv_sec - start->tv_sec;
 		result.tv_nsec = stop->tv_nsec - start->tv_nsec;
 	}
 	return result;
 }
 
+/*
+**	Set the timeout for select according to the list of clients.
+**	Timeout cannot be null or the select blocks the main loop.
+*/
 struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end)
 {
 	struct timespec now;
 
-	if (!lower_time_end) // no cmd in progress : timeout is useless
+	if (!lower_time_end) // no cmd in progress
 	{
 		//printf(KYEL "timeout select: NULL (sleeping)\n" KRESET);
-		return (NULL);
+		timeout->tv_sec = 0;
+		timeout->tv_usec = 100;
+		return (timeout);
 	}
 	get_time(&now);
 	if (min_timespec(&now, lower_time_end) == &now)
@@ -66,5 +79,35 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 		timeout->tv_usec = 0;
 	}
 	//printf(KYEL "timeout select: %06lds %06ldus\n" KRESET, timeout->tv_sec, (long)timeout->tv_usec);
-	return (timeout);	
+	return (timeout);
+}
+
+/*
+**	Will check if time_end is reached compared to current frame time.
+**	If yes, return 1, return 0 otherwise.
+*/
+
+int		timespec_is_over(struct timespec time_end)
+{
+	struct timespec	now;
+
+	get_time(&now);
+	if (now.tv_sec > time_end.tv_sec ||
+		(now.tv_sec == time_end.tv_sec && now.tv_nsec >= time_end.tv_nsec))
+		return (1);
+	return (0);
+}
+
+/*
+**	Compare two times and returns the closest one.
+*/
+
+struct timespec	*min_timespec(struct timespec *a, struct timespec *b)
+{
+	if (!a)
+		return (b);
+	if (a->tv_sec == b->tv_sec)
+		return a->tv_nsec < b->tv_nsec ? a : b;
+	else
+		return a->tv_sec < b->tv_sec ? a : b;
 }

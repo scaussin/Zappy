@@ -86,26 +86,6 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 	client->size_list_cmds += 1;
 }
 
-int		timespec_is_over(struct timespec time_end)
-{
-	struct timespec	now;
-
-	get_time(&now);
-	if (now.tv_sec > time_end.tv_sec || (now.tv_sec == time_end.tv_sec && now.tv_nsec >= time_end.tv_nsec))
-		return (1);
-	return (0);
-}
-
-struct timespec	*min_timespec(struct timespec *a, struct timespec *b)
-{
-	if (!a)
-		return (b);
-	if (a->tv_sec == b->tv_sec)
-		return a->tv_nsec < b->tv_nsec ? a : b;
-	else
-		return a->tv_sec < b->tv_sec ? a : b;
-}
-
 /*
 ** set time_end of cmd
 ** when time_end is over, execute cmd and delete cmd of list_cmds

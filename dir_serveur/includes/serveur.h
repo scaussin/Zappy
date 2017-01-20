@@ -9,6 +9,7 @@
 # include <unistd.h>
 # include <stdio.h>
 # include <time.h>
+# include <math.h>
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -133,6 +134,7 @@ typedef struct				s_player
 	t_dir					dir;
 	t_world_case			*cur_case;
 	int						inventory[7];
+	struct timespec			next_dinner_time;
 }							t_player;
 
 
@@ -343,16 +345,24 @@ void						client_authenticate_gfx(t_serveur *serv, t_client_entity *client);
 void						client_authenticate_player(t_serveur *serv, t_client_entity *client, char *cmd);
 
 /*
-**	Player handling (inside client_entity)
+**	Player game datas handling
 */
 
 void						assign_random_player_position(t_serveur *serv, t_player *player);
+void						assign_player_time_of_dinner(t_serveur *serv, t_player *player);
 
 /*
 ** team_hdl.c
 */
 
 t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
+
+/*
+**	Game events checking.
+*/
+
+void						check_game_events(t_serveur *serv);
+void							check_players_life(t_serveur *serv);
 
 /*
 ** cmd_clients_manager.c
@@ -400,5 +410,7 @@ void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *para
 void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int is_equal(double x, double y);
 
 #endif

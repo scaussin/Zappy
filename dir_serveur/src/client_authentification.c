@@ -71,7 +71,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 	if (team->available_slots > 0)
 	{
 		// sending first datas; <nb-client>\n<x><y>\n
-		client->is_in_game = 1; 
+		client->is_in_game = 1;
 		client->team = team;
 		printf(KGRN "Player client recognized. Team: %s\n" KRESET, client->team->name);
 		asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots, serv->world_hdl.map_x, serv->world_hdl.map_y);
@@ -80,8 +80,10 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		// one slot now taken in team.
 		team->available_slots -= 1;
 
-		// assign player pos and send msg to gfx
+		// assign player game datas.
 		assign_random_player_position(serv, &(client->player));
+		assign_player_time_of_dinner(serv, &(client->player));
+
 		// "pnw #n X Y O L N\n"
 		asprintf(&str_to_send, "pnw #%d %d %d %d %d %s\n",
 			client->sock,

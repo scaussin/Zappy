@@ -44,6 +44,7 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 /*
 **	Get index for ressource from param string, splitting it at the space.
+**	Example : "prend 1" and "pose linemate" will both return (1);
 */
 
 int		parse_ressource_index(char *param)
