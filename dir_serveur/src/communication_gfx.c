@@ -50,13 +50,13 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 			asprintf(&msg, "bct %d %d %d %d %d %d %d %d %d\n",
 				x,
 				y,
-				world_board[y][x].ressources.food,
-				world_board[y][x].ressources.linemate,
-				world_board[y][x].ressources.deraumere,
-				world_board[y][x].ressources.sibur,
-				world_board[y][x].ressources.mendiane,
-				world_board[y][x].ressources.phiras,
-				world_board[y][x].ressources.thystame);
+				world_board[y][x].ressources[FOOD],
+				world_board[y][x].ressources[LINEMATE],
+				world_board[y][x].ressources[DERAUMERE],
+				world_board[y][x].ressources[SIBUR],
+				world_board[y][x].ressources[MENDIANE],
+				world_board[y][x].ressources[PHIRAS],
+				world_board[y][x].ressources[THYSTAME]);
 			push_gfx_msg(serv, msg);
 			free(msg);
 			x++;

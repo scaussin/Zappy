@@ -7,19 +7,19 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 	char		*msg;
 
 	cur_player = &(client_cur->player);
-	if (cur_player->dir == 0) // north
+	if (cur_player->dir == UP) // 0 north
 	{
 		cur_player->pos.y += 1;
 	}
-	else if (cur_player->dir == 1) // east
+	else if (cur_player->dir == RIGHT) // 1 east
 	{
 		cur_player->pos.x += 1;
 	}
-	else if (cur_player->dir == 2) // south
+	else if (cur_player->dir == DOWN) // 2 south
 	{
 		cur_player->pos.y -= 1;
 	}
-	else if (cur_player->dir == 3) // west
+	else if (cur_player->dir == LEFT) // 3 west
 	{
 		cur_player->pos.x -= 1;
 	}

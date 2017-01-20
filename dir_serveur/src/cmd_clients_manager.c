@@ -39,6 +39,13 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 	else
 		nb_of_parsed_chars = strlen(cmd);
 
+	if (nb_of_parsed_chars > 11)
+	{
+		printf(KMAG "[Serveur]: cmd too long (no cmd takes more than 11 char):"
+					"%s on sock: %d\n" KRESET, cmd, client->sock);
+		return ;
+	}
+
 	// Parsing
 	while (i < SIZE_CMD_MATCH_TABLE)
 	{

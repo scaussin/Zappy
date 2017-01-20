@@ -71,13 +71,13 @@ void	set_world_board_cases(t_world_hdl *world_hdl)
 	{
 		while (x < world_hdl->map_x)
 		{
-			world_hdl->world_board[y][x].ressources.food = 0;
-			world_hdl->world_board[y][x].ressources.linemate = 0;
-			world_hdl->world_board[y][x].ressources.deraumere = 0;
-			world_hdl->world_board[y][x].ressources.sibur = 0;
-			world_hdl->world_board[y][x].ressources.mendiane = 0;
-			world_hdl->world_board[y][x].ressources.phiras = 0;
-			world_hdl->world_board[y][x].ressources.thystame = 0;
+			world_hdl->world_board[y][x].ressources[FOOD] = 0;
+			world_hdl->world_board[y][x].ressources[LINEMATE] = 0;
+			world_hdl->world_board[y][x].ressources[DERAUMERE] = 0;
+			world_hdl->world_board[y][x].ressources[SIBUR] = 0;
+			world_hdl->world_board[y][x].ressources[MENDIANE] = 0;
+			world_hdl->world_board[y][x].ressources[PHIRAS] = 0;
+			world_hdl->world_board[y][x].ressources[THYSTAME] = 0;
 			x++;
 		}
 		y++;
@@ -117,13 +117,13 @@ void	generate_ressources(t_world_hdl *world_hdl)
 
 void generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
 {
-	world_hdl->world_board[y][x].ressources.food = rand() % 10;
-	world_hdl->world_board[y][x].ressources.linemate = rand() % 10;
-	world_hdl->world_board[y][x].ressources.deraumere = rand() % 10;
-	world_hdl->world_board[y][x].ressources.sibur = rand() % 10;
-	world_hdl->world_board[y][x].ressources.mendiane = rand() % 10;
-	world_hdl->world_board[y][x].ressources.phiras = rand() % 10;
-	world_hdl->world_board[y][x].ressources.thystame = rand() % 10;
+	world_hdl->world_board[y][x].ressources[FOOD] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[DERAUMERE] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[SIBUR] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[MENDIANE] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[PHIRAS] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[THYSTAME] = rand() % 10;
 }
 
 /*
@@ -138,25 +138,25 @@ void generate_ressources_diced(t_world_hdl *world_hdl, int x, int y)
 
 	dice = rand() % 100; // d100 cast.
 	if (dice < 60) // 70% that case has food.
-		world_hdl->world_board[y][x].ressources.food = rand() % 6;
+		world_hdl->world_board[y][x].ressources[FOOD] = rand() % 6;
 	dice = rand() % 100;
 	if (dice < 60) // 60% that case has linemate.
-		world_hdl->world_board[y][x].ressources.linemate = rand() % 8;
+		world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 8;
 	dice = rand() % 100;
 	if (dice < 50) // 50% that case has deraumere.
-		world_hdl->world_board[y][x].ressources.deraumere = rand() % 8;
+		world_hdl->world_board[y][x].ressources[DERAUMERE] = rand() % 8;
 	dice = rand() % 100;
 	if (dice < 40) // 40% that case has sibur.
-		world_hdl->world_board[y][x].ressources.sibur = rand() % 6;
+		world_hdl->world_board[y][x].ressources[SIBUR] = rand() % 6;
 	dice = rand() % 100;
 	if (dice < 30) // 30% that case has mendiane.
-		world_hdl->world_board[y][x].ressources.mendiane = rand() % 5;
+		world_hdl->world_board[y][x].ressources[MENDIANE] = rand() % 5;
 	dice = rand() % 100;
 	if (dice < 20) // 20% that case has phiras.
-		world_hdl->world_board[y][x].ressources.phiras = rand() % 3;
+		world_hdl->world_board[y][x].ressources[PHIRAS] = rand() % 3;
 	dice = rand() % 100;
 	if (dice < 15) // 15% that case has thystame.
-		world_hdl->world_board[y][x].ressources.thystame = rand() % 2;
+		world_hdl->world_board[y][x].ressources[THYSTAME] = rand() % 2;
 }
 
 void	print_world_board(t_world_hdl *world_hdl)
@@ -175,13 +175,13 @@ void	print_world_board(t_world_hdl *world_hdl)
 		{
 			printf (KYEL "Case %d : %dx %dy\n" KRESET, case_number, x, y);
 			printf(" {food %d} {linemate %d} {deraumere %d} {sibur %d} {mendiane %d} {phiras %d} {thystame %d}\n",
-				world_hdl->world_board[y][x].ressources.food,
-				world_hdl->world_board[y][x].ressources.linemate,
-				world_hdl->world_board[y][x].ressources.deraumere,
-				world_hdl->world_board[y][x].ressources.sibur,
-				world_hdl->world_board[y][x].ressources.mendiane,
-				world_hdl->world_board[y][x].ressources.phiras,
-				world_hdl->world_board[y][x].ressources.thystame);
+				world_hdl->world_board[y][x].ressources[FOOD],
+				world_hdl->world_board[y][x].ressources[LINEMATE],
+				world_hdl->world_board[y][x].ressources[DERAUMERE],
+				world_hdl->world_board[y][x].ressources[SIBUR],
+				world_hdl->world_board[y][x].ressources[MENDIANE],
+				world_hdl->world_board[y][x].ressources[PHIRAS],
+				world_hdl->world_board[y][x].ressources[THYSTAME]);
 			x++;
 			case_number++;
 		}

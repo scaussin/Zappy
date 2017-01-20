@@ -27,26 +27,19 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 		// Try to take the ressource from the ground for the corresponding ressource.
 		if (strncmp(arg, "0", arg_len) == 0 || strncmp(arg, "nourriture", arg_len) == 0)  // TODO: player food == player life time.
-			success = try_to_take_res(&client_cur->player.inventory.food,
-				&client_cur->player.cur_case->ressources.food, 0);
+			success = try_to_take_res(&client_cur->player, 0);
 		else if (strncmp(arg, "1", arg_len) == 0 || strncmp(arg, "linemate", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.linemate,
-				&client_cur->player.cur_case->ressources.linemate, 1);
+			success = try_to_take_res(&client_cur->player, 1);
 		else if (strncmp(arg, "2", arg_len) == 0 || strncmp(arg, "deraumere", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.deraumere,
-				&client_cur->player.cur_case->ressources.deraumere, 2);
+			success = try_to_take_res(&client_cur->player, 2);
 		else if (strncmp(arg, "3", arg_len) == 0 || strncmp(arg, "sibur", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.sibur,
-				&client_cur->player.cur_case->ressources.sibur, 3);
+			success = try_to_take_res(&client_cur->player, 3);
 		else if (strncmp(arg, "4", arg_len) == 0 || strncmp(arg, "mendiane", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.mendiane,
-				&client_cur->player.cur_case->ressources.mendiane, 4);
+			success = try_to_take_res(&client_cur->player, 4);
 		else if (strncmp(arg, "5", arg_len) == 0 || strncmp(arg, "phiras", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.phiras,
-				&client_cur->player.cur_case->ressources.phiras, 5);
+			success = try_to_take_res(&client_cur->player, 5);
 		else if (strncmp(arg, "6", arg_len) == 0 || strncmp(arg, "thystame", arg_len) == 0)
-			success = try_to_take_res(&client_cur->player.inventory.thystame,
-				&client_cur->player.cur_case->ressources.thystame, 6);
+			success = try_to_take_res(&client_cur->player, 6);
 		else
 			printf(KMAG "Invalid parameter for cmd [prend] from sock %d\n", client_cur->sock);
 		if (success >= 0)
@@ -59,27 +52,31 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
 				client_cur->player.pos.x,
 				client_cur->player.pos.y,
-				client_cur->player.cur_case->ressources.food,
-				client_cur->player.cur_case->ressources.linemate,
-				client_cur->player.cur_case->ressources.deraumere,
-				client_cur->player.cur_case->ressources.sibur,
-				client_cur->player.cur_case->ressources.mendiane,
-				client_cur->player.cur_case->ressources.phiras,
-				client_cur->player.cur_case->ressources.thystame);
+				client_cur->player.cur_case->ressources[FOOD],
+				client_cur->player.cur_case->ressources[LINEMATE],
+				client_cur->player.cur_case->ressources[DERAUMERE],
+				client_cur->player.cur_case->ressources[SIBUR],
+				client_cur->player.cur_case->ressources[MENDIANE],
+				client_cur->player.cur_case->ressources[PHIRAS],
+				client_cur->player.cur_case->ressources[THYSTAME]);
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
 		}
-		else 
+		else
 			write_buffer(&client_cur->buff_send, "ko\n", 3);
 	}
 }
 
-int		try_to_take_res(int *client_res, int *ressource, int res_nb)
+/*
+** Client try to take res on its current case.
+** Returns the res index if success, -1 otherwise.
+*/
+int		try_to_take_res(t_player *player, int res_nb)
 {
-	if (*ressource > 0)
+	if (player->cur_case->ressources[res_nb] > 0)
 	{
-		*client_res += 1;
-		*ressource -= 1;
+		player->inventory[res_nb] += 1;
+		player->cur_case->ressources[res_nb] -= 1;
 		return (res_nb);
 	}
 	return (-1);

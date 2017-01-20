@@ -60,6 +60,17 @@ typedef enum				e_dir
 	LEFT
 }							t_dir;
 
+typedef enum				e_ressources
+{
+	FOOD,
+	LINEMATE,
+	DERAUMERE,
+	SIBUR,
+	MENDIANE,
+	PHIRAS,
+	THYSTAME
+}							t_ressources;
+
 typedef struct				s_pos
 {
 	int						x;
@@ -103,7 +114,7 @@ typedef struct 				s_team_hdl
 ** ************************ Client **************************
 */
 
-typedef struct				s_player_inventory
+/*typedef struct				s_player_inventory
 {
 	int						food;
 	int						linemate;
@@ -112,7 +123,7 @@ typedef struct				s_player_inventory
 	int						mendiane;
 	int						phiras;
 	int						thystame;
-}							t_player_inventory;
+}							t_player_inventory;*/
 
 // Player belonging to the client.
 typedef struct				s_player
@@ -121,8 +132,7 @@ typedef struct				s_player
 	t_pos					pos;
 	t_dir					dir;
 	t_world_case			*cur_case;
-	t_player_inventory		inventory;
-
+	int						inventory[7];
 }							t_player;
 
 
@@ -193,7 +203,7 @@ typedef struct 				s_cmd_hdl
 ** ************************ World struct ***************************** => Game board
 */
 
-typedef struct				s_case_ressources
+/*typedef struct				s_case_ressources
 {
 	int						food;
 	int						linemate;
@@ -202,12 +212,12 @@ typedef struct				s_case_ressources
 	int						mendiane;
 	int						phiras;
 	int						thystame;
-}							t_case_ressources;
+}							t_case_ressources;*/
 
 typedef struct				s_world_case
 {
 	// A case is associated to a player.cur_case pointer.
-	t_case_ressources		ressources;// items
+	int						ressources[7];
 }							t_world_case;
 
 typedef struct 				s_world_hdl
@@ -377,7 +387,7 @@ int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
-int								try_to_take_res(int *client_res, int *ressource, int res_nb);
+int								try_to_take_res(t_player *client, int res_nb);
 void						cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
