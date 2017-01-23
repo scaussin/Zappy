@@ -41,6 +41,20 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 		x = tab_pos[i].x;
 		j = -1;
 		multi_ressources = 0;
+		while (++j < (i == 0 ? world[y][x].nb_players - 1 : world[y][x].nb_players))
+		{
+			if (multi_ressources)
+			{
+				see_str = str_concat_realloc1(see_str, sep_rsrc);
+				see_str = str_concat_realloc1(see_str, "joueur");
+			}
+			else
+			{
+				see_str = str_concat_realloc1(see_str, "joueur");
+				multi_ressources = 1;
+			}
+		}
+		j = -1;
 		while (++j < NB_RESSOURCES)
 		{
 			k = -1;
@@ -60,21 +74,21 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 				}
 			}
 		}
-		j = -1;
-		multi_ressources = 0;
-		while (++j < world[y][x].nb_players)
-		{
-			if (multi_ressources)
-			{
-				see_str = str_concat_realloc1(see_str, sep_rsrc);
-				see_str = str_concat_realloc1(see_str, "joueur");
-			}
-			else
-			{
-				see_str = str_concat_realloc1(see_str, "joueur");
-				multi_ressources = 1;
-			}
-		}
+		// j = -1;
+		// multi_ressources = 0;
+		// while (++j < world[y][x].nb_players)
+		// {
+		// 	if (multi_ressources)
+		// 	{
+		// 		see_str = str_concat_realloc1(see_str, sep_rsrc);
+		// 		see_str = str_concat_realloc1(see_str, "joueur");
+		// 	}
+		// 	else
+		// 	{
+		// 		see_str = str_concat_realloc1(see_str, "joueur");
+		// 		multi_ressources = 1;
+		// 	}
+		// }
 		if (i != player->nb_see_case - 1)
 			see_str = str_concat_realloc1(see_str, sep_case);
 		else
