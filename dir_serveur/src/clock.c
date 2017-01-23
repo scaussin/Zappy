@@ -82,6 +82,13 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 	return (timeout);
 }
 
+/*
+**	Add nano seconds to the timespec. Dont forget to multiply your sec time by 1000000000!
+**	Example:
+**		add_nsec_to_timespec(&player->next_dinner_time,
+**		FOOD_LIFE_TIME * serv->world_hdl.t_unit * 1000000000);
+*/
+
 void	add_nsec_to_timespec(struct timespec *time, long nanosec)
 {
 	time->tv_nsec += nanosec;

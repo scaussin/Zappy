@@ -27,13 +27,6 @@ void		assign_random_player_position(t_serveur *serv, t_player *player)
 void		assign_player_time_of_dinner(t_serveur *serv, t_player *player)
 {
 	get_time(&player->next_dinner_time);
-
-	player->next_dinner_time.tv_nsec += FOOD_LIFE_TIME * serv->world_hdl.t_unit * 1000000000;
-	// check it we got through seconds.
-	while (player->next_dinner_time.tv_nsec > 1000000000)
-	{
-		player->next_dinner_time.tv_nsec -= 1000000000;
-		player->next_dinner_time.tv_sec += 1;
-	}
-	//player->next_dinner_time.tv_sec += FOOD_LIFE_TIME * serv->world_hdl.t_unit;
+	add_nsec_to_timespec(&player->next_dinner_time,
+		FOOD_LIFE_TIME * serv->world_hdl.t_unit * 1000000000);
 }

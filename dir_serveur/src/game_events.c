@@ -13,6 +13,8 @@ void	check_game_events(t_serveur *serv)
 
 /*
 **	For each player, we check if they must die of hunger.
+**	At zero, the player dies at ~12.6 sec for 126 of food life time
+**	and t_unit 100.
 */
 
 void	check_players_life(t_serveur *serv)
@@ -28,7 +30,7 @@ void	check_players_life(t_serveur *serv)
 			&& !cur_client->is_player_dead
 			&& !cur_client->is_disconnecting)
 		{
-			if (cur_client->player.inventory[FOOD] == 0) // Works. At zero, the player dies at ~12.6 sec for 126 of food life time and t_unit 100.
+			if (cur_client->player.inventory[FOOD] == 0) // Works. 
 			{
 				cur_client->is_player_dead = 1;
 				// we do not disconnect him right away cause we want to send it "mort\n"
