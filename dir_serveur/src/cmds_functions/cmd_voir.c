@@ -44,7 +44,7 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 		while (++j < NB_RESSOURCES)
 		{
 			k = -1;
-			while (++k < world[y][y].ressources[j])
+			while (++k < world[y][x].ressources[j])
 			{
 				if (multi_ressources)
 				{
@@ -62,7 +62,7 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 		}
 		j = -1;
 		multi_ressources = 0;
-		while (++j < world[y][y].nb_players)
+		while (++j < world[y][x].nb_players)
 		{
 			if (multi_ressources)
 			{
