@@ -216,22 +216,32 @@ typedef struct 				s_cmd_hdl
 /*
 ** ************************ World struct ***************************** => Game board
 */
-
-/*typedef struct				s_case_ressources
+typedef	struct				s_event_client
 {
-	int						food;
-	int						linemate;
-	int						deraumere;
-	int						sibur;
-	int						mendiane;
-	int						phiras;
-	int						thystame;
-}							t_case_ressources;*/
+	t_client_entity			*client;
+	struct s_event_client	*next;
+}							t_event_client;
+
+/*
+**	!! -> chained_list of world event.
+**	May or not concern another chained list of players.
+*/
+
+typedef struct				s_world_event
+{
+	char					*type;
+	int 					trigger_delay;
+	struct timespec			time;
+	t_event_client			*concerned_clients;
+
+	struct s_world_event	*next;
+}							t_world_event;
 
 typedef struct				s_world_case
 {
 	// A case is associated to a player.cur_case pointer.
 	int						ressources[7];
+	int						nb_players;
 }							t_world_case;
 
 typedef struct 				s_world_hdl
@@ -240,6 +250,7 @@ typedef struct 				s_world_hdl
 	int						map_y;
 	double					t_unit;
 	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
+	t_world_event			*ongoing_events;
 }							t_world_hdl;
 
 
@@ -369,11 +380,13 @@ void						assign_player_time_of_dinner(t_serveur *serv, t_player *player);
 t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 
 /*
-**	Game events checking.
+** game_events.c && game_events_helper.c
 */
 
 void						check_game_events(t_serveur *serv);
 void							check_players_life(t_serveur *serv);
+void							check_world_events(t_serveur *serv);
+
 
 /*
 ** cmd_clients_manager.c
@@ -384,6 +397,11 @@ void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
 void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
 void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
 void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
+
+void						init_game_event(t_world_event *world_event, char *type_str, int trigger_delay);
+void						add_new_event(t_serveur *serv, t_world_event *world_event);
+void						add_client_to_event(t_world_event *world_event, t_client_entity *client);
+void						delete_game_event(t_serveur *serv, t_world_event *target_event);
 
 // client command execution.
 struct timespec				*exec_cmd_client(t_serveur *serv);
@@ -420,6 +438,8 @@ void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 void							expulse_client_in_dir(t_serveur *serv, t_client_entity *client, int dir);
 void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+int								*set_incantation_target_res(int plevel);
+int								are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player, int *target_res);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 

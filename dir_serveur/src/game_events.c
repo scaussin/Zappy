@@ -6,9 +6,38 @@
 
 void	check_game_events(t_serveur *serv)
 {
+	check_world_events(serv);
 	check_players_life(serv);
 	// TODO: check_eggs(); -> for each egg on the ground, check if they hatch or die of hunger.
 	// TODO: check_game_over(); -> a team won, or all players died.
+}
+
+/*
+**	Will check ongoing events and fire them if it is their time.
+**	The end of an incantation for example, is one such event.
+*/
+
+void	check_world_events(t_serveur *serv)
+{
+	t_world_event	*event_tmp;
+
+	if (serv->world_hdl.ongoing_events) // any event waiting ?
+	{
+		event_tmp = serv->world_hdl.ongoing_events;
+		while (event_tmp)
+		{
+			if (timespec_is_over(event_tmp->time) == 1)
+			{
+				// fire event.
+				printf("event to fire : %s\n", event_tmp->type);
+				// TODO : call event functions.
+				delete_game_event(serv, event_tmp);
+				event_tmp = serv->world_hdl.ongoing_events;
+			}
+			if (event_tmp) // protect against solo event deleted.
+				event_tmp = event_tmp->next;
+		}
+	}
 }
 
 /*
@@ -51,8 +80,4 @@ void	check_players_life(t_serveur *serv)
 	}
 }
 
-int is_equal(double x, double y)
-{
-  const double epsilon = 1e-5;
-  return fabs(x - y) <= epsilon * fabs(x);
-}
+

@@ -78,6 +78,7 @@ void	set_world_board_cases(t_world_hdl *world_hdl)
 			world_hdl->world_board[y][x].ressources[MENDIANE] = 0;
 			world_hdl->world_board[y][x].ressources[PHIRAS] = 0;
 			world_hdl->world_board[y][x].ressources[THYSTAME] = 0;
+			world_hdl->world_board[y][x].nb_players = 0;
 			x++;
 		}
 		y++;

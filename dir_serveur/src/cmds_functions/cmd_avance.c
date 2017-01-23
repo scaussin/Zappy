@@ -33,8 +33,10 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 	else if (cur_player->pos.y < 0)
 		client_cur->player.pos.y = serv->world_hdl.map_y - 1;
 	// Case assignation
+	cur_player->cur_case->nb_players -= 1;
 	cur_player->cur_case = &(serv->world_hdl.
 			world_board[cur_player->pos.y][cur_player->pos.x]);
+	cur_player->cur_case->nb_players += 1;
 
 	// player client response.
 	write_buffer(&client_cur->buff_send, "ok\n", 3);

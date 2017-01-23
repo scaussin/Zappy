@@ -87,9 +87,8 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 }
 
 /*
-** set time_end of cmd
-** when time_end is over, execute cmd and delete cmd of list_cmds
-** return the lower time_end for optimal select() timeout.
+**	Changed: for each player, executes the cmd then put the client in "delay state".
+**	Next cmd will be executed when delay_time is over.
 */
 
 struct timespec	*exec_cmd_client(t_serveur *serv)
@@ -105,6 +104,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 		if (p_client->list_cmds && timespec_is_over(p_client->delay_time))
 		{
 			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+			// reset time for next command -> "delay state" for the client.
 			get_time(&p_client->delay_time);
 			add_nsec_to_timespec(&p_client->delay_time,
 									p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
