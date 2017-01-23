@@ -17,6 +17,7 @@ void		assign_random_player_position(t_serveur *serv, t_player *player)
 
 	player->cur_case = &(serv->world_hdl
 						.world_board[player->pos.y][player->pos.x]);
+	player->cur_case->nb_players += 1;
 }
 
 

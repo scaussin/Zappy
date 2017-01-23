@@ -7,6 +7,7 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 	char		*msg;
 
 	cur_player = &(client_cur->player);
+	cur_player->cur_case->nb_players -= 1;
 	if (cur_player->dir == UP) // 0 north
 	{
 		cur_player->pos.y += 1;
@@ -35,10 +36,11 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 	// Case assignation
 	cur_player->cur_case = &(serv->world_hdl.
 			world_board[cur_player->pos.y][cur_player->pos.x]);
+	cur_player->cur_case->nb_players += 1;
 
 	// player client response.
 	write_buffer(&client_cur->buff_send, "ok\n", 3);
-	// gfx msg : "ppo #n X Y O\n" 
+	// gfx msg : "ppo #n X Y O\n"
 	asprintf(&msg, "ppo #%d %d %d %d\n",
 		client_cur->sock,
 		cur_player->pos.x,
