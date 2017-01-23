@@ -82,6 +82,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 
 		// assign player game datas.
 		assign_random_player_position(serv, &(client->player));
+		get_time(&client->delay_time);
 		assign_player_time_of_dinner(serv, &(client->player));
 
 		// "pnw #n X Y O L N\n"

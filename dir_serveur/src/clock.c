@@ -82,6 +82,16 @@ struct timeval	*set_timeout_select(struct timeval *timeout, struct timespec *low
 	return (timeout);
 }
 
+void	add_nsec_to_timespec(struct timespec *time, long nanosec)
+{
+	time->tv_nsec += nanosec;
+	while (time->tv_nsec > 1000000000)
+	{
+		time->tv_nsec -= 1000000000;
+		time->tv_sec += 1;
+	}
+}
+
 /*
 **	Will check if time_end is reached compared to current frame time.
 **	If yes, return 1, return 0 otherwise.

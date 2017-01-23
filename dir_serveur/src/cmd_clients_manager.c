@@ -101,38 +101,17 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		while (p_client->list_cmds)
+		// execute cmd and delete cmd_entity
+		if (p_client->list_cmds && timespec_is_over(p_client->delay_time))
 		{
-			if (p_client->list_cmds->time_end.tv_sec == 0) // set time_end of cmd
-			{
-				get_time(&p_client->list_cmds->time_end);
-				//printf(KYEL "now: %lu %lu\n" KRESET, p_client->list_cmds->time_end.tv_sec, p_client->list_cmds->time_end.tv_nsec);
-				p_client->list_cmds->time_end.tv_nsec += (serv->world_hdl.t_unit - (int)serv->world_hdl.t_unit) * 1000000000;
-				if (p_client->list_cmds->time_end.tv_nsec > 1000000000)
-				{
-					p_client->list_cmds->time_end.tv_nsec -= 1000000000;
-					p_client->list_cmds->time_end.tv_sec += 1;	
-				}
-				p_client->list_cmds->time_end.tv_sec += p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit;
-				//printf(KYEL "end: %lu %lu\n" KRESET, p_client->list_cmds->time_end.tv_sec, p_client->list_cmds->time_end.tv_nsec);
-			}
-			if (timespec_is_over(p_client->list_cmds->time_end) == 1)//if time commande is terminated
-			{
-				//execute cmd and delete cmd_entity
-				struct timespec	now;
-				get_time(&now);
-				//printf(KRED "lag %lus %luns\n" KRESET, now.tv_sec - p_client->list_cmds->time_end.tv_sec, now.tv_nsec - p_client->list_cmds->time_end.tv_nsec);
-				p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
-				if (p_client->list_cmds->param)
-					free(p_client->list_cmds->param);
-				p_client->list_cmds = p_client->list_cmds->next;
-				p_client->size_list_cmds -= 1;
-			}
-			else //time not terminated - get the lower time_end
-			{
-				lower_time_end = min_timespec(lower_time_end, &p_client->list_cmds->time_end);
-				break ;
-			}
+			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+			get_time(&p_client->delay_time);
+			add_nsec_to_timespec(&p_client->delay_time,
+									p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
+			if (p_client->list_cmds->param)
+				free(p_client->list_cmds->param);
+			p_client->list_cmds = p_client->list_cmds->next;
+			p_client->size_list_cmds -= 1;
 		}
 		p_client = p_client->next;
 	}

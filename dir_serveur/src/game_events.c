@@ -23,7 +23,10 @@ void	check_players_life(t_serveur *serv)
 	cur_client = serv->client_hdl.list_clients;
 	while (cur_client)
 	{
-		if (!cur_client->is_gfx && cur_client->is_in_game && !cur_client->is_player_dead)
+		if (!cur_client->is_gfx 
+			&& cur_client->is_in_game 
+			&& !cur_client->is_player_dead
+			&& !cur_client->is_disconnecting)
 		{
 			if (cur_client->player.inventory[FOOD] == 0) // Works. At zero, the player dies at ~12.6 sec for 126 of food life time and t_unit 100.
 			{

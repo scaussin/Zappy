@@ -180,6 +180,7 @@ typedef struct 				s_client_entity
 	t_buffer				buff_send;
 	int						size_list_cmds;
 	t_list_cmds_entity		*list_cmds;
+	struct timespec			delay_time;
 
 	// Client Player variables.
 	t_player				player;
@@ -396,6 +397,7 @@ struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 void						get_time(struct timespec *ts);
 struct timespec				timespec_diff(struct timespec *start, struct timespec *stop);
 struct timeval				*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end);
+void						add_nsec_to_timespec(struct timespec *time, long nanosec);
 
 /*
 ** src/cmds_functions/
