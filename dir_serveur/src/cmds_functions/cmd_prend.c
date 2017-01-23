@@ -44,6 +44,8 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 /*
 **	Get index for ressource from param string, splitting it at the space.
+**	Returns the index of the ressource (0-6 cf gfx_protocol) or -1
+**	if no ressource is found.
 **	Example : "prend 1" and "pose linemate" will both return (1);
 */
 
@@ -55,7 +57,7 @@ int		parse_ressource_index(char *param)
 	arg = strchr(param, ' ') + 1;
 	arg_len = strlen(arg) - 1; // we dont want the \n
 	// Try to take the ressource from the ground for the corresponding ressource.
-	if (strncmp(arg, "0", arg_len) == 0 || strncmp(arg, "nourriture", arg_len) == 0)  // TODO: player food == player life time.
+	if (strncmp(arg, "0", arg_len) == 0 || strncmp(arg, "nourriture", arg_len) == 0)
 		return (0);
 	else if (strncmp(arg, "1", arg_len) == 0 || strncmp(arg, "linemate", arg_len) == 0)
 		return (1);

@@ -19,19 +19,17 @@ void	check_players_life(t_serveur *serv)
 {
 	t_client_entity		*cur_client;
 	char				*gfx_msg;
-	struct timespec		now;
 
 	cur_client = serv->client_hdl.list_clients;
-	get_time(&now);
 	while (cur_client)
 	{
 		if (!cur_client->is_gfx && cur_client->is_in_game && !cur_client->is_player_dead)
 		{
-			if (cur_client->player.inventory[FOOD] == -1) // Fonctionnel. At zero, the player gets one last turn.
+			if (cur_client->player.inventory[FOOD] == 0) // Works. At zero, the player dies at ~12.6 sec for 126 of food life time and t_unit 100.
 			{
 				cur_client->is_player_dead = 1;
 				// we do not disconnect him right away cause we want to send it "mort\n"
-				write_buffer(&cur_client->buff_send, "mort\n", 6);
+				write_buffer(&cur_client->buff_send, "mort\n", 5);
 				printf(KMAG "player %d died: death by hunger\n" KRESET, cur_client->sock);
 				// "pdi #n\n"
 				asprintf(&gfx_msg, "pdi #%d\n", cur_client->sock);
@@ -41,7 +39,7 @@ void	check_players_life(t_serveur *serv)
 			else if (timespec_is_over(cur_client->player.next_dinner_time) == 1) // updates food in inventory.
 			{
 				cur_client->player.inventory[FOOD] -= 1;
-				cur_client->player.next_dinner_time.tv_sec += 126 * serv->world_hdl.t_unit;
+				assign_player_time_of_dinner(serv, &cur_client->player);
 			}
 		}
 		cur_client = cur_client->next;

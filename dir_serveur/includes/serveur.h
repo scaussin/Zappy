@@ -46,6 +46,16 @@
 # define CHAR_END '\n'
 # define LEN_END 1
 
+/*
+**	Game defines
+*/
+
+# define FOOD_LIFE_TIME 126
+
+/*
+**	Server structures.
+*/
+
 typedef int                 SOCKET;
 typedef struct sockaddr_in  SOCKADDR_IN;
 typedef struct sockaddr     SOCKADDR;
