@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// Player controller. Access and make the players do their biddings,
-/// and updates theirs values.
+/// and updates theirs values. Also calls their animations.
 /// </summary>
 public class PlayerController : MonoBehaviour {
 	public GameObject			ActorContainer;
@@ -165,13 +165,40 @@ public class PlayerController : MonoBehaviour {
 	/// <param name="msg">Message.</param>
 	public void PlayerExpulse(string msg)
 	{
-		Debug.Log ("TODO: player expulse");
-		// TODO: expulse every players that are at the same pos as the one of the msg.
+		rgx = new Regex ("^pex #(\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("Expulse");
+				}
+			}
+		}
+		// Players move by theirselves.
 	}
 
 	public void PlayerDropRessource(string msg)
 	{
-		Debug.Log ("TODO: player drop ressource");
+		rgx = new Regex ("^pgt #(\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("ArmAction");
+					return ;
+				}
+			}
+		}
 	}
 
 	public void PlayerTakeRessource(string msg)

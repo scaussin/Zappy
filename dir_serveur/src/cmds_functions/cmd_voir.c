@@ -1,13 +1,4 @@
 #include "../../includes/serveur.h"
-/*	Player and World grid
-	+y
-	^
-	|
-	|
-	|
-	|------------> +x
-*/
-
 
 void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
 {
@@ -95,7 +86,7 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 			see_str = str_concat_realloc1(see_str, "}\n");
 	}
 
-	printf("%s\n", see_str);
+	//printf("%s\n", see_str);
 	write_buffer(&client_cur->buff_send, see_str, strlen(see_str));
 	free(see_str);
 	free(tab_pos);
@@ -122,13 +113,13 @@ t_pos	*get_see_case_coordinates(t_serveur *serv, t_player *player)
 		while (i_case < 2 * i_line + 1)
 		{
 			fill_tab(tab_pos + i_tab, &rel_pos, player, serv);
-			printf("*x %d y %d*", rel_pos.x, rel_pos.y); // Debug
+			//printf("*x %d y %d*", rel_pos.x, rel_pos.y); // Debug
 			i_case++;
 			i_tab++;
 			rel_pos.x++;
 		}
 		i_line++;
-		printf("\n"); // Debug
+		//printf("\n"); // Debug
 	}
 	return (tab_pos);
 }

@@ -107,7 +107,7 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 			// reset time for next command -> "delay state" for the client.
 			get_time(&p_client->delay_time);
 			add_nsec_to_timespec(&p_client->delay_time,
-									p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
+				p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
 
 			// function may cancel the timer reset, thats why it must be executed last.
 			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);

@@ -129,8 +129,21 @@ public class GameController : MonoBehaviour {
 			if ((groups [1].Value).Equals ("SHUTDOWN"))
 			{
 				Debug.Log ("RECEIVED SERVER SHUTDOWN");
+				OnServerShutdown ();
 			}
 		}
+	}
+
+	/// <summary>
+	/// Called when the connection with the server is down or the serveur sent shutdown signal.
+	/// </summary>
+	public void OnServerShutdown()
+	{
+		ActivateMainMenuInput();
+		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
+		GameManager.instance.MainMenuController.ResponseText.color = Color.red;
+		GameManager.instance.MainMenuController.ResponseText.text = "- Connection to server lost-";
+		DisablePlayerCameraControl ();
 	}
 
 	/// <summary>

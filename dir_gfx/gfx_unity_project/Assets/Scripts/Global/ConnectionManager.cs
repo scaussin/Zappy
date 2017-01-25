@@ -71,6 +71,7 @@ public class ConnectionManager : MonoBehaviour
 				if (ClientSocket.Available == 0)
 				{
 					Debug.Log ("Client Disconnected from server");
+					GameManager.instance.GameController.OnServerShutdown ();
 					IsConnected = false;
 					return ;
 				}

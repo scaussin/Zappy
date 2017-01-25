@@ -93,7 +93,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 				new_block.isStatic = true;
 				cur_x++;
 				spawn_location.x += x_base_offset;
-				//new_block.GetComponent<Animator> ().enabled = true;
+//				new_block.GetComponent<Animator> ().enabled = true;
 			}
 			cur_y++;
 			cur_x = 0;
@@ -102,5 +102,17 @@ public class WorldBoardSpawner : MonoBehaviour {
 			spawn_location.z += z_base_offset;
 		}
 		OnWorldBoardSpawned.Invoke ();
+	}
+
+	public void DeleteWorld()
+	{
+		for (int i = 0; i < Blocks_col.Count; i++)
+		{
+			for (int y = 0; y < Blocks_col [i].Row.Count; y++)
+			{
+				Destroy (Blocks_col [i].Row[y].gameObject);
+			}
+		}
+		Blocks_col.Clear ();
 	}
 }
