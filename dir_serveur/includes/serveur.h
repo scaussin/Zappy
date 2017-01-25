@@ -17,7 +17,7 @@
 # include <arpa/inet.h>
 # include <syslog.h>
 
-#include <inttypes.h>  
+#include <inttypes.h>
 
 # ifdef __MACH__
 #  include <mach/clock.h>
@@ -45,6 +45,7 @@
 # define END "\n"
 # define CHAR_END '\n'
 # define LEN_END 1
+# define NB_RESSOURCES 7
 
 /*
 **	Game defines
@@ -143,8 +144,9 @@ typedef struct				s_player
 	int						level;
 	t_pos					pos;
 	t_dir					dir;
+	int						nb_see_case;
 	t_world_case			*cur_case;
-	int						inventory[7];
+	int						inventory[NB_RESSOURCES];
 	struct timespec			next_dinner_time;
 
 	int						is_incanting;
@@ -254,6 +256,7 @@ typedef struct 				s_world_hdl
 	int						map_x;
 	int						map_y;
 	double					t_unit;
+	char					*name_ressources[NB_RESSOURCES];
 	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
 	t_world_event			*ongoing_events;
 }							t_world_hdl;
@@ -271,7 +274,7 @@ typedef struct				s_serveur
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
 
-	
+
 }							t_serveur;
 
 /*
@@ -296,6 +299,7 @@ void						print_buff(t_buffer buff);
 void						print_send(int sock, char *str, int len);
 void						print_send_gfx(char *str);
 void						print_receive(int sock, char *str, int len);
+char						*str_concat_realloc1(char *str1, char *str2);
 
 /*
 ** input_handler.c
@@ -311,6 +315,7 @@ int							regex_match(char *string_to_search, char *regex_str);
 ** terrain_generation.c
 */
 void						init_terrain(t_serveur *serv);
+void						generate_ressources_name(t_world_hdl *world_hdl);
 void						allocate_world_board(t_world_hdl *world_hdl);
 void						set_world_board_cases(t_world_hdl *world_hdl);
 void						generate_ressources(t_world_hdl *world_hdl);
@@ -431,7 +436,7 @@ void						cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-void							get_voir_case_positions(t_serveur *serv, t_player *player);
+t_pos						*get_see_case_coordinates(t_serveur *serv, t_player *player);
 int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);

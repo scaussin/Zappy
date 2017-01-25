@@ -32,6 +32,26 @@ void	replace_nl(char *str, int len)
 	}
 }
 
+char	*str_concat_realloc1(char *str1, char *str2)
+{
+	char	*ret;
+	int		len1;
+	int		len2;
+	int		i;
+
+	len1 = strlen(str1);
+	len2 = strlen(str2);
+	ret = (char *)s_malloc(sizeof(char) * (len1 + len2 + 1));
+	i = -1;
+	while (++i < len1)
+		ret[i] = str1[i];
+	i = -1;
+	while (++i < len2)
+		ret[i + len1] = str2[i];
+	ret[i + len1] = '\0';
+	free(str1);
+	return (ret);
+}
 
 /*void	logs(int type, char *log)
 {

@@ -27,6 +27,7 @@ void			set_client_player_datas(t_client_entity *new_client)
 	new_client->player.pos.x = 5;
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;
+	new_client->player.nb_see_case = 4;
 	new_client->player.cur_case = NULL;
 	while (res_i < 7)
 	{

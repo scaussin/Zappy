@@ -28,17 +28,30 @@ void	init_terrain(t_serveur *serv)
 			serv->world_hdl.map_x, serv->world_hdl.map_y);
 		exit (-1);
 	}
-	
+
 	allocate_world_board(&serv->world_hdl);
 
 	set_world_board_cases(&serv->world_hdl);
 
 	generate_ressources(&serv->world_hdl);
 
+	generate_ressources_name(&serv->world_hdl);
+
 	// print_world_board(&serv->world_hdl); // Print the world map and resources.
 
 	printf(KGRN "Terrain generated successfully.\n" KRESET);
 
+}
+
+void	generate_ressources_name(t_world_hdl *world_hdl)
+{
+	world_hdl->name_ressources[0] = "nourriture";
+	world_hdl->name_ressources[1] = "linemate";
+	world_hdl->name_ressources[2] = "deraumere";
+	world_hdl->name_ressources[3] = "sibur";
+	world_hdl->name_ressources[4] = "mendiane";
+	world_hdl->name_ressources[5] = "phiras";
+	world_hdl->name_ressources[6] = "thystame";
 }
 
 void	allocate_world_board(t_world_hdl *world_hdl)
@@ -128,7 +141,7 @@ void generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
 }
 
 /*
-**	This is diced ressource generation. Before generating a random, a dice is 
+**	This is diced ressource generation. Before generating a random, a dice is
 **	cast to give more meaning to the generation.
 **	This is a random of rarity.
 */
