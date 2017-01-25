@@ -32,17 +32,11 @@ void	client_authentification(t_serveur *serv, t_client_entity *client)
 
 void	client_authenticate_gfx(t_serveur *serv, t_client_entity *client)
 {
-	char			*str_to_send;
-	
 	if (!serv->client_hdl.gfx_client)
 	{
 		serv->client_hdl.gfx_client = client;
 		client->is_gfx = 1;
-
-		// sending world size;
-		asprintf(&str_to_send, "msz %d %d\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
-		write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
-		free(str_to_send);
+		send_current_world_state(serv, client); // see communication_gfx.c
 		printf(KGRN "GFX client recognized\n" KRESET);
 		return ;
 	}
@@ -77,7 +71,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 	if (team->available_slots > 0)
 	{
 		// sending first datas; <nb-client>\n<x><y>\n
-		client->is_in_game = 1; 
+		client->is_in_game = 1;
 		client->team = team;
 		printf(KGRN "Player client recognized. Team: %s\n" KRESET, client->team->name);
 		asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots, serv->world_hdl.map_x, serv->world_hdl.map_y);
@@ -85,6 +79,22 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		free(str_to_send);
 		// one slot now taken in team.
 		team->available_slots -= 1;
+
+		// assign player game datas.
+		assign_random_player_position(serv, &(client->player));
+		get_time(&client->delay_time);
+		assign_player_time_of_dinner(serv, &(client->player));
+
+		// "pnw #n X Y O L N\n"
+		asprintf(&str_to_send, "pnw #%d %d %d %d %d %s\n",
+			client->sock,
+			client->player.pos.x,
+			client->player.pos.y,
+			client->player.dir + 1, // +1 cause dir enum start at 0, and gfx protocol wants 1;
+			client->player.level,
+			client->team->name);
+		push_gfx_msg(serv, str_to_send);
+		free(str_to_send);
 	}
 	else
 	{

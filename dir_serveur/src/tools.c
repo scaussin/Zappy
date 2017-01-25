@@ -19,16 +19,39 @@ void	*s_malloc(size_t size)
 	return (ret);
 }
 
-void	replace_nl(char *str)
+void	replace_nl(char *str, int len)
 {
-	while (*str)
+	int i;
+
+	i = 0;
+	while (i < len)
 	{
-		if (*str == '\n')
-			*str = '*';
-		str++;
+		if (str[i] == '\n')
+			str[i] = '*';
+		i++;
 	}
 }
 
+char	*str_concat_realloc1(char *str1, char *str2)
+{
+	char	*ret;
+	int		len1;
+	int		len2;
+	int		i;
+
+	len1 = strlen(str1);
+	len2 = strlen(str2);
+	ret = (char *)s_malloc(sizeof(char) * (len1 + len2 + 1));
+	i = -1;
+	while (++i < len1)
+		ret[i] = str1[i];
+	i = -1;
+	while (++i < len2)
+		ret[i + len1] = str2[i];
+	ret[i + len1] = '\0';
+	free(str1);
+	return (ret);
+}
 
 /*void	logs(int type, char *log)
 {
@@ -98,13 +121,20 @@ void	print_buff(t_buffer buff)
 void print_send(int sock, char *str, int len)
 {
 	printf(KYEL " Sending to sock %d: " KRESET, sock);
-	replace_nl(str);
+	replace_nl(str, len);
 	printf("[%*s]\n", len, str);
+}
+
+void print_send_gfx(char *str)
+{
+	printf(KMAG " Sending to gfx : " KRESET);
+	printf("[%*s]\n", (int)strlen(str), str);
 }
 
 void print_receive(int sock, char *str, int len)
 {
+	str[len] = '\0'; // fix print ouf of bond.
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);
-	replace_nl(str);
-	printf("[%*s]\n", len, str);
+	replace_nl(str, len);
+	printf("[%*s] len: %d\n", len, str, len);
 }

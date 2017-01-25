@@ -7,21 +7,7 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientInputHandler::ClientInputHandler()
-{
-
-}
-
-ClientInputHandler::~ClientInputHandler()
-{
-
-}
-
-// Usage: ./client -n <team> -p <port> [-h <hostname>]
-//	-n nom d'equipe
-//	-p port
-//	-h nom de la machine par defaut c'est le localhost
-void	ClientInputHandler::GetInput(ClientConnection &Connection, int argc, char **argv)
+ClientInputHandler::ClientInputHandler(int argc, char **argv)
 {
 	if (argc != 5 && argc != 7)
 	{
@@ -32,9 +18,12 @@ void	ClientInputHandler::GetInput(ClientConnection &Connection, int argc, char *
 		// These method will throw exceptions if there's a problem.
 		CheckInputFormat(argc, argv);
 		ParseInput(argc, argv);
-		FillInput(Connection, argc, argv);
+		FillInput(argc, argv);
 	}
 }
+
+ClientInputHandler::~ClientInputHandler()
+{}
 
 void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 {
@@ -86,17 +75,12 @@ void	ClientInputHandler::ParseInput(int argc, char **argv)
 	}
 }
 
-void	ClientInputHandler::FillInput(ClientConnection &Connection, int argc, char **argv)
+void	ClientInputHandler::FillInput(int argc, char **argv)
 {
-	Connection.Settings.TeamName = argv[2];
-	Connection.Settings.Port = std::stoi(argv[4], NULL, 10);
+	teamName = argv[2];
+	port = std::stoi(argv[4], NULL, 10);
 	if (argc == 7)
-	{
-		Connection.Settings.HostName = argv[6];
-	}
+		hostName = argv[6];
 	else
-	{
-		Connection.Settings.HostName = "localhost";
-	}
-
+		hostName = "localhost";
 }

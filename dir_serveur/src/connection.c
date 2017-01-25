@@ -63,6 +63,7 @@ void close_all_connections(t_serveur *serv)
 	t_client_entity	*p_client;
 
 	p_client = serv->client_hdl.list_clients;
+	push_gfx_msg(serv, "smg SHUTDOWN\n");
 	while (p_client)
 	{
 		close(p_client->sock);

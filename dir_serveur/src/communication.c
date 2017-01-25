@@ -11,6 +11,7 @@ void		check_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity		*p_client;
 	int					ret_read;
+	char				*msg;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
@@ -18,6 +19,17 @@ void		check_all_clients_communication(t_serveur *serv)
 		if (FD_ISSET(p_client->sock, serv->network.read_fs)
 			&& !(ret_read = read_client(p_client)))
 		{
+			// check gfx clear
+			if (p_client->is_gfx == 1)
+				serv->client_hdl.gfx_client = NULL;
+			if (p_client->is_in_game == 1)
+			{
+				// gfx msg : "pdi #n\n"
+				asprintf(&msg, "pdi #%d\n",
+					p_client->sock);
+				push_gfx_msg(serv, msg);
+				free(msg);
+			}
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			return ;
@@ -37,12 +49,24 @@ void		check_all_clients_communication(t_serveur *serv)
 void		disconnect_flagged_clients(t_serveur *serv)
 {
 	t_client_entity		*p_client;
+	char				*msg;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
 		if (p_client->is_disconnecting == 1)
 		{
+			// check gfx clear
+			if (p_client->is_gfx == 1)
+				serv->client_hdl.gfx_client = NULL;
+			if (p_client->is_in_game == 1)
+			{
+				// gfx msg : "pdi #n\n"
+				asprintf(&msg, "pdi #%d\n",
+					p_client->sock);
+				push_gfx_msg(serv, msg);
+				free(msg);
+			}
 			disconnect_client(p_client->sock);
 			remove_client(serv, p_client);
 			p_client = serv->client_hdl.list_clients;
@@ -110,8 +134,10 @@ int			read_client(t_client_entity *client)
 	if (ret == -1)
 		perror("recv()");
 	else
+	{
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
-	print_receive(client->sock, buff_tmp, client->buff_recv.len);
+		print_receive(client->sock, buff_tmp, ret);
+	}
 	free(buff_tmp);
 	return (ret);
 }
@@ -156,13 +182,13 @@ char		*read_buffer(t_buffer *buff)
 	if (buff->len > 0)
 	{
 		ret_buff = s_malloc(buff->len + 1);
-		bzero(ret_buff, buff->len + 1);
 		i = 0;
 		while (i < buff->len)
 		{
 			ret_buff[i] = buff->buff[(buff->start + i) % BUFF_SIZE];
 			i++;
 		}
+		ret_buff[buff->len] = 0;
 	}
 	return (ret_buff);
 }
@@ -178,13 +204,9 @@ char		*get_first_cmd(t_buffer *buffer)
 	char *end;
 	int len_cmd;
 
-	buff = read_buffer(buffer);
-	//printf("buff:%s", buff);
-	end = strstr(buff, END);
-	if (end)
+	if ((buff = read_buffer(buffer)) && (end = memchr(buff, CHAR_END, buffer->len)))
 	{
-		//printf("end:\\%s", end);
-		end[1] = 0;
+		end[LEN_END] = 0;
 		len_cmd = (end - buff) + LEN_END;
 		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;
 		buffer->len -= len_cmd;

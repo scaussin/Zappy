@@ -1,16 +1,21 @@
 #ifndef CLIENTINPUTHANDLER_HPP
 # define CLIENTINPUTHANDLER_HPP
 
+# include "Client.hpp"
+
 class ClientInputHandler
 {
 	public:
-		ClientInputHandler();
+		ClientInputHandler(int argc, char **argv);
 		~ClientInputHandler();
 	
-		void	GetInput(ClientConnection &Connection, int argc, char **argv);
-		void	CheckInputFormat(int argc, char **argv);
-		void	ParseInput(int argc, char **argv);
-		void	FillInput(ClientConnection &Connection, int argc, char **argv);
+		void			CheckInputFormat(int argc, char **argv);
+		void			ParseInput(int argc, char **argv);
+		void			FillInput(int argc, char **argv);
+
+		std::string		teamName;
+		std::string		hostName;
+		int				port;
 };
 
 #endif
