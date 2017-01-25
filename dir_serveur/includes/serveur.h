@@ -51,6 +51,7 @@
 */
 
 # define FOOD_LIFE_TIME 126
+# define INCANTATION_TIME 300
 
 /*
 **	Server structures.
@@ -145,6 +146,10 @@ typedef struct				s_player
 	t_world_case			*cur_case;
 	int						inventory[7];
 	struct timespec			next_dinner_time;
+
+	int						is_incanting;
+	int						is_incanter;
+	struct timespec			incantation_end_time;
 }							t_player;
 
 
@@ -384,9 +389,10 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 */
 
 void						check_game_events(t_serveur *serv);
-void							check_players_life(t_serveur *serv);
 void							check_world_events(t_serveur *serv);
-
+void							check_players_events(t_serveur *serv);
+void								check_player_life(t_serveur *serv, t_client_entity *cur_client);
+void								check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
 
 /*
 ** cmd_clients_manager.c
@@ -440,6 +446,8 @@ void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *para
 void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
 int								*set_incantation_target_res(int plevel);
 int								are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player, int *target_res);
+void							set_players_incanting(t_serveur *serv, t_client_entity *cur_client);
+void							strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *target_res);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 

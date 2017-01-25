@@ -23,7 +23,7 @@ void			set_client_player_datas(t_client_entity *new_client)
 	int res_i;
 
 	res_i = 0;
-	new_client->player.level = 0;
+	new_client->player.level = 1;
 	new_client->player.pos.x = 5;
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;

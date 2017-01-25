@@ -39,9 +39,9 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 	else
 		nb_of_parsed_chars = strlen(cmd);
 
-	if (nb_of_parsed_chars > 11)
+	if (nb_of_parsed_chars > 12)
 	{
-		printf(KMAG "[Serveur]: cmd too long (no cmd takes more than 11 char):"
+		printf(KMAG "[Serveur]: cmd too long (no cmd takes more than 12 char):"
 					"%s on sock: %d\n" KRESET, cmd, client->sock);
 		return ;
 	}
@@ -93,8 +93,9 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 
 struct timespec	*exec_cmd_client(t_serveur *serv)
 {
-	t_client_entity	*p_client;
-	struct timespec *lower_time_end;
+	t_client_entity			*p_client;
+	struct timespec			*lower_time_end;
+	t_list_cmds_entity		*cmd_to_free;
 
 	lower_time_end = NULL;
 	p_client = serv->client_hdl.list_clients;
@@ -103,15 +104,21 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 		// execute cmd and delete cmd_entity
 		if (p_client->list_cmds && timespec_is_over(p_client->delay_time))
 		{
-			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
 			// reset time for next command -> "delay state" for the client.
 			get_time(&p_client->delay_time);
 			add_nsec_to_timespec(&p_client->delay_time,
 									p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
+
+			// function may cancel the timer reset, thats why it must be executed last.
+			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
+
+			// cleaning cmd from the cmd list for the player.
 			if (p_client->list_cmds->param)
 				free(p_client->list_cmds->param);
+			cmd_to_free = p_client->list_cmds;
 			p_client->list_cmds = p_client->list_cmds->next;
 			p_client->size_list_cmds -= 1;
+			free(cmd_to_free);
 		}
 		p_client = p_client->next;
 	}

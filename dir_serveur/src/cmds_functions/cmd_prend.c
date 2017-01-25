@@ -19,10 +19,25 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 			(try_to_take_res(&client_cur->player, res_i)) >= 0)
 		{
 			write_buffer(&client_cur->buff_send, "ok\n", 3);
-			//"pgt #n i\n"
+			
+			// send prend cmd"pgt #n i\n"
 			asprintf(&gfx_msg, "pgt #%d %d\n", client_cur->sock, res_i);
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
+
+			// send inventaire "pin #n X Y q q q q q q q\n"
+			asprintf(&gfx_msg, "pin #%d %d %d %d %d %d %d %d\n",
+				client_cur->sock,
+				client_cur->player.inventory[FOOD],
+				client_cur->player.inventory[LINEMATE],
+				client_cur->player.inventory[DERAUMERE],
+				client_cur->player.inventory[SIBUR],
+				client_cur->player.inventory[MENDIANE],
+				client_cur->player.inventory[PHIRAS],
+				client_cur->player.inventory[THYSTAME]);
+			push_gfx_msg(serv, gfx_msg);
+			free(gfx_msg);
+			
 			// gfx world block ressource update.
 			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
 				client_cur->player.pos.x,
