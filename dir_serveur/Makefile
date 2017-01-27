@@ -17,7 +17,9 @@ src/serveur_data.c \
 src/terrain_generation.c \
 src/serveur_loop.c \
 src/game_events.c \
+src/game_player_events.c \
 src/game_events_helper.c \
+src/egg_handling.c \
 src/player_handler.c \
 src/clock.c \
 src/cmds_functions/cmd_avance.c \

@@ -122,13 +122,13 @@ void print_send(int sock, char *str, int len)
 {
 	printf(KYEL " Sending to sock %d: " KRESET, sock);
 	replace_nl(str, len);
-	printf("[%*s]\n", len, str);
+	printf("[%.*s]\n", len, str);
 }
 
 void print_send_gfx(char *str)
 {
 	printf(KMAG " Sending to gfx : " KRESET);
-	printf("[%*s]\n", (int)strlen(str), str);
+	printf("[%.*s]\n", (int)strlen(str), str);
 }
 
 void print_receive(int sock, char *str, int len)
@@ -136,5 +136,5 @@ void print_receive(int sock, char *str, int len)
 	str[len] = '\0'; // fix print ouf of bond.
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);
 	replace_nl(str, len);
-	printf("[%*s] len: %d\n", len, str, len);
+	printf("[%.*s] len: %d\n", len, str, len);
 }

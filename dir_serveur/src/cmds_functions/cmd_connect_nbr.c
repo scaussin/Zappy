@@ -1,8 +1,19 @@
 #include "../../includes/serveur.h"
 
+/*
+**	La commande connect_nbr renvoie le nombre de connections autorisées et non
+**	autorisées pour cette famille.
+**
+**	connaitre le nb de connections	| connect_nbr	| 0/t	|	valeur
+**	non utilisée par l’équipe		|
+*/
 void	cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
 	(void)serv;
-	(void)client_cur;
 	(void)param;
+	char *client_msg;
+
+	asprintf(&client_msg, "%d\n", client_cur->team->available_slots);
+	write_buffer(&client_cur->buff_send, client_msg, strlen(client_msg));
+	free(client_msg);
 }

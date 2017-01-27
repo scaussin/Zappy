@@ -7,114 +7,14 @@
 void	check_game_events(t_serveur *serv)
 {
 	check_world_events(serv); // no events created for now, but lets keep it in case of.
-	check_players_events(serv);
-	// TODO: check_eggs(); -> for each egg on the ground, check if they hatch or die of hunger.
+	check_players_events(serv); // game_player_events.c
+	check_eggs(serv); // -> for each egg on the ground, check if they hatch or die of hunger.
 	// TODO: check_game_over(); -> a team won, or all players died.
 }
 
-/*
-**	Check events that must be check on a "per player" basis.
-**	Reuniting them here allows to make only one run through the players.
-*/
-
-void	check_players_events(t_serveur *serv)
-{
-	t_client_entity		*cur_client;
-
-
-	cur_client = serv->client_hdl.list_clients;
-	while (cur_client)
-	{
-		if (!cur_client->is_gfx 
-			&& cur_client->is_in_game 
-			&& !cur_client->is_player_dead
-			&& !cur_client->is_disconnecting)
-		{
-			check_player_life(serv, cur_client);
-			check_player_incantation_end(serv, cur_client);
-		}
-		cur_client = cur_client->next;
-	}
-}
 
 /*
-**	For current player, we check if he must die of hunger.
-**	At zero, the player dies at ~12.6 sec for 126 of food life time
-**	and t_unit 100.
-*/
-
-void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
-{
-	char				*gfx_msg;
-	if (cur_client->player.inventory[FOOD] == 0) // Works. 
-	{
-		cur_client->is_player_dead = 1;
-		// we do not disconnect him right away cause we want to send it "mort\n"
-		write_buffer(&cur_client->buff_send, "mort\n", 5);
-		printf(KMAG "player %d died: death by hunger\n" KRESET, cur_client->sock);
-		// "pdi #n\n"
-		asprintf(&gfx_msg, "pdi #%d\n", cur_client->sock);
-		push_gfx_msg(serv, gfx_msg);
-		free(gfx_msg);
-	}
-	else if (timespec_is_over(cur_client->player.next_dinner_time) == 1) // updates food in inventory.
-	{
-		cur_client->player.inventory[FOOD] -= 1;
-		assign_player_time_of_dinner(serv, &cur_client->player);
-	}
-}
-
-void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
-{
-	char	*client_msg;
-	char	*gfx_msg;
-
-	if (cur_client->player.is_incanting == 1)
-	{
-		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
-		{
-			cur_client->player.is_incanting = 0;
-			cur_client->player.level += 1;
-			
-			// send client: "niveau actuel : K"
-			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);
-			write_buffer(&cur_client->buff_send, client_msg, strlen(client_msg));
-			free(client_msg);
-
-			// send gfx: "pie X Y R\n" for incantation leader only
-			if (cur_client->player.is_incanter)
-			{
-				asprintf(&gfx_msg, "pie %d %d %d\n",
-					cur_client->player.pos.x, cur_client->player.pos.y, cur_client->player.level);
-				push_gfx_msg(serv, gfx_msg);
-				free(gfx_msg);
-			}
-
-			// send gfx : "plv #n L\n"
-			asprintf(&gfx_msg, "plv #%d %d\n",
-				cur_client->sock, cur_client->player.level);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
-
-			// gfx world block ressource update.
-			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				cur_client->player.pos.x,
-				cur_client->player.pos.y,
-				cur_client->player.cur_case->ressources[FOOD],
-				cur_client->player.cur_case->ressources[LINEMATE],
-				cur_client->player.cur_case->ressources[DERAUMERE],
-				cur_client->player.cur_case->ressources[SIBUR],
-				cur_client->player.cur_case->ressources[MENDIANE],
-				cur_client->player.cur_case->ressources[PHIRAS],
-				cur_client->player.cur_case->ressources[THYSTAME]);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
-		}
-	}
-}
-
-/*
-**	Will check ongoing events and fire them if it is their time.
+**	Will check ongoing global events and fire them if it is their time.
 */
 
 void	check_world_events(t_serveur *serv)
@@ -138,4 +38,59 @@ void	check_world_events(t_serveur *serv)
 				event_tmp = event_tmp->next;
 		}
 	}
+}
+
+void check_eggs(t_serveur *serv)
+{
+	t_egg	*egg_tmp;
+	char	*gfx_msg;
+
+	if (serv->world_hdl.eggs) // any eggs spawned on the world ?
+	{
+		egg_tmp = serv->world_hdl.eggs;
+		while (egg_tmp)
+		{
+			if (egg_tmp->has_hatched == 0)
+			{
+				if (timespec_is_over(egg_tmp->hatch_time) == 1) // eclosion time, egg!
+				{
+					egg_tmp->has_hatched = 1;
+					// set the death time the same as a player. 10 * food.
+					get_time(&egg_tmp->death_time);
+					add_nsec_to_timespec(&egg_tmp->death_time,
+						FOOD_LIFE_TIME * 10 * serv->world_hdl.t_unit * 1000000000);
+
+					// gfx egg eclosion "eht #e\n"
+					asprintf(&gfx_msg, "eht #%d\n", egg_tmp->egg_nb);
+					push_gfx_msg(serv, gfx_msg);
+					free(gfx_msg);
+
+					printf(KGRN "[Serveur]: egg #%d hatched!"
+								"A player can now connect through the egg.\n" KRESET,
+								egg_tmp->egg_nb);
+				}
+			}
+			else // egg already hatched, check death of egg.
+				//	Only a player connection of the same team will save an egg from death.
+			{
+				if (timespec_is_over(egg_tmp->death_time) == 1)
+				{
+					// gfx egg death "edi #e\n"
+					asprintf(&gfx_msg, "edi #%d\n", egg_tmp->egg_nb);
+					push_gfx_msg(serv, gfx_msg);
+					free(gfx_msg);
+
+					printf(KGRN "[Serveur]: egg #%d died of hunger." 
+								"Egg removed from server.\n" KRESET, egg_tmp->egg_nb);
+
+					// clear node and restart the check.
+					clear_egg(serv, egg_tmp);
+					egg_tmp = serv->world_hdl.eggs;
+				}
+			}
+			if (egg_tmp)
+				egg_tmp = egg_tmp->next;
+		}
+	}
+
 }

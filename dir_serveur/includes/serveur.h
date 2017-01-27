@@ -53,6 +53,11 @@
 
 # define FOOD_LIFE_TIME 126
 # define INCANTATION_TIME 300
+# define EGG_HATCH_TIME 600
+# define EGG_LAYING_TIME 42
+
+# define VICTORY_CDT_PLAYER_NB 6
+# define VICTORY_CDT_PLAYER_LV 8
 
 /*
 **	Server structures.
@@ -127,17 +132,6 @@ typedef struct 				s_team_hdl
 ** ************************ Client **************************
 */
 
-/*typedef struct				s_player_inventory
-{
-	int						food;
-	int						linemate;
-	int						deraumere;
-	int						sibur;
-	int						mendiane;
-	int						phiras;
-	int						thystame;
-}							t_player_inventory;*/
-
 // Player belonging to the client.
 typedef struct				s_player
 {
@@ -152,6 +146,9 @@ typedef struct				s_player
 	int						is_incanting;
 	int						is_incanter;
 	struct timespec			incantation_end_time;
+
+	int						is_laying_egg;
+	struct timespec			egg_layed_time;
 }							t_player;
 
 
@@ -229,10 +226,18 @@ typedef	struct				s_event_client
 	struct s_event_client	*next;
 }							t_event_client;
 
-/*
-**	!! -> chained_list of world event.
-**	May or not concern another chained list of players.
-*/
+typedef struct				s_egg
+{
+	int						egg_nb;
+	t_team_entity			*team;
+	t_pos					pos;
+
+	struct timespec			hatch_time;
+	int						has_hatched;
+	struct timespec			death_time;
+
+	struct s_egg			*next;
+}							t_egg;
 
 typedef struct				s_world_event
 {
@@ -258,14 +263,27 @@ typedef struct 				s_world_hdl
 	double					t_unit;
 	char					*name_ressources[NB_RESSOURCES];
 	t_world_case			**world_board; // ==> access with	world_board[y_pos][x_pos]
+
 	t_world_event			*ongoing_events;
+
+	int						nb_of_eggs;
+	t_egg					*eggs;
 }							t_world_hdl;
 
+/*
+** ******************** Serveur game settings ******************
+**	Could be useful for in-game rule change.
+*/
 
+typedef struct				s_game_settings
+{
+//	int						are_teams_infinite; // does not seem possible for now.
+}							t_game_settings;
 
 /*
 ** ******************** Serveur Main Struct ******************
 */
+
 typedef struct				s_serveur
 {
 	t_network_data 			network;
@@ -274,7 +292,7 @@ typedef struct				s_serveur
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
 
-
+	t_game_settings			settings_hdl;
 }							t_serveur;
 
 /*
@@ -300,6 +318,8 @@ void						print_send(int sock, char *str, int len);
 void						print_send_gfx(char *str);
 void						print_receive(int sock, char *str, int len);
 char						*str_concat_realloc1(char *str1, char *str2);
+
+int							is_equal(double x, double y);
 
 /*
 ** input_handler.c
@@ -396,9 +416,10 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 void						check_game_events(t_serveur *serv);
 void							check_world_events(t_serveur *serv);
 void							check_players_events(t_serveur *serv);
+void							check_eggs(t_serveur *serv);
 void								check_player_life(t_serveur *serv, t_client_entity *cur_client);
 void								check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
-
+void								check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
 /*
 ** cmd_clients_manager.c
 */
@@ -456,6 +477,12 @@ void							strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, i
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 
-int is_equal(double x, double y);
+/*
+**	egg_handling.c
+*/
+
+void	add_new_egg(t_serveur *serv, t_client_entity *client);
+void	clear_egg(t_serveur *serv, t_egg *egg);
+
 
 #endif
