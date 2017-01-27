@@ -20,6 +20,7 @@ SOCKET	accept_connection(t_serveur *serv)
 		printf(KRED "No available slot\n" KRESET);
 		return (-1);
 	}
+	printf("Slots available: %d\n", n_available_slots);
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
@@ -35,7 +36,7 @@ void new_client_connection(t_serveur *serv)
 	t_client_entity		*client;
 
 	// Debug Print
-	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);
+	printf(KGRN "\n- New client connection process started -\n" KRESET);
 
 	// Accept connection
 	if ((c_sock = accept_connection(serv)) < 0)
@@ -55,7 +56,7 @@ void new_client_connection(t_serveur *serv)
 	add_client(serv, client);
 
 	// Debug Print
-	printf("%sNew client connected, sock : %d%s\n", KGRN, client->sock, KRESET);
+	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
 }
 
 void disconnect_client(SOCKET c_sock)

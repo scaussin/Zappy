@@ -156,6 +156,7 @@ int			write_buffer(t_buffer *buff, char *to_write, int size)
 		if (buff->len + size > BUFF_SIZE)
 		{
 			perror("buffer full");
+			
 			return (0);
 		}
 		while (i < size)
@@ -211,6 +212,10 @@ char		*get_first_cmd(t_buffer *buffer)
 		buffer->start = (buffer->start + len_cmd) % BUFF_SIZE;
 		buffer->len -= len_cmd;
 		return (buff);
+	}
+	if (end == NULL && buffer->len == BUFF_SIZE)
+	{
+		buffer->len = 0;
 	}
 	return (NULL);
 }
