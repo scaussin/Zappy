@@ -38,6 +38,7 @@ void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 	if (cur_client->player.inventory[FOOD] == 0) // Works. 
 	{
 		cur_client->is_player_dead = 1;
+		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 		// we do not disconnect him right away cause we want to send it "mort\n"
 		write_buffer(&cur_client->buff_send, "mort\n", 5);
 		printf(KMAG "player %d died: death by hunger\n" KRESET, cur_client->sock);
@@ -63,7 +64,9 @@ void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
 		{
 			cur_client->player.is_incanting = 0;
+			cur_client->team->nb_players_per_lv[cur_client.level - 1] -= 1;
 			cur_client->player.level += 1;
+			cur_client->team->nb_players_per_lv[cur_client.level - 1] += 1;
 			
 			// send client: "niveau actuel : K"
 			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);
@@ -120,7 +123,7 @@ void	check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client)
 			asprintf(&gfx_msg, "enw #%d\n", cur_client->sock);
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
-			
+
 		}
 	}
 }

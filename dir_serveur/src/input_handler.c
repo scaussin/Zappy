@@ -143,9 +143,11 @@ void	check_input_format(t_serveur *serv, int argc, char **argv)
 void	fill_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
+	int y;
 	int team_i;
 
 	i = 1;
+	y = 0;
 	team_i = 0;
 	// for each arg.
 	while (i != argc && i < 7)
@@ -181,12 +183,19 @@ void	fill_input(t_serveur *serv, int argc, char **argv)
 		&& strncmp(argv[i], "-c", 2) != 0
 		&& strncmp(argv[i], "-t", 2) != 0)
 		{
+			// -------- Init new team 
 			if (strlen(argv[i]) > 40)
 				error_in_args(i, "Team Name is too long (40 char max)");
 			serv->team_hdl.array_teams[team_i].name =
 				(char *)malloc(sizeof(char) * strlen(argv[i]) + 1);
 			strncpy(serv->team_hdl.array_teams[team_i].name, argv[i], strlen(argv[i]));
 			serv->team_hdl.array_teams[team_i].name[strlen(argv[i])] = '\0';
+			// set team number of players by lvl to zero -> teams are empty.
+			while (serv->team_hdl.array_teams[team_i].nb_players_per_lv[y] < MAX_LV)
+			{
+				serv->team_hdl.array_teams[team_i].nb_players_per_lv[y] = 0;
+				y++;
+			}
 			team_i++;
 			i++;
 		}

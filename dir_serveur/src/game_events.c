@@ -94,3 +94,21 @@ void check_eggs(t_serveur *serv)
 	}
 
 }
+
+void check_victory(t_serveur *serv)
+{
+	int i;
+
+	i = 0;
+	while (i < serv->team_hdl.nb_teams)
+	{
+		if (serv->team_hdl->array_teams[i]
+			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV] == 
+			VICTORY_CDT_PLAYER_NB)
+		{
+			printf(KGRN "Victory condition reached for a team!\n"KRESET);
+		}
+
+		i++;
+	}
+}

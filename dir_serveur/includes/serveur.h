@@ -56,6 +56,7 @@
 # define EGG_HATCH_TIME 600
 # define EGG_LAYING_TIME 42
 
+# define MAX_LV 8
 # define VICTORY_CDT_PLAYER_NB 6
 # define VICTORY_CDT_PLAYER_LV 8
 
@@ -89,6 +90,22 @@ typedef enum				e_ressources
 	THYSTAME
 }							t_ressources;
 
+/*
+**	Used for team level status. look at t_team_entity.
+*/
+
+typedef enum				e_level
+{
+	LV1,
+	LV2,
+	LV3,
+	LV4,
+	LV5,
+	LV6,
+	LV7,
+	LV8
+}							t_level;
+
 typedef struct				s_pos
 {
 	int						x;
@@ -119,6 +136,7 @@ typedef struct 				s_team_entity
 {
 	char					*name;
 	int						available_slots;
+	int						nb_players_per_lv[MAX_LV];
 }							t_team_entity;
 
 typedef struct 				s_team_hdl

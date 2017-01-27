@@ -81,17 +81,17 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		free(str_to_send);
 		// one slot now taken in team.
 		team->available_slots -= 1;
-
+		team->nb_players_per_lv[client->player.level - 1] += 1;
 		if ((egg = egg_available(serv, client)) != NULL)
 		{
 			client->player.pos.x = egg->pos.x;
 			client->player.pos.y = egg->pos.y;
-			clear_egg(serv, egg);
-			
+			client->player.dir = rand() % 4;
+			clear_egg(serv, egg);	
 			// gfx egg connection "ebo #e\n"
 			asprintf(&str_to_send, "ebo #%d\n", egg->egg_nb);
 			free(str_to_send);
-			
+
 			printf(KGRN "[Serveur]: Client #%d connected as egg #%d\n" KRESET,
 					client->sock, egg->egg_nb);
 		}
