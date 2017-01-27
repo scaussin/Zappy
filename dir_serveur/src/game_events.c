@@ -12,9 +12,9 @@ void	check_game_events(t_serveur *serv)
 	// TODO: check_game_over(); -> a team won, or all players died.
 }
 
-
 /*
 **	Will check ongoing global events and fire them if it is their time.
+**	--> Unused right now.
 */
 
 void	check_world_events(t_serveur *serv)
@@ -65,7 +65,7 @@ void check_eggs(t_serveur *serv)
 					push_gfx_msg(serv, gfx_msg);
 					free(gfx_msg);
 
-					printf(KGRN "[Serveur]: egg #%d hatched!"
+					printf(KGRN "[Serveur]: egg #%d hatched! "
 								"A player can now connect through the egg.\n" KRESET,
 								egg_tmp->egg_nb);
 				}
@@ -80,7 +80,7 @@ void check_eggs(t_serveur *serv)
 					push_gfx_msg(serv, gfx_msg);
 					free(gfx_msg);
 
-					printf(KGRN "[Serveur]: egg #%d died of hunger." 
+					printf(KGRN "[Serveur]: egg #%d died of hunger. " 
 								"Egg removed from server.\n" KRESET, egg_tmp->egg_nb);
 
 					// clear node and restart the check.

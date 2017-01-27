@@ -482,6 +482,7 @@ void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *pa
 */
 
 void	add_new_egg(t_serveur *serv, t_client_entity *client);
+t_egg	*egg_available(t_serveur *serv, t_client_entity *client);
 void	clear_egg(t_serveur *serv, t_egg *egg);
 
 
