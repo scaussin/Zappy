@@ -16,7 +16,10 @@ SOCKET	accept_connection(t_serveur *serv)
 		i++;
 	}
 	if  (n_available_slots == 0)
+	{
+		printf(KRED "No available slot\n" KRESET);
 		return (-1);
+	}
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
