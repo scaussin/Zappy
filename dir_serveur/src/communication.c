@@ -132,7 +132,9 @@ int			read_client(t_client_entity *client)
 			break ;
 	}	
 	if (ret == -1)
-		perror("recv()");
+	{
+		//perror("recv()");
+	}
 	else
 	{
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
@@ -156,7 +158,7 @@ int			write_buffer(t_buffer *buff, char *to_write, int size)
 		if (buff->len + size > BUFF_SIZE)
 		{
 			perror("buffer full");
-			
+
 			return (0);
 		}
 		while (i < size)
@@ -205,6 +207,7 @@ char		*get_first_cmd(t_buffer *buffer)
 	char *end;
 	int len_cmd;
 
+	end = NULL;
 	if ((buff = read_buffer(buffer)) && (end = memchr(buff, CHAR_END, buffer->len)))
 	{
 		end[LEN_END] = 0;
