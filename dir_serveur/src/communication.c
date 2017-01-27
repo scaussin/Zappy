@@ -102,7 +102,7 @@ void		write_client(t_client_entity *client)
 	if (ret_send > 0)
 	{
 		client->buff_send.start = (client->buff_send.start + ret_send) % BUFF_SIZE;
-		client->buff_send.len -= ret_send;
+		client->buff_send.len -= ret_send;/*!!*/
 	}
 }
 
@@ -151,16 +151,27 @@ int			read_client(t_client_entity *client)
 int			write_buffer(t_buffer *buff, char *to_write, int size)
 {
 	int		i;
+	int		size_overflow;
 
 	if (size)
 	{
-		i = 0;
 		if (buff->len + size > BUFF_SIZE)
 		{
-			perror("buffer full");
-
-			return (0);
+			size_overflow = buff->len + size - BUFF_SIZE;
+			if (buff->overflow)
+			{
+				buff->overflow = realloc(buff->overflow, buff->len_overflow);
+				memcpy(buff->overflow + buff->len_overflow, to_write, size_overflow);
+				buff->len_overflow += size_overflow;
+			}
+			else
+			{
+				buff->overflow = malloc(size_overflow);
+				buff->len_overflow = size_overflow;
+			}
+			printf("[WARNING] : buffer overflow\n");
 		}
+		i = 0;
 		while (i < size)
 		{
 			buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
@@ -193,6 +204,7 @@ char		*read_buffer(t_buffer *buff)
 		}
 		ret_buff[buff->len] = 0;
 	}
+	/*realloc();*/
 	return (ret_buff);
 }
 

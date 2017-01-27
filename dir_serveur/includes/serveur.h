@@ -169,6 +169,8 @@ typedef struct				s_buffer
 	char					buff[BUFF_SIZE];
 	int						start;
 	int						len;
+	char					*overflow;
+	int						len_overflow;
 }							t_buffer;
 
 typedef struct 				s_client_entity
