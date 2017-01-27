@@ -13,8 +13,10 @@
 void	get_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
+	int y;
 
 	i = 0;
+	y = 0;
 	if (argc < 13)
 	{
 		error_in_args(0, "Invalid number of arguments");
@@ -35,6 +37,12 @@ void	get_input(t_serveur *serv, int argc, char **argv)
 		while (i < serv->team_hdl.nb_teams)
 		{
 			printf("  %s", serv->team_hdl.array_teams[i].name);
+			// set team number of players by lvl to zero -> teams are empty.
+			while (y < MAX_LV)
+			{
+				serv->team_hdl.array_teams[i].nb_players_per_lv[y] = 0;
+				y++;
+			}
 			i++;
 		}
 		printf("\n");
@@ -143,11 +151,9 @@ void	check_input_format(t_serveur *serv, int argc, char **argv)
 void	fill_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
-	int y;
 	int team_i;
 
 	i = 1;
-	y = 0;
 	team_i = 0;
 	// for each arg.
 	while (i != argc && i < 7)
@@ -190,12 +196,6 @@ void	fill_input(t_serveur *serv, int argc, char **argv)
 				(char *)malloc(sizeof(char) * strlen(argv[i]) + 1);
 			strncpy(serv->team_hdl.array_teams[team_i].name, argv[i], strlen(argv[i]));
 			serv->team_hdl.array_teams[team_i].name[strlen(argv[i])] = '\0';
-			// set team number of players by lvl to zero -> teams are empty.
-			while (serv->team_hdl.array_teams[team_i].nb_players_per_lv[y] < MAX_LV)
-			{
-				serv->team_hdl.array_teams[team_i].nb_players_per_lv[y] = 0;
-				y++;
-			}
 			team_i++;
 			i++;
 		}

@@ -87,7 +87,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 			client->player.pos.x = egg->pos.x;
 			client->player.pos.y = egg->pos.y;
 			client->player.dir = rand() % 4;
-			clear_egg(serv, egg);	
+			clear_egg(serv, egg);
 			// gfx egg connection "ebo #e\n"
 			asprintf(&str_to_send, "ebo #%d\n", egg->egg_nb);
 			free(str_to_send);

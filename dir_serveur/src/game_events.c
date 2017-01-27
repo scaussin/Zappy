@@ -9,7 +9,7 @@ void	check_game_events(t_serveur *serv)
 	check_world_events(serv); // no events created for now, but lets keep it in case of.
 	check_players_events(serv); // game_player_events.c
 	check_eggs(serv); // -> for each egg on the ground, check if they hatch or die of hunger.
-	// TODO: check_game_over(); -> a team won, or all players died.
+	check_victory(serv);
 }
 
 /*
@@ -92,23 +92,37 @@ void check_eggs(t_serveur *serv)
 				egg_tmp = egg_tmp->next;
 		}
 	}
-
 }
+
+/*
+**	For each team, check if the nb of player by level is the targeted one.
+**	The team is updated at three moments:
+**	- a player connects([LV1] += 1)
+**	- a player gets a lv([NEW LV] += 1 ; [OLD LV] -= 1)
+**	- a player dies ([LV] -= 1)
+*/
 
 void check_victory(t_serveur *serv)
 {
-	int i;
+	char	*gfx_msg;
+	int		i;
 
 	i = 0;
 	while (i < serv->team_hdl.nb_teams)
 	{
-		if (serv->team_hdl->array_teams[i]
-			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV] == 
+		if (serv->team_hdl.array_teams[i]
+			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] == 
 			VICTORY_CDT_PLAYER_NB)
 		{
-			printf(KGRN "Victory condition reached for a team!\n"KRESET);
+			printf(KGRN "Victory condition reached for team %s!\n"KRESET,
+				serv->team_hdl.array_teams[i].name);
+			// TODO: Victory code ?
+			sleep(10); //
+			// gfx send victory "seg N\n"
+			asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
+			push_gfx_msg(serv, gfx_msg);
+			free(gfx_msg);
 		}
-
 		i++;
 	}
 }

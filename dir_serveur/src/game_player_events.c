@@ -64,9 +64,10 @@ void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
 		{
 			cur_client->player.is_incanting = 0;
-			cur_client->team->nb_players_per_lv[cur_client.level - 1] -= 1;
+			// updates team and player level.
+			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 			cur_client->player.level += 1;
-			cur_client->team->nb_players_per_lv[cur_client.level - 1] += 1;
+			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
 			
 			// send client: "niveau actuel : K"
 			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);

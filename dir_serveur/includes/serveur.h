@@ -90,22 +90,6 @@ typedef enum				e_ressources
 	THYSTAME
 }							t_ressources;
 
-/*
-**	Used for team level status. look at t_team_entity.
-*/
-
-typedef enum				e_level
-{
-	LV1,
-	LV2,
-	LV3,
-	LV4,
-	LV5,
-	LV6,
-	LV7,
-	LV8
-}							t_level;
-
 typedef struct				s_pos
 {
 	int						x;
@@ -438,6 +422,7 @@ void							check_eggs(t_serveur *serv);
 void								check_player_life(t_serveur *serv, t_client_entity *cur_client);
 void								check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
 void								check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
+void							check_victory(t_serveur *serv);
 /*
 ** cmd_clients_manager.c
 */
