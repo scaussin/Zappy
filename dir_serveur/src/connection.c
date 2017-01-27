@@ -2,10 +2,21 @@
 
 SOCKET	accept_connection(t_serveur *serv)
 {
-	SOCKET		c_sock;
-	SOCKADDR_IN	c_sin;
-	socklen_t	c_sin_size;
+	SOCKET			c_sock;
+	SOCKADDR_IN		c_sin;
+	socklen_t		c_sin_size;
+	int				i;
+	int 			n_available_slots;
 
+	i = 0;
+	n_available_slots = 0;
+	while (i < serv->team_hdl.nb_teams)
+	{
+		n_available_slots += serv->team_hdl.array_teams[i].available_slots;
+		i++;
+	}
+	if  (n_available_slots == 0)
+		return (-1);
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
