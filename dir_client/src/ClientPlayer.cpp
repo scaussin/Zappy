@@ -7,35 +7,71 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientPlayer::ClientPlayer() : Connection(NULL)
+ClientPlayer::ClientPlayer(std::string _teamName) : teamName(_teamName)
 {
-
+	level = 1;
+	lifeUnits = 10;
+	teamSlots = -1;
 }
-
 
 ClientPlayer::~ClientPlayer()
-{
+{}
 
+void	ClientPlayer::printStat()
+{
+	std::cout << KGRN << "Player Game datas:" << KRESET << std::endl;
+	std::cout << "  World size: " << worldSizeX << "x " << worldSizeY << "y " << std::endl;
+	std::cout << "  Team: " << teamName << " - Level: " << level << std::endl;
+	std::cout << "  Life Units: " << lifeUnits << std::endl;
+	std::cout << "  Inventory size: " << inventory.size() << std::endl;
 }
 
-// First, lets set all games elements as they should be at game beginning.
-void	ClientPlayer::InitGameDatas(ClientConnection &SentConnection)
+void	ClientPlayer::avance()
 {
-	// with this, ClientPlayer methods have access 
-	// to the connection class to send msgs.
-	this->Connection = &SentConnection;
+	bufferSend->pushMsg("avance\n");
+	stackCallbackCommandes.push_back(&ClientCommande::avanceCallback);
+}
 
-	// fill the player position with the received string during connection.
-	this->World_x = this->Connection->Startx;
-	this->World_y = this->Connection->Starty;
+void	ClientPlayer::droite()
+{
+	bufferSend->pushMsg("gauche\n");
+	stackCallbackCommandes.push_back(&ClientCommande::droiteCallback);
+}
 
-	this->Level = 1;
-	this->LifeUnits = 10;
+void	ClientPlayer::gauche()
+{
+	bufferSend->pushMsg("gauche\n");
+	stackCallbackCommandes.push_back(&ClientCommande::gaucheCallback);
+}
 
-	// Starting print
-	std::cout << KGRN << "Player Game datas:" << KRESET << std::endl;
-	std::cout << "World size: " << this->World_x << "x " << this->World_y << "y " << std::endl;
-	std::cout << "Level: " << this->Level << std::endl;
-	std::cout << "Life Units: " << this->LifeUnits << std::endl;
-	std::cout << "Inventory size: " << this->Inventory.size() << std::endl;
+void	ClientPlayer::voir()
+{
+	bufferSend->pushMsg("voir\n");
+	stackCallbackCommandes.push_back(&ClientCommande::voirCallback);
+}
+
+/*
+** Methodes callback
+*/
+
+void	ClientPlayer::avanceCallback(std::string response)
+{
+	std::cout << "exec avance ok" << std::endl;
+	avance();
+	gauche();
+}
+
+void	ClientPlayer::droiteCallback(std::string response)
+{
+	std::cout << "exec droite ok" << std::endl;
+}
+
+void	ClientPlayer::gaucheCallback(std::string response)
+{
+	std::cout << "exec gauche ok" << std::endl;
+}
+
+void	ClientPlayer::voirCallback(std::string response)
+{
+	std::cout << "exec voir ok" << std::endl;
 }

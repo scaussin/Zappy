@@ -11,15 +11,34 @@ t_client_entity	*create_client(SOCKET sock)
 	// set client program status variables.
 	new_client->is_in_game = 0;
 	new_client->is_gfx = 0;
-	new_client->level = 0;
+	new_client->is_player_dead = 0;
 
 	// set player game starting datas
-	new_client->player.level = 0;
+	set_client_player_datas(new_client);
+	return (new_client);
+}
+
+void			set_client_player_datas(t_client_entity *new_client)
+{
+	int res_i;
+
+	res_i = 0;
+	new_client->player.level = 1;
 	new_client->player.pos.x = 5;
 	new_client->player.pos.y = 5;
 	new_client->player.dir = UP;
-
-	return (new_client);
+	new_client->player.nb_see_case = 4;
+	new_client->player.cur_case = NULL;
+	while (res_i < 7)
+	{
+		new_client->player.inventory[res_i] = 0;
+		res_i++;
+	}
+	// Set life and death time.
+	new_client->player.inventory[FOOD] = 10;
+	// Dinner time will be set to a value when the player is authenticated.
+	new_client->player.next_dinner_time.tv_sec = 0;
+	new_client->player.next_dinner_time.tv_nsec = 0;
 }
 
 void			add_client(t_serveur *serv, t_client_entity *client)

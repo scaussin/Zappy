@@ -3,25 +3,34 @@
 
 # include "Client.hpp"
 
-class ClientPlayer
+class ClientPlayer : public ClientCommande
 {
 	public:
-		ClientConnection						*Connection;
-
-		int										World_x;
-		int										World_y;
-
-		int										Level;
-		int										LifeUnits;
-
-		std::list<std::string>					Inventory;
-		std::list<std::string>					Vision;
-
-		ClientPlayer();
+		ClientPlayer(std::string teamName);
 		~ClientPlayer();
 
-		void		InitGameDatas(ClientConnection &SentConnection);
+		void						printStat();
 
+		std::string					teamName;
+		int							worldSizeX;
+		int							worldSizeY;
+		int							teamSlots;
+
+		virtual void				avance();
+		virtual void				droite();
+		virtual void				gauche();
+		virtual void				voir();
+
+	private:
+		virtual void				avanceCallback(std::string response);
+		virtual void				droiteCallback(std::string response);
+		virtual void				gaucheCallback(std::string response);
+		virtual void				voirCallback(std::string response);
+
+		int							level;
+		int							lifeUnits;
+		std::list<std::string>		inventory;
+		std::list<std::string>		vision;
 };
 
 #endif

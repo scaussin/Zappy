@@ -5,6 +5,7 @@ HEADER = includes/serveur.h
 SRC = src/serveur_main.c \
 src/connection.c \
 src/communication.c \
+src/communication_gfx.c \
 src/tools.c \
 src/cmd_clients_init.c \
 src/cmd_clients_manager.c \
@@ -15,9 +16,22 @@ src/team_hdl.c \
 src/serveur_data.c \
 src/terrain_generation.c \
 src/serveur_loop.c \
+src/game_events.c \
+src/game_events_helper.c \
+src/player_handler.c \
+src/clock.c \
 src/cmds_functions/cmd_avance.c \
 src/cmds_functions/cmd_droite.c \
-src/cmds_functions/cmd_voir.c
+src/cmds_functions/cmd_gauche.c \
+src/cmds_functions/cmd_voir.c \
+src/cmds_functions/cmd_inventaire.c \
+src/cmds_functions/cmd_prend.c \
+src/cmds_functions/cmd_pose.c \
+src/cmds_functions/cmd_expulse.c \
+src/cmds_functions/cmd_broadcast.c \
+src/cmds_functions/cmd_incantation.c \
+src/cmds_functions/cmd_fork.c \
+src/cmds_functions/cmd_connect_nbr.c
 
 
 OBJ = $(SRC:.c=.o)

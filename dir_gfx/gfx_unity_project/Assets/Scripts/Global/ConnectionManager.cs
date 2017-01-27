@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Text;
 using System.Net;
@@ -7,27 +8,51 @@ using System.Text.RegularExpressions;
 
 public class ConnectionManager : MonoBehaviour
 {
-    public Socket              	 ClientSocket;
+	/// <summary>
+	/// The only client socket. Is connected to the server with hostname and port.
+	/// </summary>
+    public Socket              	 		ClientSocket;
 
-	// public
-	[HideInInspector]
-	public int						ServerPort;
-	public bool						IsConnected = false;
-    public bool                 	IsAuthenticated = false;
-	public bool						IsAuthMsgSend = false;
+	/// <summary>
+	/// Event invoked when the client is connected to the server and authentified as zappy-gfx connection.
+	/// </summary>
+	//public UnityEvent					OnAuthentificationDone;
+
+	/// <summary>
+	/// Invoked when the client is connected to the server, not yet authentified. (server may not be the correct one) 
+	/// </summary>
+	public UnityEvent					OnConnectionWithServer;
+
+    /// <summary>
+	/// Invoked when the client could not connect to the server. Will allow the GameController to reput the menu in front.
+	/// </summary>
+    public UnityEvent                   OnConnectionFailed;
+
+    // public
+    [HideInInspector]
+	public int							ServerPort;
+	public bool							IsConnected = false;
+    public bool                 		IsAuthenticated = false;
+	public bool							IsAuthMsgSend = false;
 
 	// private
-	private byte[]					buffer = new byte[100];
-	private string					retString;
-	private MsgBroadcastController	MsgBroadcastController;
+	public int							msg_size = 2048;
+	public CircularBuffer				buffer_recv = new CircularBuffer();
+	public CircularBuffer				buffer_send = new CircularBuffer();
 
-	// Use this for initialization
-	void Start () {
-		MsgBroadcastController = GameManager.instance.MsgBroadcastController;
+	//private byte[]					buffer = new byte[4096];
+	private string						retString;
+	private MsgBroadcastController		MsgBroadcastController;
+
+	void Awake()
+	{
+		//OnAuthentificationDone = new UnityEvent ();
 	}
 
-	void Awake() {
-		
+	// Use this for initialization
+	void Start()
+	{
+		MsgBroadcastController = GameManager.instance.MsgBroadcastController;
 	}
 	
 	/// <summary>
@@ -35,7 +60,8 @@ public class ConnectionManager : MonoBehaviour
 	/// All received messages are sent to the MsgBroadcastController,
 	/// except for the starting authentification dialog.
 	/// </summary>
-	void Update () {
+	void Update()
+	{
 	    if (IsConnected)
         {
             // Use the SelectWrite enumeration to obtain Socket status.
@@ -45,37 +71,15 @@ public class ConnectionManager : MonoBehaviour
 				if (ClientSocket.Available == 0)
 				{
 					Debug.Log ("Client Disconnected from server");
+					GameManager.instance.GameController.OnServerShutdown ();
 					IsConnected = false;
 					return ;
 				}
-
-				// Authentification process - read second message after GRAPHIC\n sent;
-				if (!IsAuthenticated && IsAuthMsgSend)
-				{
-					string receivedMsg = ReadMsg ();
-					Debug.Log ("Received: [" + receivedMsg + "]");
-					AuthReception (receivedMsg); // will confirm the auth.
-				}
-				else
-				{
-					// When authentified, msg are transmitted to MsgBroadcastController for parsing.
-					MsgBroadcastController.CurrentReceivedMsg = ReadMsg();
-					MsgBroadcastController.OnMsgReception.Invoke ();
-				}
+				ReadMsg ();
             }
 			else if (ClientSocket.Poll(100, SelectMode.SelectWrite))
 			{
-				// Authentification process - write part;
-				if (!IsAuthenticated && !IsAuthMsgSend) {
-					Debug.Log ("Send: GRAPHIC*");
-					SendMsg ("GRAPHIC\n");
-					IsAuthMsgSend = true;
-				}
-				else if (MsgBroadcastController.HasMsgToSend)
-				{
-					SendMsg (MsgBroadcastController.MsgToSend);
-					MsgBroadcastController.HasMsgToSend = false;
-				}
+				SendMsg ();
 			}
 			else if (ClientSocket.Poll(100, SelectMode.SelectError))
             {
@@ -84,14 +88,46 @@ public class ConnectionManager : MonoBehaviour
         }
 	}
 
+	// to send msg to server, use ConnectionManager.buffer_send.pushMsg(string);
+	// this function will send at the appropriated moment.
+	private void SendMsg()
+	{
+		int		sizeToSend;
+		byte[]	bytesToSend;
+
+		if ((sizeToSend = buffer_send.getLen()) > 0)
+		{
+			bytesToSend = buffer_send.ExtractBufferBytes ();
+			ClientSocket.Send(bytesToSend, 0, sizeToSend, SocketFlags.None);
+			Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString(bytesToSend) + "]");
+		}
+	}
+
+	private void ReadMsg()
+	{
+		int					ret;
+		byte[]				buffer = new byte[msg_size];
+
+		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
+		Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
+		buffer_recv.pushBytes (buffer, ret);
+
+		return ;
+	}
+
 	/// <summary>
-	/// Connects to server. Will set ConnectionManager's ClientStream to the corresponding server
-	/// Every Call to ReadMsg() and SendMsg() will use the ClientStream set in this method. 
+	/// Connects to server. Will set ConnectionManager's ClientSocket to the corresponding server
+	/// Every Call to ReadMsg() and SendMsg() will use the ClientSocket set in this method.
+	/// Also send event calls on Connection with server, and authentification success with server.
 	/// </summary>
 	/// <param name="port">Port.</param>
 	/// <param name="hostname">Hostname.</param>
-	public void		ConnectToServer(string port, string hostname)
+	public void		ConnectToServer()
 	{
+        // Get server info from GM.
+        string port = GameManager.instance.Port;
+        string hostname = GameManager.instance.Hostname;
+
         try
         {
             // -------------- Set the connection datas.
@@ -103,7 +139,7 @@ public class ConnectionManager : MonoBehaviour
 
             // Connect to a remote device.
             // Establish the remote endpoint for the socket.
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            // IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = IPAddress.Parse(hostname);
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, ServerPort);
 
@@ -115,20 +151,19 @@ public class ConnectionManager : MonoBehaviour
             if (!ClientSocket.Connected)
             {
                 Debug.Log("Unable to connect to host");
+                IsConnected = false;
+                OnConnectionFailed.Invoke();
             }
 			ClientSocket.ReceiveTimeout = 1000;
 
             Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
-			if (ClientSocket.Poll(1000, SelectMode.SelectRead))
-			{
-				string ReceivedMsg = ReadMsg();
-				Debug.Log("Receiveid: " + ReceivedMsg);
-			}
+			OnConnectionWithServer.Invoke();
 			IsConnected = true;
         }
         catch (System.Exception e)
         {
             IsConnected = false;
+            OnConnectionFailed.Invoke();
             Debug.Log("Error" + e.ToString());
         }
 
@@ -138,16 +173,18 @@ public class ConnectionManager : MonoBehaviour
 	private void AuthReception(string receivedMsg)
 	{
 		// check if server sent world size
-		Regex rgx = new Regex("^msz \\d+ \\d+");
+		Regex rgx = new Regex("^msz (\\d+) (\\d+)\\n");
+
 		Match match = rgx.Match(receivedMsg);
-		if (match.Success) {
+		if (match.Success && match.Groups.Count == 3)
+		{
+			GroupCollection groups = match.Groups;
+			GameManager.instance.WorldSettings.WorldX = int.Parse(groups[1].Value);
+			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
+
 			Debug.Log ("Success - Received world size - Gfx authentified");
 			IsAuthenticated = true;
-
-			// fill world size settings
-			string[] arr = receivedMsg.Split(" "[0]);
-			GameManager.instance.WorldSettings.WorldX = int.Parse(arr[1]);
-			GameManager.instance.WorldSettings.WorldY = int.Parse(arr[2]);
+//			OnAuthentificationDone.Invoke ();
 		}
 		else
 		{
@@ -155,20 +192,7 @@ public class ConnectionManager : MonoBehaviour
 		}
 	}
     
-	// to send msg to server, use the MsgBroadcastController. Because the msg must be sent
-	// according to the select status.
-    private void SendMsg(string msg)
-	{
-		byte[] toBytes = Encoding.ASCII.GetBytes(msg);
-        ClientSocket.Send(toBytes);
-	}
 
-	private string ReadMsg()
-	{
-		ClientSocket.Receive(buffer);
-		retString = Encoding.ASCII.GetString(buffer);
-		return retString;
-	}
 }
 
 /*
