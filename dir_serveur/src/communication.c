@@ -102,7 +102,8 @@ void		write_client(t_client_entity *client)
 	if (ret_send > 0)
 	{
 		client->buff_send.start = (client->buff_send.start + ret_send) % BUFF_SIZE;
-		client->buff_send.len -= ret_send;/*!!*/
+		client->buff_send.len -= ret_send;
+		/* TODO update len overflow */
 	}
 }
 
@@ -151,28 +152,21 @@ int			read_client(t_client_entity *client)
 int			write_buffer(t_buffer *buff, char *to_write, int size)
 {
 	int		i;
-	int		size_overflow;
+	int		new_size_overflow;
 
+	new_size_overflow = 0;
 	if (size)
 	{
 		if (buff->len + size > BUFF_SIZE)
 		{
-			size_overflow = buff->len + size - BUFF_SIZE;
-			if (buff->overflow)
-			{
-				buff->overflow = realloc(buff->overflow, buff->len_overflow);
-				memcpy(buff->overflow + buff->len_overflow, to_write, size_overflow);
-				buff->len_overflow += size_overflow;
-			}
-			else
-			{
-				buff->overflow = malloc(size_overflow);
-				buff->len_overflow = size_overflow;
-			}
+			new_size_overflow = (buff->len + size) - BUFF_SIZE;
+			buff->overflow = realloc(buff->overflow, buff->len_overflow + new_size_overflow);
+			memcpy(buff->overflow + buff->len_overflow, to_write + (size - new_size_overflow), new_size_overflow);
+			buff->len_overflow += new_size_overflow;
 			printf("[WARNING] : buffer overflow\n");
 		}
 		i = 0;
-		while (i < size)
+		while (i < size - new_size_overflow)
 		{
 			buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
 			i++;
@@ -204,9 +198,20 @@ char		*read_buffer(t_buffer *buff)
 		}
 		ret_buff[buff->len] = 0;
 	}
-	/*realloc();*/
+	if (buff->len_overflow > 0)
+	{
+		ret_buff = realloc(ret_buff, buff->len_overflow + buff->len + 1);
+		memcpy(ret_buff + buff->len, buff->overflow, buff->len_overflow);
+		ret_buff[buff->len_overflow + buff->len] = 0;
+	}
 	return (ret_buff);
 }
+
+/*void	update_len_buffer(t_buffer *buffer, int size)
+{
+//TODO
+}
+*/
 
 /*
 **	Read buffer until first \n and return cmd. Updates 'start' and 'len' variables.
@@ -231,6 +236,7 @@ char		*get_first_cmd(t_buffer *buffer)
 	if (end == NULL && buffer->len == BUFF_SIZE)
 	{
 		buffer->len = 0;
+		/* TODO update len overflow */
 	}
 	return (NULL);
 }
