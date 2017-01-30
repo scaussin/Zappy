@@ -13,6 +13,12 @@ void	cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param)
 	(void)param;
 	char *client_msg;
 
+	if (!regex_match(param, "^connect_nbr\n$"))
+	{
+		printf(KMAG "Bad format to cmd [connect_nbr]"
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	asprintf(&client_msg, "%d\n", client_cur->team->available_slots);
 	write_buffer(&client_cur->buff_send, client_msg, strlen(client_msg));
 	free(client_msg);

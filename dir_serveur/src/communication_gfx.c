@@ -15,17 +15,18 @@ void	push_gfx_msg(t_serveur *serv, char *msg)
 
 void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 {
-	char			*msg;
-	int				y;
-	int				x;
-	t_world_case	**world_board;
+	char				*msg;
+	t_client_entity		*tmp_client;
+	// int				y;
+	//int				x;
+	//t_world_case	**world_board;
 
 	
 	// ------------------------------------	//
 	// sending World size					//
 	// ------------------------------------	//
 	// "msz X Y\n"
-	gfx_cmd_msz(serv, gfx_client, NULL);
+	gfx_cmd_msz(serv, gfx_client, "msz\n");
 
 	// ------------------------------------	//
 	// sending server time unit				//
@@ -39,47 +40,16 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 	// Sending map content					//
 	// ------------------------------------	//
 	// "bct X Y q q q q q q q\n" * nbr_cases
-	x = 0;
-	y = 0;
-	world_board = serv->world_hdl.world_board;
-	while (y < serv->world_hdl.map_y)
-	{
-		while (x < serv->world_hdl.map_x)
-		{
-			asprintf(&msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				x,
-				y,
-				world_board[y][x].ressources[FOOD],
-				world_board[y][x].ressources[LINEMATE],
-				world_board[y][x].ressources[DERAUMERE],
-				world_board[y][x].ressources[SIBUR],
-				world_board[y][x].ressources[MENDIANE],
-				world_board[y][x].ressources[PHIRAS],
-				world_board[y][x].ressources[THYSTAME]);
-			push_gfx_msg(serv, msg);
-			free(msg);
-			x++;
-		}
-		y++;
-		x = 0;
-	}
+	gfx_cmd_mct(serv, gfx_client, "mct\n");
 
 	// ------------------------------------	//
 	// Sending team names					//
 	// ------------------------------------	//
-	x = 0;
-	while (x < serv->team_hdl.nb_teams)
-	{
-		asprintf(&msg, "tna %s\n", serv->team_hdl.array_teams[x].name);
-		push_gfx_msg(serv, msg);
-		free(msg);
-		x++;
-	}
+	gfx_cmd_tna(serv, gfx_client, "tna\n");
 
 	// ------------------------------------	//
 	// Sending currently connected players	//
 	// ------------------------------------	//
-	t_client_entity	*tmp_client;
 	tmp_client = serv->client_hdl.list_clients;
 	while (tmp_client)
 	{

@@ -9,6 +9,12 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 
 	cur_player = &(client_cur->player);
 
+	if (!regex_match(param, "^inventaire\n$"))
+	{
+		printf(KMAG "Bad format to cmd [inventaire] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	// player client response.
 	asprintf(&msg, "{nourriture %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d}\n",  // nourriture ??
 		cur_player->inventory[FOOD],

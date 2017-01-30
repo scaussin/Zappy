@@ -6,6 +6,12 @@ void	cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char
 	t_player	*cur_player;
 	char		*msg;
 
+	if (!regex_match(param, "^gauche\n$"))
+	{
+		printf(KMAG "Bad format to cmd [gauche] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	cur_player = &(client_cur->player);
 	if (cur_player->dir == 0)
 		cur_player->dir = 3;

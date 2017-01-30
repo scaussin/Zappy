@@ -11,7 +11,12 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 	nb_client_expulsed = 0;
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
-
+	if (!regex_match(param, "^expulse\n$"))
+	{
+		printf(KMAG "Bad format to cmd [expulse] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	asprintf(&msg, "pex #%d\n",client_cur->sock);
 	push_gfx_msg(serv, msg);
 	free(msg);

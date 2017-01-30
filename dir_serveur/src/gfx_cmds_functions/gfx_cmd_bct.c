@@ -24,7 +24,7 @@ void	gfx_cmd_bct(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		errno = 0;
 		arg = strchr(param, ' ') + 1;
 		x = strtol(arg, NULL, 10);
-		arg = strchr(param, ' ') + 1;
+		arg = strchr(arg, ' ') + 1;
 		y = strtol(arg, NULL, 10); // the ptr advanced.
 
 		// boundary check -> protects against overflow and map too big.
@@ -37,15 +37,15 @@ void	gfx_cmd_bct(t_serveur *serv, t_client_entity *gfx_client, char *param)
 			return ;
 		}
 		asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				x,
-				y,
-				serv->world_hdl.world_board[y][x].ressources[FOOD],
-				serv->world_hdl.world_board[y][x].ressources[LINEMATE],
-				serv->world_hdl.world_board[y][x].ressources[DERAUMERE],
-				serv->world_hdl.world_board[y][x].ressources[SIBUR],
-				serv->world_hdl.world_board[y][x].ressources[MENDIANE],
-				serv->world_hdl.world_board[y][x].ressources[PHIRAS],
-				serv->world_hdl.world_board[y][x].ressources[THYSTAME]);
+			x,
+			y,
+			serv->world_hdl.world_board[y][x].ressources[FOOD],
+			serv->world_hdl.world_board[y][x].ressources[LINEMATE],
+			serv->world_hdl.world_board[y][x].ressources[DERAUMERE],
+			serv->world_hdl.world_board[y][x].ressources[SIBUR],
+			serv->world_hdl.world_board[y][x].ressources[MENDIANE],
+			serv->world_hdl.world_board[y][x].ressources[PHIRAS],
+			serv->world_hdl.world_board[y][x].ressources[THYSTAME]);
 		push_gfx_msg(serv, gfx_msg);
 		free(gfx_msg);
 	}

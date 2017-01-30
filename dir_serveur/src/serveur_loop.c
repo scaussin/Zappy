@@ -109,6 +109,7 @@ void manage_clients_input(t_serveur *serv)
 			}
 			else if (p_client->is_gfx)
 			{
+				printf("hey\n");
 				// it may be gfx commands.
 				lex_and_parse_gfx_cmds(serv, p_client);
 			}

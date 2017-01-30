@@ -31,9 +31,12 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 {
 	int		i = 0;
 	char	*arg_cmd;
+	char	*cmd_end;
 	int		nb_of_parsed_chars;
 
 	// Check for arguments
+	cmd_end = strchr(cmd, '\n');
+	arg_cmd = NULL;
 	if ((arg_cmd = strchr(cmd, ' ')))
 		nb_of_parsed_chars = arg_cmd - cmd;
 	else

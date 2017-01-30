@@ -13,6 +13,12 @@ void	cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param)
 	char			*client_msg;
 	char			*gfx_msg;
 
+	if (!regex_match(param, "^fork\n$"))
+	{
+		printf(KMAG "Bad format to cmd [fork] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	cur_player = &client_cur->player;		
 
 	// Set player time of egg laying. -> 42/t default

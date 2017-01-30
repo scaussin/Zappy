@@ -47,6 +47,7 @@
 # define CHAR_END '\n'
 # define LEN_END 1
 # define NB_RESSOURCES 7
+# define MSG_ARG_MAX_SIZE 10
 
 /*
 **	Game defines

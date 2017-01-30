@@ -19,6 +19,12 @@ void	cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 		que les joueurs soient de la même équipe. Seul leur niveau importe. Tous les joueurs du
 		groupe réalisant l’incantation atteignent le niveau supérieur.
 	*/
+	if (!regex_match(param, "^incantation\n$"))
+	{
+		printf(KMAG "Bad format to cmd [incantation] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	cur_player = &client_cur->player;
 	target_res = set_incantation_target_res(cur_player->level);
 	if (are_incantation_cdts_ok(serv, cur_player, target_res))

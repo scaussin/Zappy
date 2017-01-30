@@ -6,6 +6,12 @@ void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* ty
 	t_player	*cur_player;
 	char		*msg;
 
+	if (!regex_match(param, "^avance\n$"))
+	{
+		printf(KMAG "Bad format to cmd [avance] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	cur_player = &(client_cur->player);
 	cur_player->cur_case->nb_players -= 1;
 	if (cur_player->dir == UP) // 0 north

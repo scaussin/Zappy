@@ -15,6 +15,12 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 	char			*sep_rsrc;
 	char			*sep_case;
 
+	if (!regex_match(param, "^voir\n$"))
+	{
+		printf(KMAG "Bad format to cmd [voir] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	(void) param;
 	player = &(client_cur->player);
 	world = serv->world_hdl.world_board;

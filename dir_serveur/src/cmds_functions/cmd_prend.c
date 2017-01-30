@@ -37,7 +37,7 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 				client_cur->player.inventory[THYSTAME]);
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
-			
+ 
 			// gfx world block ressource update.
 			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
 				client_cur->player.pos.x,

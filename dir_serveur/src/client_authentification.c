@@ -9,11 +9,10 @@
 void	client_authentification(t_serveur *serv, t_client_entity *client)
 {
 	char			*cmd;
-	
 
 	if ((cmd = get_first_cmd(&client->buff_recv)))
 	{
-		if (strcmp(cmd, "GRAPHIC\n") == 0)
+		if (strncmp(cmd, "GRAPHIC\n", 8) == 0)
 		{
 			client_authenticate_gfx(serv, client);
 		}

@@ -6,6 +6,12 @@ void	cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char
 	t_player	*cur_player;
 	char		*msg;
 
+	if (!regex_match(param, "^droite\n$"))
+	{
+		printf(KMAG "Bad format to cmd [droite]"
+					"from sock %d\n" KRESET, client_cur->sock);
+		return ;
+	}
 	cur_player = &(client_cur->player);
 	cur_player->dir += 1;
 	if (cur_player->dir > 3)
