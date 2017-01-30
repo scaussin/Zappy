@@ -78,7 +78,7 @@ void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 			if (cur_client->player.is_incanter)
 			{
 				asprintf(&gfx_msg, "pie %d %d %d\n",
-					cur_client->player.pos.x, cur_client->player.pos.y, cur_client->player.level);
+					cur_client->player.pos.x, cur_client->player.pos.y, 1);
 				push_gfx_msg(serv, gfx_msg);
 				free(gfx_msg);
 			}
