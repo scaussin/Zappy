@@ -98,7 +98,7 @@ void manage_clients_input(t_serveur *serv)
 			}
 			else if (p_client->is_in_game && !p_client->is_player_dead && !p_client->is_gfx)
 			{
-				// client is in game and not gfx, everything he sends is cmds.
+				// client is in game and not gfx and not dead, everything he sends is cmds.
 				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
 			}
 			else if (p_client->is_player_dead)
@@ -106,6 +106,11 @@ void manage_clients_input(t_serveur *serv)
 				// we must wait for the client to receive "mort\n" before
 				// disconnecting him.
 				p_client->is_disconnecting = 1;
+			}
+			else if (p_client->is_gfx)
+			{
+				// it may be gfx commands.
+				lex_and_parse_gfx_cmds(serv, p_client);
 			}
 		}
 		p_client = p_client->next;

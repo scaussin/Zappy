@@ -57,4 +57,44 @@ void		init_cmd_match_table(t_serveur *serv)
 	serv->cmd_hdl.cmd_match_table[11].name = "connect_nbr\n";
 	serv->cmd_hdl.cmd_match_table[11].func = cmd_connect_nbr;
 	serv->cmd_hdl.cmd_match_table[11].duration_cmd = 0;
+
+	// init gfx cmds in the same way.
+	serv->cmd_hdl.gfx_cmd_match_table = s_malloc(sizeof(t_cmd_match)
+		* SIZE_CMD_MATCH_TABLE);
+
+	serv->cmd_hdl.gfx_cmd_match_table[0].name = "msz\n";
+	serv->cmd_hdl.gfx_cmd_match_table[0].func = gfx_cmd_msz;
+	serv->cmd_hdl.gfx_cmd_match_table[0].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[1].name = "bct\n";
+	serv->cmd_hdl.gfx_cmd_match_table[1].func = gfx_cmd_bct;
+	serv->cmd_hdl.gfx_cmd_match_table[1].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[2].name = "mct\n";
+	serv->cmd_hdl.gfx_cmd_match_table[2].func = gfx_cmd_mct;
+	serv->cmd_hdl.gfx_cmd_match_table[2].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[3].name = "tna\n";
+	serv->cmd_hdl.gfx_cmd_match_table[3].func = gfx_cmd_tna;
+	serv->cmd_hdl.gfx_cmd_match_table[3].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[4].name = "ppo\n";
+	serv->cmd_hdl.gfx_cmd_match_table[4].func = gfx_cmd_ppo;
+	serv->cmd_hdl.gfx_cmd_match_table[4].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[5].name = "plv\n";
+	serv->cmd_hdl.gfx_cmd_match_table[5].func = gfx_cmd_plv;
+	serv->cmd_hdl.gfx_cmd_match_table[5].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[6].name = "pin\n";
+	serv->cmd_hdl.gfx_cmd_match_table[6].func = gfx_cmd_pin;
+	serv->cmd_hdl.gfx_cmd_match_table[6].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[7].name = "sgt\n";
+	serv->cmd_hdl.gfx_cmd_match_table[7].func = gfx_cmd_sgt;
+	serv->cmd_hdl.gfx_cmd_match_table[7].duration_cmd = 0;
+
+	serv->cmd_hdl.gfx_cmd_match_table[8].name = "sst\n";
+	serv->cmd_hdl.gfx_cmd_match_table[8].func = gfx_cmd_sst;
+	serv->cmd_hdl.gfx_cmd_match_table[8].duration_cmd = 0;
 }

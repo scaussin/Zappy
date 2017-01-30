@@ -41,6 +41,7 @@
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
+# define SIZE_GFX_CMD_MATCH_TABLE 9 // The number of client available cmds.
 # define MAX_LIST_CMD 10
 # define END "\n"
 # define CHAR_END '\n'
@@ -217,6 +218,7 @@ typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
 	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
+	t_cmd_match				*gfx_cmd_match_table;
 }							t_cmd_hdl;
 
 /*
@@ -438,6 +440,13 @@ void						add_new_event(t_serveur *serv, t_world_event *world_event);
 void						add_client_to_event(t_world_event *world_event, t_client_entity *client);
 void						delete_game_event(t_serveur *serv, t_world_event *target_event);
 
+/*
+**	Gfx client cmds
+*/
+
+void						lex_and_parse_gfx_cmds(t_serveur *serv, t_client_entity *gfx_client);
+void						parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd);
+
 // client command execution.
 struct timespec				*exec_cmd_client(t_serveur *serv);
 int							timespec_is_over(struct timespec time_end);
@@ -479,6 +488,21 @@ void							set_players_incanting(t_serveur *serv, t_client_entity *cur_client);
 void							strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *target_res);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+/*
+**	src/gfx_cmds_functions/
+*/
+
+void						gfx_cmd_msz(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_bct(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_mct(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_tna(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_ppo(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_plv(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_sgt(t_serveur *serv, t_client_entity *gfx_client, char *param);
+void						gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param);
+
 
 /*
 **	egg_handling.c
