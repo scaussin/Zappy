@@ -1,5 +1,9 @@
 #include "../../includes/serveur.h"
 
+/*
+**	gfx command bct: asking for a case content.
+*/
+
 void	gfx_cmd_bct(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
 	(void)serv;

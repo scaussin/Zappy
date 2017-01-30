@@ -1,5 +1,9 @@
 #include "../../includes/serveur.h"
 
+/*
+**	gfx command pin: asking for the inventory of one player by its sock number.
+*/
+
 void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
 	char				*arg;
@@ -52,7 +56,7 @@ void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 	}
 	printf(KMAG "[Serveur]: gfx cmd [pin]: "
 				"could not find asked player\n" KRESET);
-	asprintf(&gfx_msg, "could not find asked player for cmd [pin]\n");
+	asprintf(&gfx_msg, "smg could not find asked player for cmd [pin]\n");
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
 }

@@ -1,5 +1,9 @@
 #include "../../includes/serveur.h"
 
+/*
+**	gfx command mct: asking for every case on the board's content.
+*/
+
 void	gfx_cmd_mct(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
 	(void)param;

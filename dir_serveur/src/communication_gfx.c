@@ -32,9 +32,7 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 	// sending server time unit				//
 	// ------------------------------------	//
 	// "sgt T\n"
-	asprintf(&msg, "sgt %f\n", serv->world_hdl.t_unit);
-	push_gfx_msg(serv, msg);
-	free(msg);
+	gfx_cmd_sgt(serv, gfx_client, "sgt\n");
 
 	// ------------------------------------	//
 	// Sending map content					//

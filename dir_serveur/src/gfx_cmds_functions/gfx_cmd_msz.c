@@ -1,5 +1,9 @@
 #include "../../includes/serveur.h"
 
+/*
+**	gfx command msz: asking for the world size.
+*/
+
 void	gfx_cmd_msz(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
 	(void)serv;
