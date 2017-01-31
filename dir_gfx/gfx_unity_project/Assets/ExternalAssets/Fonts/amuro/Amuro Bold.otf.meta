@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: d9b81f6d408fa4f84bb953fadcf79fc6
+timeCreated: 1485866683
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Amuro
+  fontNames:
+  - Amuro
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 3c1e82b72bca54d96a0a5bd2283060bd, type: 3}
+  - {fileID: 12800000, guid: 744fba9aaa19d4f24b14c5a4ef1ad0ec, type: 3}
+  - {fileID: 12800000, guid: 21aac74bbadc444a6bd2edb8a69ae037, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

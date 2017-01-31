@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 3884e6ff564f640468d7ea27860c7f88
+timeCreated: 1485866682
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Amuro Condensed
+  fontNames:
+  - Amuro Condensed
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 0416d5730bb514d388ce0529a4e65d18, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

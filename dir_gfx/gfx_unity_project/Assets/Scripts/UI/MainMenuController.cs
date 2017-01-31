@@ -4,133 +4,84 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+/// <summary>
+/// Main menu controller. The main bridge for the GameController to access the UI of the game.
+/// Here, we will have access to starting menu, game menu, end menu .... etc.
+/// </summary>
 public class MainMenuController : MonoBehaviour {
-    // something happening events.
     /// <summary>
     /// Will be invoked when user press enter with infos entered in the server info inputfields.
     /// </summary>
     public UnityEvent   OnServerInfoSelected;
 
+	public UnityEvent   OnTimeUnitModified;
+
     // menu references;
-    public InputField   HostnameInputField;
-    public InputField   PortInputField;
-    public Text         ResponseText;
-    public GameObject   MainPanel;
 
-    public bool         CanEnterInput;
+	// global transitionning tool.
+	public GameObject				BlackBackground;
 
-    // input field variable helper.
-    public bool        isHostnameSet;
-    public bool        isPortSet;
+	// starting menu
+    public GameObject   			MainPanel;
+	public MainPanelScript			MainPanelScript;
+	// ingame menu
+	public GameObject				InGameMenuPanel;
+	public InGameMenuController		InGameMenuController;
+
+
 
     // Use this for initialization
     void Awake()
     {
-        MainPanel = transform.Find("MainPanel").gameObject;
+		// Set references to objects.
+		BlackBackground = transform.Find ("BlackBackground").gameObject;
+		MainPanel = transform.Find("MainPanel").gameObject;
+		MainPanelScript = MainPanel.GetComponent<MainPanelScript> ();
 
-        HostnameInputField = MainPanel.transform
-            .Find("CenterAreaPanel").transform
-            .Find("InputContainer").transform
-            .Find("InputHostname").GetComponent<InputField>();
-        PortInputField = MainPanel.transform
-            .Find("CenterAreaPanel").transform
-            .Find("InputContainer").transform
-            .Find("InputPort").GetComponent<InputField>();
-        ResponseText = MainPanel.transform
-               .Find("CenterAreaPanel").transform
-               .Find("InputContainer").transform
-               .Find("ResponseText").GetComponent<Text>();
-        isHostnameSet = false;
-        isPortSet = false;
+		// Clean initatialization ( for when we press play )
+		MainPanel.SetActive(true);
+		BlackBackground.SetActive (true);
     }
 
-    void OnEnable()
-    {
-        HostnameInputField.onEndEdit.AddListener(OnEndEditHostname);
-        PortInputField.onEndEdit.AddListener(OnEndEditPort);
-    }
+	/// <summary>
+	/// Activates the main panel input for entering server host and port. Used by the GameController.
+	/// </summary>
+	public void ActivateMainPanelInput()
+	{
+		//MainPanel.SetActive (true);
+		MainPanelScript.HostnameInputField.enabled = true;
+		MainPanelScript.PortInputField.enabled = true;
+		MainPanelScript.CanEnterInput = true;
+		BlackBackground.SetActive (true);
+	}
 
-    void OnDisable()
-    {
-        isHostnameSet = false;
-        isPortSet = false;
-    }
+	/// <summary>
+	/// Deactivates the main panel input. Used in animation when server connection successful.
+	/// </summary>
+	public void DeactivateMainPanelInputs()
+	{
+		MainPanelScript.HostnameInputField.enabled = false;
+		MainPanelScript.HostnameInputField.text = "";
+		MainPanelScript.PortInputField.enabled = false;
+		MainPanelScript.PortInputField.text = "";
+		MainPanelScript.CanEnterInput = false;
+	}
 
+	/// <summary>
+	/// Deactivates the black background object. Used in animation after smooth transitionning.
+	/// </summary>
+	public void DeactivateBlackBackgroundObject()
+	{
+		BlackBackground.SetActive (false);
+	}
 
-    /// <summary>
-    /// Linked to the hostname input field's event.
-    /// </summary>
-    public void OnEndEditHostname(string str)
-    {
-        isHostnameSet = true;
-        if (HostnameInputField.text == "")
-        {
-            GameManager.instance.Hostname = "localhost";
-        }
-        else
-        {
-            GameManager.instance.Hostname = str;
-        }
+	/// <summary>
+	/// Activate the black background object. used in animation when server connection cut.
+	/// </summary>
+	public void ActivateBlackBackgroundObject()
+	{
+		BlackBackground.SetActive (true);
+	}
 
-        if (isPortSet == true)
-        {
-            OnServerInfoSelected.Invoke(); // lets go try connection!
-        }
-        else
-        {
-            PortInputField.Select();
-        }
-    }
-
-    /// <summary>
-    /// Linked to the port input field's event.
-    /// </summary>
-    public void OnEndEditPort(string str)
-    {
-        isPortSet = true;
-        if (PortInputField.text == "")
-        {
-            GameManager.instance.Port = "4242";
-        }
-        else
-        {
-            GameManager.instance.Port = str;
-        }
-        
-        if (isHostnameSet == true)
-        {
-            OnServerInfoSelected.Invoke(); // lets go try connection!
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (CanEnterInput)
-        {
-            // press enter when nothing is selected -> default settings.
-            if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)
-                || Input.GetKeyDown(KeyCode.Space))
-                && HostnameInputField.isFocused == false && PortInputField.isFocused == false)
-            {
-                if (!isHostnameSet)
-                {
-                    GameManager.instance.Hostname = "localhost";
-                }
-                if (!isPortSet)
-                {
-                    GameManager.instance.Port = "4242";
-                }
-                OnServerInfoSelected.Invoke();
-            }
-            // Press tab when hostname modification ? select port field.
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                if (HostnameInputField.isFocused == true)
-                {
-                    PortInputField.Select();
-                }
-            }
-        }
-    }
+   
 }

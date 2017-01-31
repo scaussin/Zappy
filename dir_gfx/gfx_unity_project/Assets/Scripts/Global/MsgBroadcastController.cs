@@ -16,10 +16,6 @@ public class MsgBroadcastController : MonoBehaviour
 {
 	public ConnectionManager	ConnectionManager;
 
-	public UnityEvent			OnWorldSizeReceived;
-
-	public UnityEvent			OnWorldTimeUnitReceived;
-
 	public string				CurrentReceivedMsg;
 
 	private string[]			LexedMsg;
@@ -34,8 +30,8 @@ public class MsgBroadcastController : MonoBehaviour
 	{
 		ConnectionManager = GameManager.instance.ConnectionManager;
 
-		OnWorldSizeReceived =  new UnityEvent ();
-		OnWorldTimeUnitReceived = new UnityEvent ();
+		//OnWorldSizeReceived =  new UnityEvent ();
+		//OnWorldTimeUnitReceived = new UnityEvent ();
 	}
 		
 
@@ -190,7 +186,7 @@ public class MsgBroadcastController : MonoBehaviour
 			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
 
 			Debug.Log ("Success - Received world size");
-			OnWorldSizeReceived.Invoke(); // call back to GameController, cause the timing is undetermined.
+			GameManager.instance.GameController.OnWorldSizeReceivedAction(); // call back to GameController, cause the timing is undetermined.
 			return (true);
 		}
 		return (false);
@@ -207,11 +203,22 @@ public class MsgBroadcastController : MonoBehaviour
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
+			float calculatedTimescale;
 			groups = match.Groups;
 			GameManager.instance.WorldSettings.TimeUnit = float.Parse (groups [1].Value);
-			Time.timeScale *= (float) (1.0f / GameManager.instance.WorldSettings.TimeUnit);
+			// May be incorrect, to be checked.
+			calculatedTimescale = (float) (1.0f / GameManager.instance.WorldSettings.TimeUnit);
+			Debug.Log ("calculated timescale = " + calculatedTimescale.ToString ());
+
+			if (calculatedTimescale > 100.0f) {
+				GameManager.instance.WorldSettings.InstantTimeMode = true;
+				Time.timeScale = 100;
+			} else {
+				GameManager.instance.WorldSettings.InstantTimeMode = false;
+				Time.timeScale = (int)calculatedTimescale;
+			}
 			Debug.Log ("Success - Received World Time unit");
-			OnWorldTimeUnitReceived.Invoke();
+			GameManager.instance.GameController.OnTimeUnitReceived(msg);
 			return (true);
 		}
 		return (false);

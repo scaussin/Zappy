@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: bd3248efad2f7410f95fea2b7c87aa7d
+timeCreated: 1485867491
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Neo Gen
+  fontNames:
+  - Neo Gen
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 0532ca947b43c4a9ba3b098ca1ffe94f, type: 3}
+  - {fileID: 12800000, guid: 2944ebc41065049c1bd8dcad6dc7b151, type: 3}
+  - {fileID: 12800000, guid: 744ce8272646143ae858fd4b52be3ed3, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
