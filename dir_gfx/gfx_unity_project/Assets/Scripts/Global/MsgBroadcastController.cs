@@ -251,7 +251,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool CatchTeamName(string msg)
 	{
-		rgx = new Regex("^tna (\\w+)$");
+		rgx = new Regex("^tna ([\\w ]+)$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
@@ -269,7 +269,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool CatchPlayerConnection(string msg)
 	{
-		rgx = new Regex("^pnw #\\d+ \\d+ \\d+ \\d+ \\d+ \\w+$");
+		rgx = new Regex("^pnw #\\d+ \\d+ \\d+ \\d+ \\d+ [\\w ]+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{

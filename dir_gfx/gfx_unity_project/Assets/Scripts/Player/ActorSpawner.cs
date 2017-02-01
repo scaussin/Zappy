@@ -26,7 +26,7 @@ public class ActorSpawner : MonoBehaviour
 	public void SpawnNewPlayer(string msg)
 	{
 		// "pnw #n X Y O L N\n"
-		Regex rgx = new Regex ("^pnw #(\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$");
+		Regex rgx = new Regex ("^pnw #(\\d+) (\\d+) (\\d+) (\\d+) (\\d+) ([\\w ]+)$");
 		Match match = rgx.Match (msg);
 		GroupCollection groups = match.Groups;
 

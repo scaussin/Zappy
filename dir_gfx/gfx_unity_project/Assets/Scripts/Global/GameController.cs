@@ -153,6 +153,7 @@ public class GameController : MonoBehaviour {
 	public void OnServerShutdown()
 	{
 		ActivateMainMenuInput();
+		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;

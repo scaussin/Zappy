@@ -8,13 +8,12 @@ public class PlayerManager : MonoBehaviour {
 	public List<string>			PlayerTeams;
 	public List<PlayerObject>	ConnectedPlayers;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	/// <summary>
+	/// Cleans the player manager of their teams and players.
+	/// </summary>
+	public void CleanPlayerManager()
+	{
+		PlayerTeams.Clear ();
+		ConnectedPlayers.Clear ();
 	}
 }
