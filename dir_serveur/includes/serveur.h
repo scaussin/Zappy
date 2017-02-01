@@ -37,7 +37,6 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
@@ -339,6 +338,7 @@ SOCKET						accept_connection(t_serveur *serv);
 void						new_client_connection(t_serveur *serveur);
 void						disconnect_client(SOCKET c_sock);
 void						close_all_connections(t_serveur *serv);
+void						update_len_buffer(t_buffer *buff, int size);
 
 /*
 ** communication.c

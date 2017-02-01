@@ -10,22 +10,23 @@ SOCKET	accept_connection(t_serveur *serv)
 
 	i = 0;
 	n_available_slots = 0;
-	while (i < serv->team_hdl.nb_teams)
-	{
-		n_available_slots += serv->team_hdl.array_teams[i].available_slots;
-		i++;
-	}
-	if  (n_available_slots == 0)
-	{
-		printf(KRED "No available slot\n" KRESET);
-		return (-1);
-	}
-	printf("Slots available: %d\n", n_available_slots);
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
 	{
 		perror("accept()");
+	}
+	while (i < serv->team_hdl.nb_teams)
+	{
+		n_available_slots += serv->team_hdl.array_teams[i].available_slots;
+		i++;
+	}
+	if (n_available_slots == 0)
+	{
+		printf(KRED "No available slot\n" KRESET);
+		if (c_sock > 0)
+			close(c_sock);
+		return (-1);
 	}
 	return (c_sock);
 }
@@ -42,7 +43,7 @@ void new_client_connection(t_serveur *serv)
 	if ((c_sock = accept_connection(serv)) < 0)
 		return ;
 
-	// Create Client and send "BIENVENU\n"
+	// Create Client and send "BIENVENUE\n"
 	client = create_client(c_sock);
 
 	// Sending BIENVENUE\n message.

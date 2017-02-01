@@ -98,7 +98,8 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 	}
 	else
 	{
-		printf(KRED "No available slot in team %s\n" KRESET, client->team->name);
+		printf(KRED "No available slot in team: %s\n" KRESET, team->name);
+		fflush(stdout);
 		client->is_disconnecting = 1;
 	}
 	return ;
