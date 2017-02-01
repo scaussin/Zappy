@@ -43,6 +43,7 @@ void	get_input(t_serveur *serv, int argc, char **argv)
 				serv->team_hdl.array_teams[i].nb_players_per_lv[y] = 0;
 				y++;
 			}
+			y = 0;
 			i++;
 		}
 		printf("\n");
