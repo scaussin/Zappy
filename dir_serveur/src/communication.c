@@ -88,22 +88,19 @@ void		write_client(t_client_entity *client)
 	buff_tmp = read_buffer(&client->buff_send);
 	while (1)
 	{
-		ret_send = send(client->sock, buff_tmp, client->buff_send.len, 0);
+		ret_send = send(client->sock, buff_tmp, client->buff_send.len + client->buff_send.len_overflow, 0);
 		if (ret_send == -1 && (errno == EAGAIN || errno == EINTR))
 			continue;
 		else
 			break ;
 	}
-	print_send(client->sock, buff_tmp, client->buff_send.len);
+	print_send(client->sock, buff_tmp, client->buff_send.len + client->buff_send.len_overflow);
 	if (buff_tmp)
 		free(buff_tmp);
 	if (ret_send == -1)
 		perror("send()");
 	if (ret_send > 0)
-	{
-		client->buff_send.start = (client->buff_send.start + ret_send) % BUFF_SIZE;
-		client->buff_send.len -= ret_send;
-	}
+		update_len_buffer(&client->buff_send, ret_send);
 }
 
 /*
@@ -132,7 +129,9 @@ int			read_client(t_client_entity *client)
 			break ;
 	}	
 	if (ret == -1)
+	{
 		perror("recv()");
+	}
 	else
 	{
 		ret = write_buffer(&client->buff_recv, buff_tmp, ret);
@@ -152,18 +151,23 @@ int			write_buffer(t_buffer *buff, char *to_write, int size)
 
 	if (size)
 	{
-		i = 0;
-		if (buff->len + size > BUFF_SIZE)
+		if (buff->len + size > BUFF_SIZE || buff->overflow) //buffer overflow
 		{
-			perror("buffer full");
-			return (0);
+			buff->overflow = realloc(buff->overflow, buff->len_overflow + size);
+			memcpy(buff->overflow + buff->len_overflow, to_write, size);
+			buff->len_overflow += size;
+			printf("[WARNING] : buffer overflow\n");
 		}
-		while (i < size)
+		else
 		{
-			buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
-			i++;
+			i = 0;
+			while (i < size)
+			{
+				buff->buff[(buff->start + buff->len + i) % BUFF_SIZE] = to_write[i];
+				i++;
+			}
+			buff->len += i;
 		}
-		buff->len += i;
 	}
 	return (size);
 }
@@ -190,8 +194,66 @@ char		*read_buffer(t_buffer *buff)
 		}
 		ret_buff[buff->len] = 0;
 	}
+	if (buff->len_overflow > 0)
+	{
+		ret_buff = realloc(ret_buff, buff->len_overflow + buff->len + 1);
+		memcpy(ret_buff + buff->len, buff->overflow, buff->len_overflow);
+		ret_buff[buff->len_overflow + buff->len] = 0;
+	}
 	return (ret_buff);
 }
+
+/*
+**	Update start and len of buffer, and manage buffer overflow.
+**	if size == -1 -> erase buffer and buffer_overflow
+*/
+
+void	update_len_buffer(t_buffer *buff, int size)
+{
+	char	*tmp;
+
+	if (size > 0)
+	{
+		if (buff->len > 0) // update buffer
+		{
+			if (buff->len < size)
+			{
+				size -= buff->len;
+				buff->len = 0;
+			}
+			else
+			{
+				buff->len -= size;
+				buff->start = (buff->start + size) % BUFF_SIZE;
+			}
+		}
+		if (buff->len_overflow > 0 && size > 0) //update buffer overflow
+		{
+			if (buff->len_overflow > size)
+			{
+				tmp = buff->overflow;
+				buff->overflow = malloc(buff->len_overflow - size);
+				memcpy(buff->overflow, tmp + size, buff->len_overflow - size);
+				buff->len_overflow -= size;
+				free(tmp);
+			}
+			else
+			{
+				free(buff->overflow);
+				buff->overflow = NULL;
+				buff->len_overflow = 0;
+			}
+		}
+	}
+	else if (size == -1) // clean all buffer
+	{
+		buff->len = 0;
+		free(buff->overflow);
+		buff->overflow = NULL;
+		buff->len_overflow = 0;
+	}
+}
+
 
 /*
 **	Read buffer until first \n and return cmd. Updates 'start' and 'len' variables.
@@ -204,6 +266,7 @@ char		*get_first_cmd(t_buffer *buffer)
 	char *end;
 	int len_cmd;
 
+	end = NULL;
 	if ((buff = read_buffer(buffer)) && (end = memchr(buff, CHAR_END, buffer->len)))
 	{
 		end[LEN_END] = 0;
@@ -212,5 +275,7 @@ char		*get_first_cmd(t_buffer *buffer)
 		buffer->len -= len_cmd;
 		return (buff);
 	}
+	if (end == NULL && buffer->len == BUFF_SIZE)
+		update_len_buffer(buffer, -1);
 	return (NULL);
 }

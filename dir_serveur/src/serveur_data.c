@@ -21,7 +21,10 @@ void	init_serveur(t_serveur *serv)
 {
 	SOCKET      sock;
 	SOCKADDR_IN sin;
+	/*struct rlimit	rlp;
 
+	getrlimit(RLIMIT_NOFILE, &rlp);
+	serv->limit_max_client = rlp.rlim_cur;*/
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		exit_error("socket()");
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -31,7 +34,6 @@ void	init_serveur(t_serveur *serv)
 		exit_error("bind()");
 	if(listen(sock, serv->network.max_clients) < 0)
 		exit_error("listen()");
-
 	// Team info
 	fill_team_info(serv);
 

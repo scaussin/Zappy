@@ -23,7 +23,7 @@ void	init_fd(t_serveur *serv)
 	while (p_client)
 	{
 		FD_SET(p_client->sock, serv->network.read_fs);
-		if (p_client->buff_send.len > 0)
+		if (p_client->buff_send.len > 0 || p_client->buff_send.len_overflow > 0)
 			FD_SET(p_client->sock, serv->network.write_fs);
 		p_client = p_client->next;
 	}
@@ -59,12 +59,10 @@ void	main_loop(t_serveur *serv)
 			if (FD_ISSET(STDIN_FILENO, serv->network.read_fs))
 				return;
 			// Connect new client
-			else if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
+			if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
 				new_client_connection(serv);
 			// Check commands from clients and fill all clients buffers
-			else
-				check_all_clients_communication(serv);
-
+			check_all_clients_communication(serv);
 			// Treat datas from buffers previously filled.
 			manage_clients_input(serv);
 		}
@@ -115,5 +113,4 @@ void manage_clients_input(t_serveur *serv)
 		}
 		p_client = p_client->next;
 	}
-
 }

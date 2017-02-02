@@ -133,7 +133,7 @@ void print_send_gfx(char *str)
 
 void print_receive(int sock, char *str, int len)
 {
-	str[len] = '\0'; // fix print ouf of bond.
+	//str[len] = '\0'; // fix print ouf of bond.
 	printf(KBLU " Receiving from sock %d: " KRESET, sock);
 	replace_nl(str, len);
 	printf("[%.*s] len: %d\n", len, str, len);

@@ -37,7 +37,6 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
@@ -170,6 +169,8 @@ typedef struct				s_buffer
 	char					buff[BUFF_SIZE];
 	int						start;
 	int						len;
+	char					*overflow;
+	int						len_overflow;
 }							t_buffer;
 
 typedef struct 				s_client_entity
@@ -362,6 +363,7 @@ SOCKET						accept_connection(t_serveur *serv);
 void						new_client_connection(t_serveur *serveur);
 void						disconnect_client(SOCKET c_sock);
 void						close_all_connections(t_serveur *serv);
+void						update_len_buffer(t_buffer *buff, int size);
 
 /*
 ** communication.c

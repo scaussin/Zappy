@@ -84,7 +84,7 @@ void	add_client_to_event(t_world_event *world_event, t_client_entity *client)
 void	delete_game_event(t_serveur *serv, t_world_event *target_event)
 {
 	t_world_event		*cur_event;
-	t_world_event		*event_to_free;
+	//t_world_event		*event_to_free;
 	t_event_client		*client_tmp;
 	t_event_client		*client_to_free;
 
@@ -95,7 +95,7 @@ void	delete_game_event(t_serveur *serv, t_world_event *target_event)
 		{
 			if (cur_event->next && cur_event->next == target_event)
 			{
-				event_to_free = cur_event->next;
+				//event_to_free = cur_event->next;
 				// free inner chained list of concerned players.
 				if (target_event->type)
 					free (target_event->type);

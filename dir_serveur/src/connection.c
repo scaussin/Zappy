@@ -2,15 +2,31 @@
 
 SOCKET	accept_connection(t_serveur *serv)
 {
-	SOCKET		c_sock;
-	SOCKADDR_IN	c_sin;
-	socklen_t	c_sin_size;
+	SOCKET			c_sock;
+	SOCKADDR_IN		c_sin;
+	socklen_t		c_sin_size;
+	int				i;
+	int 			n_available_slots;
 
+	i = 0;
+	n_available_slots = 0;
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
 	{
 		perror("accept()");
+	}
+	while (i < serv->team_hdl.nb_teams)
+	{
+		n_available_slots += serv->team_hdl.array_teams[i].available_slots;
+		i++;
+	}
+	if (n_available_slots == 0)
+	{
+		printf(KRED "No available slot\n" KRESET);
+		if (c_sock > 0)
+			close(c_sock);
+		return (-1);
 	}
 	return (c_sock);
 }
@@ -21,13 +37,13 @@ void new_client_connection(t_serveur *serv)
 	t_client_entity		*client;
 
 	// Debug Print
-	printf("%s%s%s\n", KGRN, "\n- New client connection process started -", KRESET);
+	printf(KGRN "\n- New client connection process started -\n" KRESET);
 
 	// Accept connection
 	if ((c_sock = accept_connection(serv)) < 0)
 		return ;
 
-	// Create Client and send "BIENVENU\n"
+	// Create Client and send "BIENVENUE\n"
 	client = create_client(c_sock);
 
 	// Sending BIENVENUE\n message.
@@ -41,7 +57,7 @@ void new_client_connection(t_serveur *serv)
 	add_client(serv, client);
 
 	// Debug Print
-	printf("%sNew client connected, sock : %d%s\n", KGRN, client->sock, KRESET);
+	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
 }
 
 void disconnect_client(SOCKET c_sock)
