@@ -19,17 +19,19 @@ void	fill_team_info(t_serveur *serv)
 
 void	init_serveur(t_serveur *serv)
 {
-	SOCKET      sock;
-	SOCKADDR_IN sin;
-	/*struct rlimit	rlp;
+	SOCKET		sock;
+	SOCKADDR_IN	sin;
+	int			optval;
 
-	getrlimit(RLIMIT_NOFILE, &rlp);
-	serv->limit_max_client = rlp.rlim_cur;*/
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		exit_error("socket()");
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_port = htons(serv->network.port);
 	sin.sin_family = AF_INET;
+	optval = 1;
+	if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) {
+		exit_error("setsockopt");
+	}
 	if(bind(sock,(SOCKADDR *)&sin, sizeof sin) < 0)
 		exit_error("bind()");
 	if(listen(sock, serv->network.max_clients) < 0)

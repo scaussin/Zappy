@@ -1,15 +1,13 @@
 #include "../../includes/serveur.h"
 
-void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
+void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
 {
-	(void)				param;
 	(void)				serv;
 	t_player			*cur_player;
 	char				*msg;
 
 	cur_player = &(client_cur->player);
-
-	if (!regex_match(param, "^inventaire\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [inventaire] "
 					"from sock %d\n" KRESET, client_cur->sock);

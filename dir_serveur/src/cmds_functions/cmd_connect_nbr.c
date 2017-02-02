@@ -10,10 +10,9 @@
 void	cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
 	(void)serv;
-	(void)param;
 	char *client_msg;
 
-	if (!regex_match(param, "^connect_nbr\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [connect_nbr]"
 					"from sock %d\n" KRESET, client_cur->sock);

@@ -212,6 +212,7 @@ typedef struct 				s_client_hdl
 typedef struct 				s_cmd_match
 {
 	char					*name;
+	//char					*regex_match;
 	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	int						duration_cmd;
 }							t_cmd_match;
@@ -421,27 +422,26 @@ t_team_entity				*get_team_by_name(t_serveur *serv, char *name);
 */
 
 void						check_game_events(t_serveur *serv);
-void							check_world_events(t_serveur *serv);
-void							check_players_events(t_serveur *serv);
-void							check_eggs(t_serveur *serv);
-void								check_player_life(t_serveur *serv, t_client_entity *cur_client);
-void								check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
-void								check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
-void							check_victory(t_serveur *serv);
+void						check_world_events(t_serveur *serv);
+void						check_players_events(t_serveur *serv);
+void						check_eggs(t_serveur *serv);
+void						check_player_life(t_serveur *serv, t_client_entity *cur_client);
+void						check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
+void						check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
+void						check_victory(t_serveur *serv);
+
 /*
 ** cmd_clients_manager.c
 */
-
 void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
-
 void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
 void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
 void						add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param);
-
 void						init_game_event(t_world_event *world_event, char *type_str, int trigger_delay);
 void						add_new_event(t_serveur *serv, t_world_event *world_event);
 void						add_client_to_event(t_world_event *world_event, t_client_entity *client);
 void						delete_game_event(t_serveur *serv, t_world_event *target_event);
+int							compare_cmd(char *s1, char *s2);
 
 /*
 **	Gfx client cmds

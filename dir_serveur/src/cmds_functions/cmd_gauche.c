@@ -1,12 +1,11 @@
 #include "../../includes/serveur.h"
 
-void	cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param) /* typedef ?? */
+void	cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
 {
-	(void)		param;
 	t_player	*cur_player;
 	char		*msg;
 
-	if (!regex_match(param, "^gauche\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [gauche] "
 					"from sock %d\n" KRESET, client_cur->sock);
