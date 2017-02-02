@@ -38,12 +38,6 @@ void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char
 		*param = '\0';
 		param = param + 1;
 	}
-	/*if (nb_of_parsed_chars > 12)
-	{
-		printf(KMAG "[Serveur]: cmd too long (no cmd takes more than 12 char):"
-					"%s on sock: %d\n" KRESET, cmd, client->sock);
-		return ;
-	}*/
 	// Parsing
 	while (i < SIZE_CMD_MATCH_TABLE)
 	{

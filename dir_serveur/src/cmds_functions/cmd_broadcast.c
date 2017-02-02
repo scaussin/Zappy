@@ -44,7 +44,6 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 		list_clients = list_clients->next;
 	}
 		write_buffer(&client_cur->buff_send, "ok\n", 3);
-
 }
 
 double provenance_with_dir(int provenance, int dir)
