@@ -214,16 +214,9 @@ void strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *ta
 	}
 
 	// gfx world block ressource update.
-	asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
+	asprintf(&gfx_msg, "bct %d %d\n",
 		client_cur->player.pos.x,
-		client_cur->player.pos.y,
-		client_cur->player.cur_case->ressources[FOOD],
-		client_cur->player.cur_case->ressources[LINEMATE],
-		client_cur->player.cur_case->ressources[DERAUMERE],
-		client_cur->player.cur_case->ressources[SIBUR],
-		client_cur->player.cur_case->ressources[MENDIANE],
-		client_cur->player.cur_case->ressources[PHIRAS],
-		client_cur->player.cur_case->ressources[THYSTAME]);
-	push_gfx_msg(serv, gfx_msg);
+		client_cur->player.pos.y);
+	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, gfx_msg);
 	free(gfx_msg);
 }

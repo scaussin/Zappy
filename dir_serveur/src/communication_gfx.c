@@ -87,28 +87,31 @@ void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
 
 	i = 0;
 	// Check for arguments
-	if ((arg_cmd = strchr(cmd, ' ')))
-		nb_of_parsed_chars = arg_cmd - cmd;
-	else
-		nb_of_parsed_chars = strlen(cmd);
-	if (nb_of_parsed_chars > 4)
+	if (cmd[0] && cmd[0] != ' ')
 	{
-		printf(KMAG "[Serveur]: gfx cmd too long (no gfx cmd takes more than 3 char):"
-					"%s on gfx client command parsing." KRESET, cmd);
-		return ;
-	}
-
-	// parsing with gfx match table.
-	while (i < SIZE_GFX_CMD_MATCH_TABLE)
-	{
-		if (strncmp(serv->cmd_hdl.gfx_cmd_match_table[i].name,
-			cmd, nb_of_parsed_chars) == 0)
+		if ((arg_cmd = strchr(cmd, ' ')))
+			nb_of_parsed_chars = arg_cmd - cmd;
+		else
+			nb_of_parsed_chars = strlen(cmd);
+		if (nb_of_parsed_chars > 4)
 		{
-			// -> Direct execution of cmds.
-			serv->cmd_hdl.gfx_cmd_match_table[i].func(serv, gfx_client, cmd);
+			printf(KMAG "[Serveur]: gfx cmd too long (no gfx cmd takes more than 3 char):"
+						"%s on gfx client command parsing." KRESET, cmd);
 			return ;
 		}
-		i++;
+
+		// parsing with gfx match table.
+		while (i < SIZE_GFX_CMD_MATCH_TABLE)
+		{
+			if (strncmp(serv->cmd_hdl.gfx_cmd_match_table[i].name,
+				cmd, nb_of_parsed_chars) == 0)
+			{
+				// -> Direct execution of cmds.
+				serv->cmd_hdl.gfx_cmd_match_table[i].func(serv, gfx_client, cmd);
+				return ;
+			}
+			i++;
+		}
 	}
 	printf(KMAG "[Serveur]: Unknown GFX command: %s on sock: %d\n" KRESET, cmd, gfx_client->sock);
 	// send gfx "suc\n"

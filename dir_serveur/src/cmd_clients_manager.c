@@ -29,9 +29,10 @@ void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 
 void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
 {
-	int		i = 0;
+	int		i;
 	char	*param;
 
+	i = 0;
 	param = NULL;
 	if ((param = strchr(cmd, ' ')))
 	{

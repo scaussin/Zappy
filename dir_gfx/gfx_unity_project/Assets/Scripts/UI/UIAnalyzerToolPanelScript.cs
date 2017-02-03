@@ -39,6 +39,10 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	private RaycastHit			hit;
 	private ColliderBroadcast	colBroadcast;
 
+	// private update references
+	private PlayerObject		analyzedPlayerScript;
+	private BlockObject			analyzedBlockScript;
+
 	void Awake()
 	{
 		AnalyzerToolContainer = transform.Find ("AnalyzerToolContainer").gameObject;
@@ -47,7 +51,7 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 		AnalyzerVisual = AnalyzerToolContainer.transform.Find("AnalyzerVisual").gameObject.GetComponent<Image> ();
 		NumberValue = AnalyzerDataContainer.transform.Find("NumberValue").gameObject.GetComponent<Text> ();
 		Position_x_val = AnalyzerDataContainer.transform.Find("Position_x_val").gameObject.GetComponent<Text> ();
-		Position_y_val = AnalyzerDataContainer.transform.Find("Position_x_val").gameObject.GetComponent<Text> ();
+		Position_y_val = AnalyzerDataContainer.transform.Find("Position_y_val").gameObject.GetComponent<Text> ();
 		LevelValue = AnalyzerDataContainer.transform.Find("LevelValue").gameObject.GetComponent<Text> ();
 		FoodUnitsValue = AnalyzerDataContainer.transform.Find("FoodUnitsValue").gameObject.GetComponent<Text> ();
 		LinemateValue = AnalyzerDataContainer.transform.Find("LinemateValue").gameObject.GetComponent<Text> ();
@@ -56,16 +60,19 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 		MendianeValue = AnalyzerDataContainer.transform.Find("MendianeValue").gameObject.GetComponent<Text> ();
 		PhirasValue = AnalyzerDataContainer.transform.Find("PhirasValue").gameObject.GetComponent<Text> ();
 		ThystameValue = AnalyzerDataContainer.transform.Find("ThystameValue").gameObject.GetComponent<Text> ();
-
-
 	}
-
-	// Use this for initialization
+		
 	void OnEnable () {
 		AnalyzedObject = null;
 		// let's fetch the visuals right now.
 		PlayerVisual = Resources.Load<Sprite> ("UI/AnalyzerVisuals/analyzer_player");
 		BlockVisual = Resources.Load<Sprite> ("UI/AnalyzerVisuals/analyzer_block");
+		StartCoroutine ("AnalyzerCommunicationDisplayRoutine");
+	}
+
+	void OnDisable()
+	{
+		StopCoroutine("AnalyzerCommunicationDisplayRoutine");
 	}
 	
 	// Update is called once per frame
@@ -79,8 +86,11 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 				if ((colBroadcast = hit.collider.gameObject.GetComponent<ColliderBroadcast> ()))
 				{
 					Debug.Log ("Clicked on " + colBroadcast.ObjectRoot.name);
-					AnalyzedObject = colBroadcast.ObjectRoot;
-					UpdatePanelDisplay ();
+					if (AnalyzedObject != colBroadcast.ObjectRoot)
+					{
+						AnalyzedObject = colBroadcast.ObjectRoot;
+						EngagePanelDisplay ();
+					}
 				}
 				else
 				{
@@ -94,36 +104,137 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 		}
 	}
 
+
+
 	/// <summary>
 	/// Updates the panel display. Will select the good ui display function
 	/// according to the type of object analyzed.
 	/// </summary>
-	void UpdatePanelDisplay()
+	void EngagePanelDisplay()
 	{
 		if (AnalyzedObject)
 		{
 			if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
 			{
 				// the analyzed object is a player. set the UI as such.
-				UpdatePlayerAnalyzer();
+				analyzedPlayerScript = AnalyzedObject.GetComponent<PlayerObject> ();
+
+				// send cmds to serv for data update
+				PlayerAnalyzeServerUpdate();
+				// Delayed function call, set the UI display.
+				Invoke ("UpdatePlayerAnalyzerDisplay", 0.1f);
 			}
 			else if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Block)
 			{
 				// the analyzed object is a ground block. set the UI as such.
-				UpdateBlockAnalyzer();
+				analyzedBlockScript = AnalyzedObject.GetComponent<BlockObject> ();
+
+				// send cmds to serv for data update
+				BlockAnalyzeServerUpdate();
+
+				// Delayed function call, set the UI display.
+				Invoke ("UpdateBlockAnalyzerDisplay", 0.1f);
 			}
 		}
 	}
 
-	void UpdatePlayerAnalyzer()
+	/// <summary>
+	/// Routine that will ask the server for update every n seconds.
+	/// </summary>
+	/// <returns>The analyzer communication display routine.</returns>
+	IEnumerator	AnalyzerCommunicationDisplayRoutine()
+	{
+		for (;;)
+		{
+			if (AnalyzedObject)
+			{
+				if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
+				{
+					PlayerAnalyzeServerUpdate ();
+					UpdatePlayerAnalyzerDisplay ();
+				}
+				else if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Block)
+				{
+					BlockAnalyzeServerUpdate ();
+					UpdateBlockAnalyzerDisplay ();
+				}
+			}
+			yield return StartCoroutine(CoroutineUtils.WaitForRealSeconds(0.8f));
+		}
+	}
+
+	///
+	///		------ UI UPDATES ------
+	///
+
+	/// <summary>
+	/// Updates the player analyzer display, meaning UI update.
+	/// </summary>
+	void UpdatePlayerAnalyzerDisplay()
 	{
 		// set image of the analyzer;
 		AnalyzerVisual.sprite = PlayerVisual;
+		// set ui texts.
+		NumberValue.text = analyzedPlayerScript.AssignedNumber.ToString();
+		Position_x_val.text = analyzedPlayerScript.X.ToString() + "x";
+		Position_y_val.text = analyzedPlayerScript.Y.ToString() + "y";
+		LevelValue.text = analyzedPlayerScript.Level.ToString();
+		FoodUnitsValue.text = analyzedPlayerScript.FoodTimeLeft.ToString();
+		LinemateValue.text = analyzedPlayerScript.Linemate.ToString();
+		DeraumereValue.text = analyzedPlayerScript.Deraumere.ToString();
+		SiburValue.text = analyzedPlayerScript.Sibur.ToString();
+		PhirasValue.text = analyzedPlayerScript.Phiras.ToString();
+		MendianeValue.text = analyzedPlayerScript.Mendiane.ToString();
+		ThystameValue.text = analyzedPlayerScript.Thystame.ToString();
 	}
 
-	void UpdateBlockAnalyzer()
+
+	void UpdateBlockAnalyzerDisplay()
 	{
 		// set image of the analyzer;
 		AnalyzerVisual.sprite = BlockVisual;
+		// set ui texts.
+		NumberValue.text = "-";
+		Position_x_val.text = analyzedBlockScript.x.ToString() + "x";
+		Position_y_val.text = analyzedBlockScript.y.ToString() + "y";
+		LevelValue.text = "-";
+		FoodUnitsValue.text = analyzedBlockScript.FoodUnits.ToString();
+		LinemateValue.text = analyzedBlockScript.LinemateUnits.ToString();
+		DeraumereValue.text = analyzedBlockScript.DeraumereUnits.ToString();
+		SiburValue.text = analyzedBlockScript.SiburUnits.ToString();
+		PhirasValue.text = analyzedBlockScript.PhirasUnits.ToString();
+		MendianeValue.text = analyzedBlockScript.MendianeUnits.ToString();
+		ThystameValue.text = analyzedBlockScript.ThystameUnits.ToString();
+	}
+
+
+
+
+	///
+	///		------ Communication with server ------
+	///
+
+
+
+	/// <summary>
+	/// Sends msg to serv to update players datas.
+	/// </summary>
+	void PlayerAnalyzeServerUpdate()
+	{
+		GameManager.instance.MsgBroadcastController
+			.PushMsg ("ppo #" + analyzedPlayerScript.AssignedNumber + "\n");
+		GameManager.instance.MsgBroadcastController
+			.PushMsg ("plv #" + analyzedPlayerScript.AssignedNumber + "\n");
+		GameManager.instance.MsgBroadcastController
+			.PushMsg ("pin #" + analyzedPlayerScript.AssignedNumber + "\n");
+	}
+
+	/// <summary>
+	/// Sends msg to serv to update block datas.
+	/// </summary>
+	void BlockAnalyzeServerUpdate()
+	{
+		GameManager.instance.MsgBroadcastController
+			.PushMsg ("bct " + analyzedBlockScript.x + " " + analyzedBlockScript.x + "\n");
 	}
 }

@@ -62,8 +62,10 @@ void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		// END -------------------------------- //
 
 			// send inventaire "pin #n X Y q q q q q q q\n"
-			asprintf(&gfx_msg, "pin #%d %ld %d %d %d %d %d %d\n",
+			asprintf(&gfx_msg, "pin #%d %d %d %ld %d %d %d %d %d %d\n",
 			client_tmp->sock,
+			client_tmp->player.pos.x,
+			client_tmp->player.pos.y,
 			time_left,
 			client_tmp->player.inventory[LINEMATE],
 			client_tmp->player.inventory[DERAUMERE],

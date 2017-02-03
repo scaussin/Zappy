@@ -10,7 +10,15 @@ public class PlayerObject : MonoBehaviour {
 	public int			Level; // L
 	public string		Team; // N
 
-	public string		Inventory;
+	[Header("Player Inventory")]
+	public string	InventoryStr;
+	public int		FoodTimeLeft;
+	public int		Linemate;
+	public int		Deraumere;
+	public int		Sibur;
+	public int		Mendiane;
+	public int		Phiras;
+	public int		Thystame;
 
 	[Header("Player points of interest")]
 	public GameObject	ModelContainer;
