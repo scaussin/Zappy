@@ -30,37 +30,38 @@ void	lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table)
 void	check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd)
 {
 	int		i = 0;
-	char	*arg_cmd;
-	char	*cmd_end;
-	int		nb_of_parsed_chars;
+	char	*param;
 
-	// Check for arguments
-	cmd_end = strchr(cmd, '\n');
-	arg_cmd = NULL;
-	if ((arg_cmd = strchr(cmd, ' ')))
-		nb_of_parsed_chars = arg_cmd - cmd;
-	else
-		nb_of_parsed_chars = strlen(cmd);
-
-	if (nb_of_parsed_chars > 12)
+	param = NULL;
+	if ((param = strchr(cmd, ' ')))
 	{
-		printf(KMAG "[Serveur]: cmd too long (no cmd takes more than 12 char):"
-					"%s on sock: %d\n" KRESET, cmd, client->sock);
-		return ;
+		*param = '\0';
+		param = param + 1;
 	}
-
 	// Parsing
 	while (i < SIZE_CMD_MATCH_TABLE)
 	{
-		if (strncmp(cmd_match_table[i].name, cmd, nb_of_parsed_chars) == 0)
+		if (compare_cmd(cmd_match_table[i].name, cmd) == 0)
 		{
-			add_cmd(client, &cmd_match_table[i], cmd);
+			add_cmd(client, &cmd_match_table[i], param);
 			return ;
 		}
 		i++;
 	}
 	printf(KMAG "[Serveur]: Unknown command: %s on sock: %d\n" KRESET, cmd, client->sock);
 	return ;
+}
+
+int		compare_cmd(char *s1, char *s2)
+{
+	int		i;
+
+	i = 0;
+	while (s1 && s2 && s1[i] && s2[i] && s1[i] == s2[i])
+	{
+		i++;
+	}
+	return (s1[i] - s2[i]);
 }
 
 void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
@@ -73,7 +74,10 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 	new_cmd->duration_cmd = cmd->duration_cmd;
 	new_cmd->time_end.tv_sec = 0;
 	new_cmd->time_end.tv_nsec = 0;
-	new_cmd->param = strdup(param);
+	if (param)
+		new_cmd->param = strdup(param);
+	else
+		new_cmd->param = NULL;
 	new_cmd->next = NULL;
 	if (!client->list_cmds)
 		client->list_cmds = new_cmd;

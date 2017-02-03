@@ -2,11 +2,10 @@
 
 void	cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param) /* typedef ?? */
 {
-	(void) param;
 	t_player	*cur_player;
 	char		*msg;
 
-	if (!regex_match(param, "^avance\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [avance] "
 					"from sock %d\n" KRESET, client_cur->sock);

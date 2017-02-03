@@ -4,18 +4,15 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
 	(void)serv;
 	(void)client_cur;
-	(void)param;
 	char					*msg;
 	t_player				*cur_player;
 	int						provenance;
-	char					*arg;
 	char					*msg_client;
-
-	arg = strchr(param, ' ') + 1;
 	t_client_entity			*list_clients;
+
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
-	if (!regex_match(param, "^broadcast [a-zA-Z0-9 ]+\n$"))
+	if (!regex_match(param, "^[a-zA-Z0-9 ]+\n$"))
 	{
 		printf(KMAG "Bad format to cmd [broadcast] "
 					"from sock %d\n" KRESET, client_cur->sock);
@@ -38,7 +35,7 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 
 			//asprintf(&msg_client, "message %d,%s, tu es en %d , %d\n, tu regardes vers %d",provenance, arg, list_clients->player.pos.x, list_clients->player.pos.y, list_clients->player.dir);
-			asprintf(&msg_client, "message %d,%s",provenance, arg);
+			asprintf(&msg_client, "message %d,%s",provenance, param);
 			write_buffer(&list_clients->buff_send, msg_client, strlen(msg_client));
 			free(msg_client);
 			msg_client = NULL;
@@ -47,7 +44,6 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 		list_clients = list_clients->next;
 	}
 		write_buffer(&client_cur->buff_send, "ok\n", 3);
-
 }
 
 double provenance_with_dir(int provenance, int dir)
@@ -68,6 +64,7 @@ double distance(int sourcex, int sourcey, int i, int j)
     //printf("sourcex : %d  sourcey : %d  a: %d  b: %d,  dist:%lf\n",sourcex,sourcey,i,j,sqrt(a));
     return sqrt(a);
 }
+
 int orientation(int sourcex, int sourcey, int i, int j)
 {
     if (abs(sourcex - i) > abs(sourcey - j))

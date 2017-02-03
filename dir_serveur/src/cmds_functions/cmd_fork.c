@@ -8,12 +8,11 @@
 
 void	cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
-	(void)param;
 	t_player		*cur_player;
 	char			*client_msg;
 	char			*gfx_msg;
 
-	if (!regex_match(param, "^fork\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [fork] "
 					"from sock %d\n" KRESET, client_cur->sock);

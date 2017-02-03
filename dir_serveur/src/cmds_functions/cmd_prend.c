@@ -6,7 +6,7 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 	char	*gfx_msg;
 
 	// Parse args first.	
-	if (!regex_match(param, "^prend [a-zA-Z0-6]+\n$"))
+	if (!param || !regex_match(param, "^[a-zA-Z0-6]+\n$"))
 	{
 		printf(KMAG "Bad format to cmd [prend] "
 					"from sock %d\n" KRESET, client_cur->sock);
@@ -37,7 +37,7 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 				client_cur->player.inventory[THYSTAME]);
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
- 
+
 			// gfx world block ressource update.
 			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
 				client_cur->player.pos.x,
@@ -66,25 +66,23 @@ void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 int		parse_ressource_index(char *param)
 {
-	char	*arg;
 	int		arg_len;
 
-	arg = strchr(param, ' ') + 1;
-	arg_len = strlen(arg) - 1; // we dont want the \n
+	arg_len = strlen(param) - 1; // we dont want the \n
 	// Try to take the ressource from the ground for the corresponding ressource.
-	if (strncmp(arg, "0", arg_len) == 0 || strncmp(arg, "nourriture", arg_len) == 0)
+	if (strncmp(param, "0", arg_len) == 0 || strncmp(param, "nourriture", arg_len) == 0)
 		return (0);
-	else if (strncmp(arg, "1", arg_len) == 0 || strncmp(arg, "linemate", arg_len) == 0)
+	else if (strncmp(param, "1", arg_len) == 0 || strncmp(param, "linemate", arg_len) == 0)
 		return (1);
-	else if (strncmp(arg, "2", arg_len) == 0 || strncmp(arg, "deraumere", arg_len) == 0)
+	else if (strncmp(param, "2", arg_len) == 0 || strncmp(param, "deraumere", arg_len) == 0)
 		return (2);
-	else if (strncmp(arg, "3", arg_len) == 0 || strncmp(arg, "sibur", arg_len) == 0)
+	else if (strncmp(param, "3", arg_len) == 0 || strncmp(param, "sibur", arg_len) == 0)
 		return (3);
-	else if (strncmp(arg, "4", arg_len) == 0 || strncmp(arg, "mendiane", arg_len) == 0)
+	else if (strncmp(param, "4", arg_len) == 0 || strncmp(param, "mendiane", arg_len) == 0)
 		return (4);
-	else if (strncmp(arg, "5", arg_len) == 0 || strncmp(arg, "phiras", arg_len) == 0)
+	else if (strncmp(param, "5", arg_len) == 0 || strncmp(param, "phiras", arg_len) == 0)
 		return (5);
-	else if (strncmp(arg, "6", arg_len) == 0 || strncmp(arg, "thystame", arg_len) == 0)
+	else if (strncmp(param, "6", arg_len) == 0 || strncmp(param, "thystame", arg_len) == 0)
 		return (6);
 	else
 		printf(KMAG "Invalid parameter for cmd [%s]\n" KRESET, param);

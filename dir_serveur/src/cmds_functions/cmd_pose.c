@@ -5,7 +5,7 @@ void	cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param)
 	int		res_i;
 	char	*gfx_msg;
 
-	if (!regex_match(param, "^pose [a-zA-Z0-6]+\n$"))
+	if (!param || !regex_match(param, "^[a-zA-Z0-6]+\n$"))
 	{
 		printf(KMAG "Bad format to cmd [pose] "
 					"from sock %d\n" KRESET, client_cur->sock);

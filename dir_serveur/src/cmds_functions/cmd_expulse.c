@@ -2,7 +2,6 @@
 
 void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
-	(void)					param;
 	t_player				*cur_player;
 	t_client_entity			*list_clients;
 	char					*msg;
@@ -11,7 +10,7 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 	nb_client_expulsed = 0;
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
-	if (!regex_match(param, "^expulse\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [expulse] "
 					"from sock %d\n" KRESET, client_cur->sock);

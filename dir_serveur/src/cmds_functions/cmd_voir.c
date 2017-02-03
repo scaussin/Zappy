@@ -15,7 +15,7 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 	char			*sep_rsrc;
 	char			*sep_case;
 
-	if (!regex_match(param, "^voir\n$"))
+	if (param)
 	{
 		printf(KMAG "Bad format to cmd [voir] "
 					"from sock %d\n" KRESET, client_cur->sock);
