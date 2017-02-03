@@ -24,6 +24,7 @@ void	cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param)
 			push_gfx_msg(serv, gfx_msg);
 			free(gfx_msg);
 
+
 			// send inventaire "pin #n X Y q q q q q q q\n"
 			asprintf(&gfx_msg, "pin #%d %d %d %d %d %d %d %d\n",
 				client_cur->sock,
