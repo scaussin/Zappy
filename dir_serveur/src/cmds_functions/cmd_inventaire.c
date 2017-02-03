@@ -6,6 +6,7 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 	(void)				serv;
 	t_player			*cur_player;
 	char				*msg;
+	long				nsec_left;
 	long				time_left;
 	struct timespec		timespec_life_left;
 	struct timespec		now;
@@ -26,13 +27,10 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 	timespec_life_left = timespec_diff(&now, &cur_player->next_dinner_time);
 
 	// Time conversion to nanoseconds for precise time remaining.
-	while (timespec_life_left.tv_sec > 0)
-	{
-		timespec_life_left.tv_sec -= 1;
-		timespec_life_left.tv_nsec += 1000000000;
-	}
+	nsec_left = convert_timespec_to_nsec(timespec_life_left);
+
 	// calculation to turn remaining time into (int)t_unit time.
-	time_left += (int)roundf((float)(timespec_life_left.tv_nsec / (float)1000000000) / serv->world_hdl.t_unit);
+	time_left += (int)roundf((float)(nsec_left / (float)1000000000) / serv->world_hdl.t_unit);
 	// player client response.
 	asprintf(&msg, "{nourriture %ld, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d}\n",  // nourriture ??
 		time_left,

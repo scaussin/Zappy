@@ -463,6 +463,7 @@ void						get_time(struct timespec *ts);
 struct timespec				timespec_diff(struct timespec *start, struct timespec *stop);
 struct timeval				*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end);
 void						add_nsec_to_timespec(struct timespec *time, long nanosec);
+long						convert_timespec_to_nsec(struct timespec time);
 
 /*
 ** src/cmds_functions/
