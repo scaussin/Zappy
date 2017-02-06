@@ -73,7 +73,6 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		// sending first datas; <nb-client>\n<x><y>\n
 		client->is_in_game = 1;
 		client->team = team;
-		printf(KGRN "Player client recognized. Team: %s\n" KRESET, client->team->name);
 		asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots,
 				serv->world_hdl.map_x, serv->world_hdl.map_y);
 		write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
@@ -98,6 +97,10 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		{
 			assign_random_player_position(serv, &(client->player));
 		}
+		printf(KGRN "Client #%d player authentified. Team: [%s]. Position: %dx %dy\n" KRESET,
+			client->sock, client->team->name, client->player.pos.x, client->player.pos.y);
+
+		// assign time of dinner = now + FOOD_LIFE_TIME;
 		get_time(&client->delay_time);
 		assign_player_time_of_dinner(serv, &(client->player));
 

@@ -66,6 +66,7 @@ t_egg	*egg_available(t_serveur *serv, t_client_entity *client)
 			{
 				return (egg_tmp);
 			}
+			egg_tmp = egg_tmp->next;
 		}
 	}
 	return (NULL);

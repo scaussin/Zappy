@@ -36,7 +36,7 @@ void	get_input(t_serveur *serv, int argc, char **argv)
 		printf("Team names:");
 		while (i < serv->team_hdl.nb_teams)
 		{
-			printf("  %s", serv->team_hdl.array_teams[i].name);
+			printf("  [%s]", serv->team_hdl.array_teams[i].name);
 			// set team number of players by lvl to zero -> teams are empty.
 			while (y < MAX_LV)
 			{

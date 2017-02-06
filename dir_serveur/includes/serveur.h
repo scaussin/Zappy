@@ -27,6 +27,7 @@
 /*
 **	color in text;
 */
+
 # define KNRM  "\x1B[0m"
 # define KRED  "\x1B[31m"
 # define KGRN  "\x1B[32m"
@@ -37,6 +38,17 @@
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
+/*
+**	Boolean defines
+*/
+
+# define B_TRUE 1
+# define B_FALSE 0
+
+/*
+**	Serveur communication defines.
+*/
+
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
@@ -45,14 +57,14 @@
 # define END "\n"
 # define CHAR_END '\n'
 # define LEN_END 1
-# define NB_RESSOURCES 7
 # define MSG_ARG_MAX_SIZE 10
 
 /*
 **	Game defines
 */
 
-# define FOOD_LIFE_TIME 126
+# define NB_RESSOURCES 7
+# define FOOD_LIFE_TIME 3000
 # define INCANTATION_TIME 300
 # define EGG_HATCH_TIME 600
 # define EGG_LAYING_TIME 42
@@ -71,6 +83,27 @@ typedef struct sockaddr     SOCKADDR;
 typedef struct in_addr      IN_ADDR;
 
 typedef struct s_list_cmds_entity		t_list_cmds_entity;
+
+/*
+** ***************** Serveur game settings ********************	**
+**					Game tweaking made easy						**
+** ************************************************************	**
+*/
+
+typedef struct				s_game_settings
+{
+	int						is_pickup_instant;
+	int						can_interrupt_incantation;
+	int						are_teams_infinite;
+}							t_game_settings;
+
+/*
+**	***********************************************************	**
+*/
+
+/*
+** ************* Game enums and helpers structs ***************	**
+*/
 
 typedef enum				e_dir
 {
@@ -132,10 +165,10 @@ typedef struct 				s_team_hdl
 }							t_team_hdl;
 
 /*
-** ************************ Client **************************
+** ******************* Client's Player ***********************
+** player struct is inside client_entity.
 */
 
-// Player belonging to the client.
 typedef struct				s_player
 {
 	int						level;
@@ -148,19 +181,27 @@ typedef struct				s_player
 
 	int						is_incanting;
 	int						is_incanter;
+	int						incantation_id;
 	struct timespec			incantation_end_time;
 
 	int						is_laying_egg;
 	struct timespec			egg_layed_time;
 }							t_player;
 
+/*
+** ************************ Client **************************
+*/
 
 typedef struct 				s_list_cmds_entity
 {
-	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-	char					*param;
 	int						duration_cmd;
-	struct timespec			time_end;
+	int						(*on_start)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	int						cmd_started;
+	int						success;
+	struct timespec			end_time;
+	void					(*on_end)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	char					*param;
+	
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -172,6 +213,10 @@ typedef struct				s_buffer
 	char					*overflow;
 	int						len_overflow;
 }							t_buffer;
+
+/*
+** -----------------------	Main client struct.
+*/
 
 typedef struct 				s_client_entity
 {
@@ -198,6 +243,10 @@ typedef struct 				s_client_entity
 	struct s_client_entity	*next;
 }							t_client_entity;
 
+/*
+** -----------------------	Client container struct.
+*/
+
 typedef struct 				s_client_hdl
 {
 	int						nb_clients;
@@ -212,20 +261,20 @@ typedef struct 				s_client_hdl
 typedef struct 				s_cmd_match
 {
 	char					*name;
-	//char					*regex_match;
-	void					(*func)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	int						duration_cmd;
+	int						(*on_start)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+	void					(*on_end)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 }							t_cmd_match;
 
 typedef struct 				s_cmd_hdl
 {
 	int						nb_cmds;
 	t_cmd_match				*cmd_match_table; // array of commands and their linked function.
-	t_cmd_match				*gfx_cmd_match_table;
+	t_cmd_match				*gfx_cmd_match_table; // the same for gfx cmd.
 }							t_cmd_hdl;
 
 /*
-** ************************ World struct ***************************** => Game board
+** ************************ World struct *****************************
 */
 typedef	struct				s_event_client
 {
@@ -263,6 +312,10 @@ typedef struct				s_world_case
 	int						nb_players;
 }							t_world_case;
 
+/*
+** -----------------------	World main container struct.
+*/
+
 typedef struct 				s_world_hdl
 {
 	int						map_x;
@@ -273,19 +326,11 @@ typedef struct 				s_world_hdl
 
 	t_world_event			*ongoing_events;
 
+	int						nb_of_incantations;
 	int						nb_of_eggs;
 	t_egg					*eggs;
 }							t_world_hdl;
 
-/*
-** ******************** Serveur game settings ******************
-**	Could be useful for in-game rule change.
-*/
-
-typedef struct				s_game_settings
-{
-//	int						are_teams_infinite; // does not seem possible for now.
-}							t_game_settings;
 
 /*
 ** ******************** Serveur Main Struct ******************
@@ -360,6 +405,7 @@ void						manage_clients_input(t_serveur *serv);
 /*
 ** connection.c
 */
+
 SOCKET						accept_connection(t_serveur *serv);
 void						new_client_connection(t_serveur *serveur);
 void						disconnect_client(SOCKET c_sock);
@@ -369,6 +415,7 @@ void						update_len_buffer(t_buffer *buff, int size);
 /*
 ** communication.c
 */
+
 void						check_all_clients_communication(t_serveur *serv);
 void						disconnect_flagged_clients(t_serveur *serv);
 int							read_client(t_client_entity *client);
@@ -389,6 +436,7 @@ void						send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 /*
 ** client_hdl.c
 */
+
 t_client_entity				*create_client(SOCKET sock);
 void						set_client_player_datas(t_client_entity *new_client);
 void						add_client(t_serveur *serv, t_client_entity *client);
@@ -442,6 +490,9 @@ void						add_new_event(t_serveur *serv, t_world_event *world_event);
 void						add_client_to_event(t_world_event *world_event, t_client_entity *client);
 void						delete_game_event(t_serveur *serv, t_world_event *target_event);
 int							compare_cmd(char *s1, char *s2);
+void						clean_clients_first_cmd(t_client_entity *p_client);
+
+struct timespec				*exec_cmd_client(t_serveur *serv);
 
 /*
 **	Gfx client cmds
@@ -450,13 +501,8 @@ int							compare_cmd(char *s1, char *s2);
 void						lex_and_parse_gfx_cmds(t_serveur *serv, t_client_entity *gfx_client);
 void						parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd);
 
-// client command execution.
-struct timespec				*exec_cmd_client(t_serveur *serv);
-int							timespec_is_over(struct timespec time_end);
-struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
-
 /*
-**	clock.c
+**	clock.c: tools for handling time on the server.
 */
 
 void						get_time(struct timespec *ts);
@@ -464,38 +510,78 @@ struct timespec				timespec_diff(struct timespec *start, struct timespec *stop);
 struct timeval				*set_timeout_select(struct timeval *timeout, struct timespec *lower_time_end);
 void						add_nsec_to_timespec(struct timespec *time, long nanosec);
 long						convert_timespec_to_nsec(struct timespec time);
+int							timespec_is_over(struct timespec time_end);
+struct timespec				*min_timespec(struct timespec *a, struct timespec *b);
 
 /*
 ** src/cmds_functions/
 */
 
+int							on_start_cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_avance(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int							on_start_cmd_droite(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_droite(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						on_end_cmd_droite(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int							on_start_cmd_gauche(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+void						on_end_cmd_gauche(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int							on_start_cmd_voir(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-t_pos						*get_see_case_coordinates(t_serveur *serv, t_player *player);
+void						on_end_cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
+t_pos							*get_see_case_coordinates(t_serveur *serv, t_player *player);
 int								get_nb_case(int level);
 void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+
+int							on_start_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
+
 int							parse_ressource_index(char *param);
+
+int							on_start_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param);
+
 int								try_to_take_res(t_player *client, int res_nb);
+
+int							on_start_cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_pose(t_serveur *serv, t_client_entity *client_cur, char *param);
 int								try_to_drop_ressource(t_player *player, int res_nb);
+
+int							on_start_cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param);
 void							expulse_client_in_dir(t_serveur *serv, t_client_entity *client, int dir);
+
+int							on_start_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param);
 double							distance(int sourcex, int sourcey, int i, int j);
 int								orientation(int sourcex, int sourcey, int i, int j);
 int								provenance_son(int taillex, int tailley, int sourcex, int sourcey, int destx, int desty);
 double							provenance_with_dir(int provenance, int dir);
-void						cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int							on_start_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+int								init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
+void							finish_incantation(t_serveur *serv, t_client_entity *cur_client);
 int								*set_incantation_target_res(int plevel);
 int								are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player, int *target_res);
 void							set_players_incanting(t_serveur *serv, t_client_entity *cur_client);
 void							strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *target_res);
+
+int							on_start_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
+
+int							on_start_cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
+void						on_end_cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);
 
 /*
 **	src/gfx_cmds_functions/
@@ -511,14 +597,13 @@ void						gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 void						gfx_cmd_sgt(t_serveur *serv, t_client_entity *gfx_client, char *param);
 void						gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param);
 
-
 /*
 **	egg_handling.c
 */
 
-void	add_new_egg(t_serveur *serv, t_client_entity *client);
-t_egg	*egg_available(t_serveur *serv, t_client_entity *client);
-void	clear_egg(t_serveur *serv, t_egg *egg);
+void						add_new_egg(t_serveur *serv, t_client_entity *client);
+t_egg						*egg_available(t_serveur *serv, t_client_entity *client);
+void						clear_egg(t_serveur *serv, t_egg *egg);
 
 
 #endif

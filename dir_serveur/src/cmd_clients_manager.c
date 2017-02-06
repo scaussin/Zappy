@@ -71,19 +71,24 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 	t_list_cmds_entity	*new_cmd;
 
 	new_cmd = s_malloc(sizeof(t_list_cmds_entity));
-	new_cmd->func = cmd->func;
+	new_cmd->on_start = cmd->on_start;
+	new_cmd->on_end = cmd->on_end;
 	new_cmd->duration_cmd = cmd->duration_cmd;
-	new_cmd->time_end.tv_sec = 0;
-	new_cmd->time_end.tv_nsec = 0;
+	new_cmd->cmd_started = 0;
+	new_cmd->success = 0;
+
 	if (param)
 		new_cmd->param = strdup(param);
 	else
 		new_cmd->param = NULL;
 	new_cmd->next = NULL;
+
+	// Add cmd to chained list of cmds.
 	if (!client->list_cmds)
 		client->list_cmds = new_cmd;
 	else
 	{
+
 		last = client->list_cmds;
 		while (last && last->next)
 		{
@@ -95,40 +100,61 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 }
 
 /*
-**	Changed: for each player, executes the cmd then put the client in "delay state".
-**	Next cmd will be executed when delay_time is over.
+**	For each player, executes the start point then the endpoint of the current cmd.
+**	If the start point fails (mainly player input error), the end point is canceled.
 */
 
 struct timespec	*exec_cmd_client(t_serveur *serv)
 {
 	t_client_entity			*p_client;
-	struct timespec			*lower_time_end;
-	t_list_cmds_entity		*cmd_to_free;
 
-	lower_time_end = NULL;
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		// execute cmd and delete cmd_entity
-		if (p_client->list_cmds && timespec_is_over(p_client->delay_time))
+		// execute start point of first cmd
+		if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_FALSE)
 		{
-			// reset time for next command -> "delay state" for the client.
-			get_time(&p_client->delay_time);
-			add_nsec_to_timespec(&p_client->delay_time,
-				p_client->list_cmds->duration_cmd * serv->world_hdl.t_unit * 1000000000);
-
-			// function may cancel the timer reset, thats why it must be executed last.
-			p_client->list_cmds->func(serv, p_client, p_client->list_cmds->param);
-
-			// cleaning cmd from the cmd list for the player.
-			if (p_client->list_cmds->param)
-				free(p_client->list_cmds->param);
-			cmd_to_free = p_client->list_cmds;
-			p_client->list_cmds = p_client->list_cmds->next;
-			p_client->size_list_cmds -= 1;
-			free(cmd_to_free);
+			if (p_client->list_cmds->on_start(serv, p_client, p_client->list_cmds->param) != -1)
+			{
+				p_client->list_cmds->cmd_started = B_TRUE;
+				
+				// set end time of cmd for launching endpoint.
+				get_time(&p_client->list_cmds->end_time);
+				add_nsec_to_timespec(&p_client->list_cmds->end_time,
+					p_client->list_cmds->duration_cmd
+					* serv->world_hdl.t_unit * 1000000000);
+			}
+			else
+			{
+				clean_clients_first_cmd(p_client);
+			}
+		}
+		else if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_TRUE) // cmd started, now look for end point time;
+		{
+			if (timespec_is_over(p_client->list_cmds->end_time))
+			{
+				// exec cmd.
+				p_client->list_cmds->on_end(serv, p_client, p_client->list_cmds->param);
+				clean_clients_first_cmd(p_client);
+			}
 		}
 		p_client = p_client->next;
 	}
-	return (lower_time_end);
+	return (NULL);
+}
+
+/*
+**	Helper function: cleans the first node from the client's cmd chained list.
+*/
+
+void	clean_clients_first_cmd(t_client_entity *p_client)
+{
+	t_list_cmds_entity		*cmd_to_free; // stock ptr to free.
+
+	if (p_client->list_cmds->param)
+		free(p_client->list_cmds->param);
+	cmd_to_free = p_client->list_cmds;
+	p_client->list_cmds = p_client->list_cmds->next;
+	p_client->size_list_cmds -= 1;
+	free(cmd_to_free);
 }

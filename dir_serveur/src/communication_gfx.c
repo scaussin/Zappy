@@ -107,7 +107,7 @@ void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
 				cmd, nb_of_parsed_chars) == 0)
 			{
 				// -> Direct execution of cmds.
-				serv->cmd_hdl.gfx_cmd_match_table[i].func(serv, gfx_client, cmd);
+				serv->cmd_hdl.gfx_cmd_match_table[i].on_end(serv, gfx_client, cmd);
 				return ;
 			}
 			i++;

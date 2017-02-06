@@ -19,8 +19,8 @@ void	check_players_events(t_serveur *serv)
 			&& !cur_client->is_disconnecting)
 		{
 			check_player_life(serv, cur_client);
-			check_player_incantation_end(serv, cur_client);
-			check_player_laying_egg_end(serv, cur_client);
+			// check_player_incantation_end(serv, cur_client);
+			// check_player_laying_egg_end(serv, cur_client);
 		}
 		cur_client = cur_client->next;
 	}
@@ -54,6 +54,7 @@ void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 	}
 }
 
+// Now executed in cmd incantation endpoint on_end_cmd_fork();
 void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 {
 	char	*client_msg;
@@ -77,6 +78,7 @@ void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 			// send gfx: "pie X Y R\n" for incantation leader only
 			if (cur_client->player.is_incanter)
 			{
+				cur_client->player.is_incanter = 0;
 				asprintf(&gfx_msg, "pie %d %d %d\n",
 					cur_client->player.pos.x, cur_client->player.pos.y, 1);
 				push_gfx_msg(serv, gfx_msg);
@@ -107,6 +109,7 @@ void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
 }
 
 
+// Now executed in cmd fork endpoint on_end_cmd_fork();
 void	check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client)
 {
 	//char	*client_msg;

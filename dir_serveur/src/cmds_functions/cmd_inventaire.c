@@ -1,8 +1,28 @@
 #include "../../includes/serveur.h"
 
+int		on_start_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	(void)	serv;
+
+	if (param)
+	{
+		printf(KMAG "Bad format to cmd [inventaire] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return (-1);
+	}
+	return (0);
+}
+
+void	on_end_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	// exec command
+	cmd_inventaire(serv, client_cur, param);
+}
+
 void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
 {
 	(void)				serv;
+	(void)				param;
 	t_player			*cur_player;
 	char				*msg;
 	long				nsec_left;
@@ -11,12 +31,7 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 	struct timespec		now;
 
 	cur_player = &(client_cur->player);
-	if (param)
-	{
-		printf(KMAG "Bad format to cmd [inventaire] "
-					"from sock %d\n" KRESET, client_cur->sock);
-		return ;
-	}
+	
 	// we set the time at food - 1 for the untouched food
 	time_left = (cur_player->inventory[FOOD] - 1) * FOOD_LIFE_TIME;
 

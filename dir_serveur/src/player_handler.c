@@ -1,7 +1,7 @@
 #include "../includes/serveur.h"
 
 /*
-** This file contains the functions to handle clients' players.
+** This file contains functions to handle clients' players.
 */
 
 /*

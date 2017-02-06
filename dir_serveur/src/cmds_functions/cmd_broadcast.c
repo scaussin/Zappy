@@ -1,10 +1,33 @@
 #include "../../includes/serveur.h"
 
+int     on_start_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+    char                    *msg;
+
+    if (!regex_match(param, "^[a-zA-Z0-9 ]+\n$"))
+    {
+        printf(KMAG "Bad format to cmd [broadcast] "
+                    "from sock %d\n" KRESET, client_cur->sock);
+        return (-1);
+    }
+    // gfx msg
+    asprintf(&msg, "pbc #%d \n",client_cur->sock);
+    push_gfx_msg(serv, msg);
+    free(msg);
+    return (0);
+}
+
+void    on_end_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+    cmd_broadcast(serv, client_cur, param);
+    write_buffer(&client_cur->buff_send, "ok\n", 3);
+}
+
 void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
 	(void)serv;
 	(void)client_cur;
-	char					*msg;
+
 	t_player				*cur_player;
 	int						provenance;
 	char					*msg_client;
@@ -12,15 +35,6 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
-	if (!regex_match(param, "^[a-zA-Z0-9 ]+\n$"))
-	{
-		printf(KMAG "Bad format to cmd [broadcast] "
-					"from sock %d\n" KRESET, client_cur->sock);
-		return ;
-	}
-	asprintf(&msg, "pbc #%d \n",client_cur->sock);
-	push_gfx_msg(serv, msg);
-	free(msg);
 	while (list_clients)
 	{
 		if (list_clients->is_in_game == 1
@@ -28,22 +42,19 @@ void	cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, char *param)
 			&& list_clients->is_disconnecting == 0
 			&& &(list_clients->player) != cur_player)
 		{
-			//calcul dou provient le son
+			//calcul d'où provient le son
 			provenance = provenance_son(serv->world_hdl.map_x, serv->world_hdl.map_y, cur_player->pos.x, cur_player->pos.y,
 				list_clients->player.pos.x , list_clients->player.pos.y);
 			provenance = provenance_with_dir(provenance,list_clients->player.dir);
-
 
 			//asprintf(&msg_client, "message %d,%s, tu es en %d , %d\n, tu regardes vers %d",provenance, arg, list_clients->player.pos.x, list_clients->player.pos.y, list_clients->player.dir);
 			asprintf(&msg_client, "message %d,%s",provenance, param);
 			write_buffer(&list_clients->buff_send, msg_client, strlen(msg_client));
 			free(msg_client);
 			msg_client = NULL;
-			
 		}	
 		list_clients = list_clients->next;
 	}
-		write_buffer(&client_cur->buff_send, "ok\n", 3);
 }
 
 double provenance_with_dir(int provenance, int dir)
