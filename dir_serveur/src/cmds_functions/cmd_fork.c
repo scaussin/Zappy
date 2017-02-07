@@ -17,7 +17,6 @@ int		on_start_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param
 		return (-1);
 	}
 	printf(KGRN "[Serveur]: player #%d laying egg ... \n" KRESET, client_cur->sock);
-	cmd_fork(serv, client_cur, param);
 	// gfx msg : "pfk #n\n"
 	asprintf(&gfx_msg, "pfk #%d\n", client_cur->sock);
 	push_gfx_msg(serv, gfx_msg);
@@ -37,11 +36,4 @@ void	on_end_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param)
 	asprintf(&gfx_msg, "enw #%d\n", client_cur->sock);
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
-}
-
-void	cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param)
-{
-	(void)			param;
-	(void)			serv;
-	(void)			client_cur;
 }

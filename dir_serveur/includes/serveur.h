@@ -72,7 +72,7 @@
 # define EGG_HATCH_TIME 5			// default 600
 
 /*
-**	cmd time defines (useful for testings)
+**	cmd time defines
 */
 
 # define MOVE_CMDS_TIME 1			// default 7
@@ -81,8 +81,8 @@
 # define ITEM_CMD_TIME 7			// default 7
 # define EXPULSE_CMD_TIME 7			// default 7
 # define BROADCAST_CMD_TIME 7		// default 7
-# define INCANTATION_CMD_TIME 5		// default 300
-# define FORK_CMD_TIME 1			// default 42
+# define INCANTATION_CMD_TIME 300	// default 300
+# define FORK_CMD_TIME 42			// default 42 == egg laying time
 # define CONNECT_NBR_CMD_TIME 0		// default 0
 
 /*
@@ -592,7 +592,6 @@ void							set_players_incanting(t_serveur *serv, t_client_entity *cur_client);
 void							strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *target_res);
 
 int							on_start_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
-void						cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						on_end_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param);
 
 int							on_start_cmd_connect_nbr(t_serveur *serv, t_client_entity *client_cur, char *param);

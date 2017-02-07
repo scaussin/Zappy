@@ -101,7 +101,7 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 
 /*
 **	For each player, executes the start point then the endpoint of the current cmd.
-**	If the start point fails (mainly player input error), the end point is canceled.
+**	If the start point fails for various reasons, the end point is canceled.
 */
 
 struct timespec	*exec_cmd_client(t_serveur *serv)
