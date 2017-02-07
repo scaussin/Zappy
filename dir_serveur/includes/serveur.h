@@ -68,8 +68,8 @@
 
 # define NB_RESSOURCES 7
 
-# define FOOD_LIFE_TIME 3000		// default 126
-# define EGG_HATCH_TIME 5			// default 600
+# define FOOD_LIFE_TIME 126		// default 126
+# define EGG_HATCH_TIME 600		// default 600
 
 /*
 **	cmd time defines

@@ -85,7 +85,15 @@ void manage_clients_input(t_serveur *serv)
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (p_client->buff_recv.len > 0) // is there something to read ?
+		// must be checked even if there is nothing to read.
+		if (p_client->is_player_dead)
+		{
+			// we must wait for the client to receive "mort\n" before
+			// disconnecting him. Must be done here to have a turn of communication.
+			p_client->is_disconnecting = 1;
+		}
+		// now, is there something to read ?
+		if (p_client->buff_recv.len > 0)
 		{
 			if (!p_client->is_in_game && !p_client->is_gfx && !p_client->is_player_dead)
 			{
@@ -98,12 +106,6 @@ void manage_clients_input(t_serveur *serv)
 			{
 				// client is in game and not gfx and not dead, everything he sends is cmds.
 				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
-			}
-			else if (p_client->is_player_dead)
-			{
-				// we must wait for the client to receive "mort\n" before
-				// disconnecting him.
-				p_client->is_disconnecting = 1;
 			}
 			else if (p_client->is_gfx)
 			{

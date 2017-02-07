@@ -88,7 +88,6 @@ void	add_cmd(t_client_entity *client, t_cmd_match *cmd, char *param)
 		client->list_cmds = new_cmd;
 	else
 	{
-
 		last = client->list_cmds;
 		while (last && last->next)
 		{

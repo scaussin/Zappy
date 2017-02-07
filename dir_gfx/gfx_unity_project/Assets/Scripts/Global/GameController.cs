@@ -153,6 +153,7 @@ public class GameController : MonoBehaviour {
 	public void OnServerShutdown()
 	{
 		ActivateMainMenuInput();
+		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
@@ -269,7 +270,7 @@ public class GameController : MonoBehaviour {
 
 	public void OnPlayerTakeRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerDropRessource (msg);
+		GameManager.instance.WorldManager.PlayerController.PlayerTakeRessource (msg);
 	}
 
 	public void OnPlayerLayedEgg(string msg)

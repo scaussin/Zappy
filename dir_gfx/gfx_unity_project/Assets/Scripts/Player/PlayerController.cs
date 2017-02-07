@@ -210,6 +210,29 @@ public class PlayerController : MonoBehaviour {
 
 	public void PlayerTakeRessource(string msg)
 	{
-		Debug.Log ("TODO: player take ressource");
+		rgx = new Regex ("^pdr #(\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("ArmAction");
+					return ;
+				}
+			}
+		}
+	}
+
+	public void CleanMapOfPlayers()
+	{
+		foreach (PlayerObject player in Players)
+		{
+			Destroy (player.gameObject);
+		}
+		Players.Clear ();
 	}
 }

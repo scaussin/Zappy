@@ -55,6 +55,7 @@ void check_eggs(t_serveur *serv)
 				if (timespec_is_over(egg_tmp->hatch_time) == 1) // eclosion time, egg!
 				{
 					egg_tmp->has_hatched = 1;
+					// egg increases nb of team slots(limited to define)
 					if (serv->settings_hdl.are_teams_growing == B_TRUE)
 					{
 						if (egg_tmp->team->available_slots < MAX_NB_OF_CLIENTS_PER_TEAM)
@@ -88,6 +89,11 @@ void check_eggs(t_serveur *serv)
 			{
 				if (timespec_is_over(egg_tmp->death_time) == 1)
 				{
+					// egg death takes out slot.
+					if (serv->settings_hdl.are_teams_growing == B_TRUE)
+					{
+						egg_tmp->team->available_slots -= 1;
+					}
 					// gfx egg death "edi #e\n"
 					asprintf(&gfx_msg, "edi #%d\n", egg_tmp->egg_nb);
 					push_gfx_msg(serv, gfx_msg);

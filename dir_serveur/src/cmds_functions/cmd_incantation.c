@@ -17,8 +17,6 @@ void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *
 	char	*gfx_msg;
 	int		*target_res;
 
-
-	printf(KGRN "[Server]: Incantation ending.\n");
 	// if incantation can be interrupted, recheck the conditions at the end,
 	// then strip the case of the resources.
 	if (serv->settings_hdl.can_interrupt_incantation == B_TRUE)
@@ -45,7 +43,6 @@ void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *
 		asprintf(&gfx_msg, "pie %d %d %d\n",
 			client_cur->player.pos.x, client_cur->player.pos.y, 1);
 	}
-	serv->world_hdl.nb_of_incantations -= 1;
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
 	
@@ -69,8 +66,6 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 	target_res = set_incantation_target_res(cur_player->level);
 	if (are_incantation_cdts_ok(serv, cur_player, target_res))
 	{
-		
-
 		serv->world_hdl.nb_of_incantations += 1;
 		cur_player->incantation_id = serv->world_hdl.nb_of_incantations;
 		printf(KGRN "[Server]: Incantation #%d starting ...\n", cur_player->incantation_id);
@@ -91,7 +86,6 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 	else
 	{
 		write_buffer(&client_cur->buff_send, "ko\n", 3);
-		//get_time(&client_cur->delay_time);
 		free(target_res);
 		return (-1);
 	}
@@ -206,6 +200,7 @@ void	set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
 			&& clients_tmp->player.pos.y == cur_player->pos.y
 			&& clients_tmp->player.level == cur_player->level)
 		{
+
 			// send "elevation en cours" to all concerned clients.
 			write_buffer(&clients_tmp->buff_send, client_msg, client_msg_len);
 			// cat player's sock value at each loop turn.
@@ -241,7 +236,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	t_player			*incanter_player;
 	char				*msg;
 
-	printf("incantation finishes\n");
+	printf(KGRN "[Server]: Incantation #%d ending.\n", cur_client->player.incantation_id);
 	clients_tmp = serv->client_hdl.list_clients;
 	incanter_player = &cur_client->player;
 	while (clients_tmp)
@@ -276,7 +271,6 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 		}
 		clients_tmp = clients_tmp->next;
 	}
-	printf("other player check done\n");
 	// Incanter must be lvled up separately and after the others.
 	// Because modifiying his datas makes the upper loop impossible.
 	if (result == 1)

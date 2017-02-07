@@ -39,6 +39,24 @@ void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 	{
 		cur_client->is_player_dead = 1;
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
+
+		// TODO: team slot now available;
+		// if (serv->settings_hdl.are_teams_growing == B_TRUE)
+		// {
+		// 	if (cur_client->team->available_slots < serv->team_hdl.nb_teams_slots)
+		// 	{
+		// 		cur_client->team->available_slots += 1;
+		// 	}
+		// 	else
+		// 	{
+		// 		cur_client->team->available_slots -= 1;
+		// 	}
+		// }
+		// else
+		// {
+		// 	cur_client->team->available_slots += 1;
+		// }
+
 		// we do not disconnect him right away cause we want to send it "mort\n"
 		write_buffer(&cur_client->buff_send, "mort\n", 5);
 		printf(KMAG "player %d died: death by hunger\n" KRESET, cur_client->sock);
