@@ -17,37 +17,17 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 {
 	char				*msg;
 	t_client_entity		*tmp_client;
-	// int				y;
-	//int				x;
-	//t_world_case	**world_board;
-
 	
-	// ------------------------------------	//
-	// sending World size					//
-	// ------------------------------------	//
-	// "msz X Y\n"
+	// sending World size
 	gfx_cmd_msz(serv, gfx_client, "msz\n");
-
-	// ------------------------------------	//
-	// sending server time unit				//
-	// ------------------------------------	//
-	// "sgt T\n"
+	// sending server time unit
 	gfx_cmd_sgt(serv, gfx_client, "sgt\n");
-
-	// ------------------------------------	//
-	// Sending map content					//
-	// ------------------------------------	//
+	// Sending map content
 	// "bct X Y q q q q q q q\n" * nbr_cases
 	gfx_cmd_mct(serv, gfx_client, "mct\n");
-
-	// ------------------------------------	//
-	// Sending team names					//
-	// ------------------------------------	//
+	// Sending team names
 	gfx_cmd_tna(serv, gfx_client, "tna\n");
-
-	// ------------------------------------	//
-	// Sending currently connected players	//
-	// ------------------------------------	//
+	// Sending currently connected players
 	tmp_client = serv->client_hdl.list_clients;
 	while (tmp_client)
 	{

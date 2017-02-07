@@ -55,6 +55,19 @@ void check_eggs(t_serveur *serv)
 				if (timespec_is_over(egg_tmp->hatch_time) == 1) // eclosion time, egg!
 				{
 					egg_tmp->has_hatched = 1;
+					if (serv->settings_hdl.are_teams_growing == B_TRUE)
+					{
+						if (egg_tmp->team->available_slots < MAX_NB_OF_CLIENTS_PER_TEAM)
+							egg_tmp->team->available_slots += 1;
+						else // hidden limit for nb of client per team.
+						{
+							printf(KMAG "[Serveur]: max nb of client reached for team %s\n" KRESET,
+								egg_tmp->team->name);
+							clear_egg(serv, egg_tmp);
+							return ;
+						}
+					}
+
 					// set the death time the same as a player. 10 * food.
 					get_time(&egg_tmp->death_time);
 					add_nsec_to_timespec(&egg_tmp->death_time,

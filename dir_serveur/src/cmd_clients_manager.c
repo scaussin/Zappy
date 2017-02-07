@@ -110,32 +110,41 @@ struct timespec	*exec_cmd_client(t_serveur *serv)
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
-	{
+	{	
 		// execute start point of first cmd
 		if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_FALSE)
 		{
-			if (p_client->list_cmds->on_start(serv, p_client, p_client->list_cmds->param) != -1)
+			if (p_client->player.is_incanting == B_FALSE) // incanting player == blocked.
 			{
-				p_client->list_cmds->cmd_started = B_TRUE;
-				
-				// set end time of cmd for launching endpoint.
-				get_time(&p_client->list_cmds->end_time);
-				add_nsec_to_timespec(&p_client->list_cmds->end_time,
-					p_client->list_cmds->duration_cmd
-					* serv->world_hdl.t_unit * 1000000000);
-			}
-			else
-			{
-				clean_clients_first_cmd(p_client);
+				if (p_client->list_cmds->on_start(serv, p_client, p_client->list_cmds->param) != -1)
+				{
+					p_client->list_cmds->cmd_started = B_TRUE;
+
+					// set end time of cmd for launching endpoint.
+					get_time(&p_client->list_cmds->end_time);
+					add_nsec_to_timespec(&p_client->list_cmds->end_time,
+						p_client->list_cmds->duration_cmd
+						* serv->world_hdl.t_unit * 1000000000);
+				}
+				else
+				{
+					clean_clients_first_cmd(p_client);
+				}
 			}
 		}
-		else if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_TRUE) // cmd started, now look for end point time;
+		// execute end point of started first cmd.
+		else if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_TRUE)
 		{
-			if (timespec_is_over(p_client->list_cmds->end_time))
+			// incanting player cant exec on_end. but incanter can.
+			if (p_client->player.is_incanting == B_FALSE)
 			{
-				// exec cmd.
-				p_client->list_cmds->on_end(serv, p_client, p_client->list_cmds->param);
-				clean_clients_first_cmd(p_client);
+				// cmd started and not incanting, now look for end point time;
+				if (timespec_is_over(p_client->list_cmds->end_time))
+				{
+					// exec cmd.
+					p_client->list_cmds->on_end(serv, p_client, p_client->list_cmds->param);
+					clean_clients_first_cmd(p_client);
+				}
 			}
 		}
 		p_client = p_client->next;

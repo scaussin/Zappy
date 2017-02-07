@@ -58,5 +58,5 @@ void	init_serveur(t_serveur *serv)
 	// Set default games rules/mechanics
 	serv->settings_hdl.is_pickup_instant = 1;
 	serv->settings_hdl.can_interrupt_incantation = 0;
-	serv->settings_hdl.are_teams_infinite = 1;
+	serv->settings_hdl.are_teams_growing = 1;
 }

@@ -63,11 +63,31 @@
 **	Game defines
 */
 
+# define MAX_NB_OF_TEAM 10
+# define MAX_NB_OF_CLIENTS_PER_TEAM 20
+
 # define NB_RESSOURCES 7
-# define FOOD_LIFE_TIME 3000
-# define INCANTATION_TIME 300
-# define EGG_HATCH_TIME 600
-# define EGG_LAYING_TIME 42
+
+# define FOOD_LIFE_TIME 3000		// default 126
+# define EGG_HATCH_TIME 5			// default 600
+
+/*
+**	cmd time defines (useful for testings)
+*/
+
+# define MOVE_CMDS_TIME 1			// default 7
+# define VOIR_CMD_TIME 7			// default 7
+# define INVENTAIRE_CMD_TIME 1		// default 1
+# define ITEM_CMD_TIME 7			// default 7
+# define EXPULSE_CMD_TIME 7			// default 7
+# define BROADCAST_CMD_TIME 7		// default 7
+# define INCANTATION_CMD_TIME 5		// default 300
+# define FORK_CMD_TIME 1			// default 42
+# define CONNECT_NBR_CMD_TIME 0		// default 0
+
+/*
+**	victory conditions
+*/
 
 # define MAX_LV 8
 # define VICTORY_CDT_PLAYER_NB 6
@@ -94,7 +114,7 @@ typedef struct				s_game_settings
 {
 	int						is_pickup_instant;
 	int						can_interrupt_incantation;
-	int						are_teams_infinite;
+	int						are_teams_growing;
 }							t_game_settings;
 
 /*
@@ -182,10 +202,6 @@ typedef struct				s_player
 	int						is_incanting;
 	int						is_incanter;
 	int						incantation_id;
-	struct timespec			incantation_end_time;
-
-	int						is_laying_egg;
-	struct timespec			egg_layed_time;
 }							t_player;
 
 /*
@@ -474,8 +490,8 @@ void						check_world_events(t_serveur *serv);
 void						check_players_events(t_serveur *serv);
 void						check_eggs(t_serveur *serv);
 void						check_player_life(t_serveur *serv, t_client_entity *cur_client);
-void						check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
-void						check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
+//void						check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
+//void						check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
 void						check_victory(t_serveur *serv);
 
 /*
@@ -569,7 +585,7 @@ double							provenance_with_dir(int provenance, int dir);
 int							on_start_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
 int								init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param);
-void							finish_incantation(t_serveur *serv, t_client_entity *cur_client);
+void							finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result);
 int								*set_incantation_target_res(int plevel);
 int								are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player, int *target_res);
 void							set_players_incanting(t_serveur *serv, t_client_entity *cur_client);

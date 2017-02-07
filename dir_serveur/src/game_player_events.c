@@ -55,79 +55,79 @@ void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 }
 
 // Now executed in cmd incantation endpoint on_end_cmd_fork();
-void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
-{
-	char	*client_msg;
-	char	*gfx_msg;
+// void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
+// {
+// 	char	*client_msg;
+// 	char	*gfx_msg;
 
-	if (cur_client->player.is_incanting == 1)
-	{
-		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
-		{
-			cur_client->player.is_incanting = 0;
-			// updates team and player level.
-			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
-			cur_client->player.level += 1;
-			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
+// 	if (cur_client->player.is_incanting == 1)
+// 	{
+// 		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
+// 		{
+// 			cur_client->player.is_incanting = 0;
+// 			// updates team and player level.
+// 			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
+// 			cur_client->player.level += 1;
+// 			cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
 			
-			// send client: "niveau actuel : K"
-			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);
-			write_buffer(&cur_client->buff_send, client_msg, strlen(client_msg));
-			free(client_msg);
+// 			// send client: "niveau actuel : K"
+// 			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);
+// 			write_buffer(&cur_client->buff_send, client_msg, strlen(client_msg));
+// 			free(client_msg);
 
-			// send gfx: "pie X Y R\n" for incantation leader only
-			if (cur_client->player.is_incanter)
-			{
-				cur_client->player.is_incanter = 0;
-				asprintf(&gfx_msg, "pie %d %d %d\n",
-					cur_client->player.pos.x, cur_client->player.pos.y, 1);
-				push_gfx_msg(serv, gfx_msg);
-				free(gfx_msg);
-			}
+// 			// send gfx: "pie X Y R\n" for incantation leader only
+// 			if (cur_client->player.is_incanter)
+// 			{
+// 				cur_client->player.is_incanter = 0;
+// 				asprintf(&gfx_msg, "pie %d %d %d\n",
+// 					cur_client->player.pos.x, cur_client->player.pos.y, 1);
+// 				push_gfx_msg(serv, gfx_msg);
+// 				free(gfx_msg);
+// 			}
 
-			// send gfx : "plv #n L\n"
-			asprintf(&gfx_msg, "plv #%d %d\n",
-				cur_client->sock, cur_client->player.level);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
+// 			// send gfx : "plv #n L\n"
+// 			asprintf(&gfx_msg, "plv #%d %d\n",
+// 				cur_client->sock, cur_client->player.level);
+// 			push_gfx_msg(serv, gfx_msg);
+// 			free(gfx_msg);
 
-			// gfx world block ressource update.
-			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				cur_client->player.pos.x,
-				cur_client->player.pos.y,
-				cur_client->player.cur_case->ressources[FOOD],
-				cur_client->player.cur_case->ressources[LINEMATE],
-				cur_client->player.cur_case->ressources[DERAUMERE],
-				cur_client->player.cur_case->ressources[SIBUR],
-				cur_client->player.cur_case->ressources[MENDIANE],
-				cur_client->player.cur_case->ressources[PHIRAS],
-				cur_client->player.cur_case->ressources[THYSTAME]);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
-		}
-	}
-}
+// 			// gfx world block ressource update.
+// 			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
+// 				cur_client->player.pos.x,
+// 				cur_client->player.pos.y,
+// 				cur_client->player.cur_case->ressources[FOOD],
+// 				cur_client->player.cur_case->ressources[LINEMATE],
+// 				cur_client->player.cur_case->ressources[DERAUMERE],
+// 				cur_client->player.cur_case->ressources[SIBUR],
+// 				cur_client->player.cur_case->ressources[MENDIANE],
+// 				cur_client->player.cur_case->ressources[PHIRAS],
+// 				cur_client->player.cur_case->ressources[THYSTAME]);
+// 			push_gfx_msg(serv, gfx_msg);
+// 			free(gfx_msg);
+// 		}
+// 	}
+// }
 
 
-// Now executed in cmd fork endpoint on_end_cmd_fork();
-void	check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client)
-{
-	//char	*client_msg;
-	char	*gfx_msg;
+// // Now executed in cmd fork endpoint on_end_cmd_fork();
+// void	check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client)
+// {
+// 	//char	*client_msg;
+// 	char	*gfx_msg;
 
-	if (cur_client->player.is_laying_egg == 1)
-	{
-		if (timespec_is_over(cur_client->player.egg_layed_time) == 1)
-		{
+// 	if (cur_client->player.is_laying_egg == 1)
+// 	{
+// 		if (timespec_is_over(cur_client->player.egg_layed_time) == 1)
+// 		{
 
-			cur_client->player.is_laying_egg = 0;
-			// the egg will be created and added to the event check.
-			add_new_egg(serv, cur_client);
-			// send gfx: "enw #e #n X Y\n"
-			asprintf(&gfx_msg, "enw #%d\n", cur_client->sock);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
+// 			cur_client->player.is_laying_egg = 0;
+// 			// the egg will be created and added to the event check.
+// 			add_new_egg(serv, cur_client);
+// 			// send gfx: "enw #e #n X Y\n"
+// 			asprintf(&gfx_msg, "enw #%d\n", cur_client->sock);
+// 			push_gfx_msg(serv, gfx_msg);
+// 			free(gfx_msg);
 
-		}
-	}
-}
+// 		}
+// 	}
+// }

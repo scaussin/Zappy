@@ -29,7 +29,7 @@ void	add_new_egg(t_serveur *serv, t_client_entity *client)
 
 	new_egg->next = NULL;
 	printf(KGRN "[Serveur]: player #%d layed egg #%d\n" KRESET, client->sock, new_egg->egg_nb);
-	
+
 	// add t_egg node to chained list of eggs.
 	if (serv->world_hdl.eggs == NULL)
 	{
