@@ -12,6 +12,7 @@ void	gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 	char	*gfx_msg;
 	int		new_t;
 	char	*arg;
+	float	old_t_unit;
 
 	if (!regex_match(param, "^sst [0-9]+\n$"))
 	{
@@ -34,8 +35,10 @@ void	gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 	}
 
 	// Change serveur time unit!
+	old_t_unit = serv->world_hdl.t_unit;
 	serv->world_hdl.t_unit = (float)(1.0 / new_t);
-	
+	// for each ongoing command, update their end time.
+	refresh_times(serv, old_t_unit);
 	// send answer to gfx.
 	asprintf(&gfx_msg, "sgt %f\n", serv->world_hdl.t_unit);
 	push_gfx_msg(serv, gfx_msg);

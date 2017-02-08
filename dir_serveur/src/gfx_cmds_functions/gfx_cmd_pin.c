@@ -11,11 +11,8 @@ void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 	t_client_entity		*client_tmp;
 	char				*gfx_msg;
 
-	// for time left;
-	long				nsec_left;
+
 	long				time_left;
-	struct timespec		timespec_life_left;
-	struct timespec		now;
 
 	if (!regex_match(param, "^pin #[0-9]+\n$"))
 	{
@@ -45,22 +42,7 @@ void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 			&& !client_tmp->is_disconnecting)
 		{
 			// client found
-
-		// Calculating the food as time value ------------------------------- //
-			// we set the time at food - 1 for the untouched food
-			time_left = (client_tmp->player.inventory[FOOD] - 1) * FOOD_LIFE_TIME;
-
-			// now we want the status of the current food.
-			get_time(&now);
-			timespec_life_left = timespec_diff(&now, &client_tmp->player.next_dinner_time);
-
-			// Time conversion to nanoseconds for precise time remaining.
-			nsec_left = convert_timespec_to_nsec(timespec_life_left);
-
-			// calculation to turn remaining time into (int)t_unit time.
-			time_left += (int)roundf((float)(nsec_left / (float)1000000000) / serv->world_hdl.t_unit);
-		// END -------------------------------- //
-
+			time_left = get_food_as_time(serv, client_tmp);
 			// send inventaire "pin #n X Y q q q q q q q\n"
 			asprintf(&gfx_msg, "pin #%d %d %d %ld %d %d %d %d %d %d\n",
 			client_tmp->sock,

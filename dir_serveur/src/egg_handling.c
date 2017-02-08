@@ -106,3 +106,39 @@ void	clear_egg(t_serveur *serv, t_egg *egg)
 					KRESET, egg->egg_nb);
 	}
 }
+
+/*
+**	refresh the time of hatch for all the eggs unhatched on the serv.
+**	Used when the time unit is changed during runtime.
+*/
+
+void	refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit)
+{
+	t_egg				*egg_tmp;
+	long				time_left;
+	long				nsec_left;
+	struct timespec		now;
+	struct timespec		timespec_life_left;
+
+	if (serv->world_hdl.eggs) // any eggs spawned on the world ?
+	{
+		egg_tmp = serv->world_hdl.eggs;
+		while (egg_tmp)
+		{
+			if (egg_tmp->has_hatched == 0)
+			{
+				get_time(&now);
+				timespec_life_left = timespec_diff(&now, &egg_tmp->hatch_time);
+
+				// Time conversion to nanoseconds for precise time remaining.
+				nsec_left = convert_timespec_to_nsec(timespec_life_left);
+				time_left = (long)roundf((float)(nsec_left / (float)1000000000) * (1 / old_t_unit));
+
+				// reset hatch time.
+				get_time(&egg_tmp->hatch_time);
+				add_nsec_to_timespec(&egg_tmp->hatch_time,
+					time_left * 1000000000 * serv->world_hdl.t_unit);
+			}
+		}
+	}
+}

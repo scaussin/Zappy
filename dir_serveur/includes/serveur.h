@@ -68,7 +68,7 @@
 
 # define NB_RESSOURCES 7
 
-# define FOOD_LIFE_TIME 126		// default 126
+# define FOOD_LIFE_TIME 1260		// default 126
 # define EGG_HATCH_TIME 600		// default 600
 
 /*
@@ -474,6 +474,7 @@ void						client_authenticate_player(t_serveur *serv, t_client_entity *client, c
 
 void						assign_random_player_position(t_serveur *serv, t_player *player);
 void						assign_player_time_of_dinner(t_serveur *serv, t_player *player);
+long						get_food_as_time(t_serveur *serv, t_client_entity *client);
 
 /*
 ** team_hdl.c
@@ -490,9 +491,12 @@ void						check_world_events(t_serveur *serv);
 void						check_players_events(t_serveur *serv);
 void						check_eggs(t_serveur *serv);
 void						check_player_life(t_serveur *serv, t_client_entity *cur_client);
+void						refresh_player_dinner_time(t_serveur *serv, t_client_entity *client, float old_t_unit);
+
 //void						check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
 //void						check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
 void						check_victory(t_serveur *serv);
+void						refresh_times(t_serveur *serv, float old_t_unit);
 
 /*
 ** cmd_clients_manager.c
@@ -509,6 +513,8 @@ int							compare_cmd(char *s1, char *s2);
 void						clean_clients_first_cmd(t_client_entity *p_client);
 
 struct timespec				*exec_cmd_client(t_serveur *serv);
+
+
 
 /*
 **	Gfx client cmds
@@ -619,6 +625,6 @@ void						gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 void						add_new_egg(t_serveur *serv, t_client_entity *client);
 t_egg						*egg_available(t_serveur *serv, t_client_entity *client);
 void						clear_egg(t_serveur *serv, t_egg *egg);
-
+void						refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit);
 
 #endif
