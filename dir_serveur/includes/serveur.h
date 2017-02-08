@@ -68,14 +68,14 @@
 
 # define NB_RESSOURCES 7
 
-# define FOOD_LIFE_TIME 1260		// default 126
+# define FOOD_LIFE_TIME 126		// default 126
 # define EGG_HATCH_TIME 600		// default 600
 
 /*
 **	cmd time defines
 */
 
-# define MOVE_CMDS_TIME 1			// default 7
+# define MOVE_CMDS_TIME 7			// default 7
 # define VOIR_CMD_TIME 7			// default 7
 # define INVENTAIRE_CMD_TIME 1		// default 1
 # define ITEM_CMD_TIME 7			// default 7
