@@ -13,18 +13,18 @@ ClientBuffer::~ClientBuffer()
 /*
 **	return first cmd whithout end char ('\n').
 */
-std::string ClientBuffer::getFirstMsg()
+string ClientBuffer::getFirstMsg()
 {
-	std::string buff;
+	string buff;
 	char *end;
 	int lenCmd;
 
 	buff = getBuffer();
-	std::size_t found = buff.find(END);
-	if (found != std::string::npos)
+	size_t found = buff.find(END);
+	if (found != string::npos)
 	{
 		buff = buff.substr(0, found + LEN_END);
-		std::size_t lenCmd = buff.size();
+		size_t lenCmd = buff.size();
 		erase(lenCmd);
 	}
 	else
@@ -32,14 +32,14 @@ std::string ClientBuffer::getFirstMsg()
 	return (buff);
 }
 
-void ClientBuffer::pushMsg(std::string msg)
+void ClientBuffer::pushMsg(string msg)
 {
 	pushBuffer((char *)msg.c_str(), msg.size());
 }
 
-std::string ClientBuffer::getBuffer()
+string ClientBuffer::getBuffer()
 {
-	std::string	retBuff(len, 0);
+	string	retBuff(len, 0);
 	int			i;
 
 	if (len > 0)

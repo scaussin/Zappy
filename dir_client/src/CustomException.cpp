@@ -1,5 +1,5 @@
 #include "../includes/Client.hpp"
 
-CustomException::CustomException(const std::string& what_arg) : std::runtime_error(what_arg)
+CustomException::CustomException(const string& what_arg) : runtime_error(what_arg)
 {	
 }

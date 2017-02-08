@@ -2,27 +2,28 @@
 
 ClientController::ClientController(int argc, char **argv)
 {
-	//std::cout << KCYN "Client Controller starting..." KRESET << std::endl;
+	//cout << KCYN "Client Controller starting..." KRESET << endl;
 	try
 	{
 		inputHandler = new ClientInputHandler(argc, argv);
 		player = new ClientPlayer(inputHandler->teamName);
-		communication = new ClientCommunication(inputHandler->hostName, inputHandler->port, player);
+		ia = new ClientIa(player);
+		communication = new ClientCommunication(inputHandler->hostName, inputHandler->port, player, ia);
 	}
 	catch (CustomException &e)
 	{
-		std::cout << KRED << e.what() << KRESET << std::endl;
-		std::cout << std::endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]" << KRESET << std::endl;
+		cout << KRED << e.what() << KRESET << endl;
+		cout << endl << KMAG << "Usage: ./client -n <team> -p <port> [-h <hostname>]" << KRESET << endl;
 		return ;
 	}
 	try
 	{
 		communication->connectToServer();
-		std::cout << KGRN << "connected" << KRESET << std::endl;
+		cout << KGRN << "connected" << KRESET << endl;
 	}
 	catch (CustomException &e)
 	{
-		std::cout << KRED << e.what() << KRESET << std::endl;
+		cout << KRED << e.what() << KRESET << endl;
 		return ;
 	}
 }
@@ -44,7 +45,7 @@ void	ClientController::mainLoop()
 		}
 		catch (CustomException &e)
 		{
-			std::cout << KRED << e.what() << KRESET << std::endl;
+			cout << KRED << e.what() << KRESET << endl;
 			return ;
 		}
 	}

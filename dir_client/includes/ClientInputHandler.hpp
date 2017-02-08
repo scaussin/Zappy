@@ -13,8 +13,8 @@ class ClientInputHandler
 		void			ParseInput(int argc, char **argv);
 		void			FillInput(int argc, char **argv);
 
-		std::string		teamName;
-		std::string		hostName;
+		string		teamName;
+		string		hostName;
 		int				port;
 };
 

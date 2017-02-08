@@ -18,7 +18,8 @@ class ClientController
 		ClientInputHandler		*inputHandler;
 		ClientCommunication		*communication;	// will handle every server related discussion.
 		ClientPlayer			*player;
-		
+		ClientIa				*ia;
+
 	private:
 };
 

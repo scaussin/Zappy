@@ -31,7 +31,7 @@ void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 	{
 		throw (CustomException("Argument 1 (TeamName specifier -n) incorrect"));
 	}
-	if (std::regex_match (argv[2], std::regex("^\\w+")) == false)
+	if (regex_match (argv[2], regex("^\\w+")) == false)
 	{
 		throw (CustomException("Argument 2 (TeamName string) incorrect"));
 	}
@@ -39,7 +39,7 @@ void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 	{
 		throw (CustomException("Argument 3 (Port specifier -p) incorrect"));
 	}
-	if (std::regex_match (argv[4], std::regex("^\\d+")) == false)
+	if (regex_match (argv[4], regex("^\\d+")) == false)
 	{
 		throw (CustomException("Argument 4 (Port number) incorrect"));
 	}
@@ -51,8 +51,8 @@ void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 		{
 			throw (CustomException("Argument 5 (HostName specifier -h) incorrect"));
 		}
-		if (std::regex_match (argv[6], 
-			std::regex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"))
+		if (regex_match (argv[6], 
+			regex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"))
 						 == false)
 		{
 			throw (CustomException("Argument 6 (HostName string) incorrect"));
@@ -69,7 +69,7 @@ void	ClientInputHandler::ParseInput(int argc, char **argv)
 	}
 
 	// Check port number.
-	if (std::stoi(argv[4], NULL, 10) < 1023 || std::stoi(argv[4], NULL, 10) > 65535)
+	if (stoi(argv[4], NULL, 10) < 1023 || stoi(argv[4], NULL, 10) > 65535)
 	{
 		throw (CustomException("Invalid port number [1023 <=> 65535]"));
 	}
@@ -78,7 +78,7 @@ void	ClientInputHandler::ParseInput(int argc, char **argv)
 void	ClientInputHandler::FillInput(int argc, char **argv)
 {
 	teamName = argv[2];
-	port = std::stoi(argv[4], NULL, 10);
+	port = stoi(argv[4], NULL, 10);
 	if (argc == 7)
 		hostName = argv[6];
 	else

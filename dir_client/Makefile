@@ -8,7 +8,7 @@ src/ClientCommunication.cpp \
 src/ClientPlayer.cpp \
 src/CustomException.cpp \
 src/ClientBuffer.cpp \
-src/ClientCommande.cpp \
+src/ClientIa.cpp \
 src/ClientController.cpp
 
 

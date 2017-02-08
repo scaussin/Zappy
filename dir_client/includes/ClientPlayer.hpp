@@ -3,34 +3,36 @@
 
 # include "Client.hpp"
 
-class ClientPlayer : public ClientCommande
+class ClientPlayer
 {
 	public:
-		ClientPlayer(std::string teamName);
+		ClientPlayer(string teamName);
 		~ClientPlayer();
 
 		void						printStat();
 
-		std::string					teamName;
+		string					teamName;
 		int							worldSizeX;
 		int							worldSizeY;
 		int							teamSlots;
 
-		virtual void				avance();
-		virtual void				droite();
-		virtual void				gauche();
-		virtual void				voir();
+		/*void						avance(void (ClientIa::*)(string));
+		void						droite(void (ClientIa::*)(string));
+		void						gauche(void (ClientIa::*)(string));
+		void						voir(void (ClientIa::*)(string));*/
+		//void						inventaire(void (ClientIa::*)(string));
+		void						inventaire();
+		void						setBufferSend(ClientBuffer *buffer);
+
+		
 
 	private:
-		virtual void				avanceCallback(std::string response);
-		virtual void				droiteCallback(std::string response);
-		virtual void				gaucheCallback(std::string response);
-		virtual void				voirCallback(std::string response);
-
 		int							level;
 		int							lifeUnits;
-		std::list<std::string>		inventory;
-		std::list<std::string>		vision;
+		list<string>		inventory;
+		list<string>		vision;
+		ClientBuffer				*bufferSend;
+
 };
 
 #endif

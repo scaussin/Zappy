@@ -7,7 +7,7 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientPlayer::ClientPlayer(std::string _teamName) : teamName(_teamName)
+ClientPlayer::ClientPlayer(string _teamName) : teamName(_teamName)
 {
 	level = 1;
 	lifeUnits = 10;
@@ -17,15 +17,28 @@ ClientPlayer::ClientPlayer(std::string _teamName) : teamName(_teamName)
 ClientPlayer::~ClientPlayer()
 {}
 
+
+
 void	ClientPlayer::printStat()
 {
-	std::cout << KGRN << "Player Game datas:" << KRESET << std::endl;
-	std::cout << "  World size: " << worldSizeX << "x " << worldSizeY << "y " << std::endl;
-	std::cout << "  Team: " << teamName << " - Level: " << level << std::endl;
-	std::cout << "  Life Units: " << lifeUnits << std::endl;
-	std::cout << "  Inventory size: " << inventory.size() << std::endl;
+	cout << KGRN << "Player Game datas:" << KRESET << endl;
+	cout << "  World size: " << worldSizeX << "x " << worldSizeY << "y " << endl;
+	cout << "  Team: " << teamName << " - Level: " << level << endl;
+	cout << "  Life Units: " << lifeUnits << endl;
+	cout << "  Inventory size: " << inventory.size() << endl;
 }
 
+void	ClientPlayer::inventaire()
+{
+	bufferSend->pushMsg("inventaire\n");
+}
+
+void	ClientPlayer::setBufferSend(ClientBuffer *buffer)
+{
+	bufferSend = buffer;
+}
+
+/*
 void	ClientPlayer::avance()
 {
 	bufferSend->pushMsg("avance\n");
@@ -38,6 +51,7 @@ void	ClientPlayer::droite()
 	stackCallbackCommandes.push_back(&ClientCommande::droiteCallback);
 }
 
+
 void	ClientPlayer::gauche()
 {
 	bufferSend->pushMsg("gauche\n");
@@ -48,30 +62,36 @@ void	ClientPlayer::voir()
 {
 	bufferSend->pushMsg("voir\n");
 	stackCallbackCommandes.push_back(&ClientCommande::voirCallback);
+}*/
+/*
+void	ClientPlayer::inventaire(void (ClientIa::*callback)(string))
+{
+	bufferSend->pushMsg("inventaire\n");
+	stackCallbackCommandes.push_back(&ClientCommande::voirCallback);
 }
-
+*/
 /*
 ** Methodes callback
 */
-
-void	ClientPlayer::avanceCallback(std::string response)
+/*
+void	ClientPlayer::avanceCallback(string response)
 {
-	std::cout << "exec avance ok" << std::endl;
+	cout << "exec avance ok" << endl;
 	avance();
 	gauche();
 }
 
-void	ClientPlayer::droiteCallback(std::string response)
+void	ClientPlayer::droiteCallback(string response)
 {
-	std::cout << "exec droite ok" << std::endl;
+	cout << "exec droite ok" << endl;
 }
 
-void	ClientPlayer::gaucheCallback(std::string response)
+void	ClientPlayer::gaucheCallback(string response)
 {
-	std::cout << "exec gauche ok" << std::endl;
+	cout << "exec gauche ok" << endl;
 }
 
-void	ClientPlayer::voirCallback(std::string response)
+void	ClientPlayer::voirCallback(string response)
 {
-	std::cout << "exec voir ok" << std::endl;
-}
+	cout << "exec voir ok" << endl;
+}*/

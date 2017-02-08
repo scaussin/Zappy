@@ -26,13 +26,15 @@
 # define BUFF_SIZE 128
 # define END "\n"
 # define LEN_END 1
+
+using namespace std;
 /*
 // Connection related structure.
 typedef struct			s_CommunicationSettings
 {
-	std::string				TeamName;
+	string				TeamName;
 	int						Port;
-	std::string				HostName;
+	string				HostName;
 
 
 }							t_CommunicationSettings;*/
@@ -43,16 +45,17 @@ class ClientBuffer;
 class ClientCommunication; // communicate with the server.
 class ClientPlayer; // the actual game player.
 class ClientController; // main controller.
+class ClientIa;
 
 
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
-# include "ClientCommande.hpp"
 # include "ClientBuffer.hpp"
 # include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
 # include "ClientController.hpp"
+# include "ClientIa.hpp"
 
 
 // color in text;
