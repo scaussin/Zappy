@@ -10,6 +10,10 @@ public class BlockObject : MonoBehaviour
 	[Header("Object with points of interests")]
 	public GameObject			Points;
 
+	[Header("Block datas")]
+	public int					x;
+	public int					y;
+
 	[Header("Ressources on the case(modified by server)")]
 	public int					FoodUnits = 0;
 	public int					LinemateUnits  = 0;

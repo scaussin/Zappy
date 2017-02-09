@@ -42,23 +42,21 @@ public class ConnectionManager : MonoBehaviour
 
 	//private byte[]					buffer = new byte[4096];
 	private string						retString;
-	private MsgBroadcastController		MsgBroadcastController;
 
 	void Awake()
 	{
-		//OnAuthentificationDone = new UnityEvent ();
+		
 	}
 
 	// Use this for initialization
 	void Start()
 	{
-		MsgBroadcastController = GameManager.instance.MsgBroadcastController;
+		
 	}
 	
 	/// <summary>
 	/// Update this instance. 
-	/// All received messages are sent to the MsgBroadcastController,
-	/// except for the starting authentification dialog.
+	/// All received messages are sent to the MsgBroadcastController.
 	/// </summary>
 	void Update()
 	{
@@ -89,7 +87,7 @@ public class ConnectionManager : MonoBehaviour
 	}
 
 	// to send msg to server, use ConnectionManager.buffer_send.pushMsg(string);
-	// this function will send at the appropriated moment.
+	// the function down there will send at the appropriated moment.
 	private void SendMsg()
 	{
 		int		sizeToSend;
@@ -169,30 +167,6 @@ public class ConnectionManager : MonoBehaviour
 
 
     }
-
-	private void AuthReception(string receivedMsg)
-	{
-		// check if server sent world size
-		Regex rgx = new Regex("^msz (\\d+) (\\d+)\\n");
-
-		Match match = rgx.Match(receivedMsg);
-		if (match.Success && match.Groups.Count == 3)
-		{
-			GroupCollection groups = match.Groups;
-			GameManager.instance.WorldSettings.WorldX = int.Parse(groups[1].Value);
-			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
-
-			Debug.Log ("Success - Received world size - Gfx authentified");
-			IsAuthenticated = true;
-//			OnAuthentificationDone.Invoke ();
-		}
-		else
-		{
-			Debug.Log ("Failure - Received world size incorrect");
-		}
-	}
-    
-
 }
 
 /*

@@ -7,114 +7,14 @@
 void	check_game_events(t_serveur *serv)
 {
 	check_world_events(serv); // no events created for now, but lets keep it in case of.
-	check_players_events(serv);
-	// TODO: check_eggs(); -> for each egg on the ground, check if they hatch or die of hunger.
-	// TODO: check_game_over(); -> a team won, or all players died.
+	check_players_events(serv); // game_player_events.c
+	check_eggs(serv); // -> for each egg on the ground, check if they hatch or die of hunger.
+	check_victory(serv);
 }
 
 /*
-**	Check events that must be check on a "per player" basis.
-**	Reuniting them here allows to make only one run through the players.
-*/
-
-void	check_players_events(t_serveur *serv)
-{
-	t_client_entity		*cur_client;
-
-
-	cur_client = serv->client_hdl.list_clients;
-	while (cur_client)
-	{
-		if (!cur_client->is_gfx 
-			&& cur_client->is_in_game 
-			&& !cur_client->is_player_dead
-			&& !cur_client->is_disconnecting)
-		{
-			check_player_life(serv, cur_client);
-			check_player_incantation_end(serv, cur_client);
-		}
-		cur_client = cur_client->next;
-	}
-}
-
-/*
-**	For current player, we check if he must die of hunger.
-**	At zero, the player dies at ~12.6 sec for 126 of food life time
-**	and t_unit 100.
-*/
-
-void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
-{
-	char				*gfx_msg;
-	if (cur_client->player.inventory[FOOD] == 0) // Works. 
-	{
-		cur_client->is_player_dead = 1;
-		// we do not disconnect him right away cause we want to send it "mort\n"
-		write_buffer(&cur_client->buff_send, "mort\n", 5);
-		printf(KMAG "player %d died: death by hunger\n" KRESET, cur_client->sock);
-		// "pdi #n\n"
-		asprintf(&gfx_msg, "pdi #%d\n", cur_client->sock);
-		push_gfx_msg(serv, gfx_msg);
-		free(gfx_msg);
-	}
-	else if (timespec_is_over(cur_client->player.next_dinner_time) == 1) // updates food in inventory.
-	{
-		cur_client->player.inventory[FOOD] -= 1;
-		assign_player_time_of_dinner(serv, &cur_client->player);
-	}
-}
-
-void	check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client)
-{
-	char	*client_msg;
-	char	*gfx_msg;
-
-	if (cur_client->player.is_incanting == 1)
-	{
-		if (timespec_is_over(cur_client->player.incantation_end_time) == 1)
-		{
-			cur_client->player.is_incanting = 0;
-			cur_client->player.level += 1;
-			
-			// send client: "niveau actuel : K"
-			asprintf(&client_msg, "niveau actuel : %d\n", cur_client->player.level);
-			write_buffer(&cur_client->buff_send, client_msg, strlen(client_msg));
-			free(client_msg);
-
-			// send gfx: "pie X Y R\n" for incantation leader only
-			if (cur_client->player.is_incanter)
-			{
-				asprintf(&gfx_msg, "pie %d %d %d\n",
-					cur_client->player.pos.x, cur_client->player.pos.y, cur_client->player.level);
-				push_gfx_msg(serv, gfx_msg);
-				free(gfx_msg);
-			}
-
-			// send gfx : "plv #n L\n"
-			asprintf(&gfx_msg, "plv #%d %d\n",
-				cur_client->sock, cur_client->player.level);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
-
-			// gfx world block ressource update.
-			asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				cur_client->player.pos.x,
-				cur_client->player.pos.y,
-				cur_client->player.cur_case->ressources[FOOD],
-				cur_client->player.cur_case->ressources[LINEMATE],
-				cur_client->player.cur_case->ressources[DERAUMERE],
-				cur_client->player.cur_case->ressources[SIBUR],
-				cur_client->player.cur_case->ressources[MENDIANE],
-				cur_client->player.cur_case->ressources[PHIRAS],
-				cur_client->player.cur_case->ressources[THYSTAME]);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
-		}
-	}
-}
-
-/*
-**	Will check ongoing events and fire them if it is their time.
+**	Will check ongoing global events and fire them if it is their time.
+**	--> Unused right now.
 */
 
 void	check_world_events(t_serveur *serv)
@@ -137,5 +37,157 @@ void	check_world_events(t_serveur *serv)
 			if (event_tmp) // protect against solo event deleted.
 				event_tmp = event_tmp->next;
 		}
+	}
+}
+
+void	check_eggs(t_serveur *serv)
+{
+	t_egg	*egg_tmp;
+	char	*gfx_msg;
+
+	if (serv->world_hdl.eggs) // any eggs spawned on the world ?
+	{
+		egg_tmp = serv->world_hdl.eggs;
+		while (egg_tmp)
+		{
+			if (egg_tmp->has_hatched == 0)
+			{
+				if (timespec_is_over(egg_tmp->hatch_time) == 1) // eclosion time, egg!
+				{
+					egg_tmp->has_hatched = 1;
+					// egg increases nb of team slots(limited to define)
+					if (serv->settings_hdl.are_teams_growing == B_TRUE)
+					{
+						if (egg_tmp->team->available_slots < MAX_NB_OF_CLIENTS_PER_TEAM)
+							egg_tmp->team->available_slots += 1;
+						else // hidden limit for nb of client per team.
+						{
+							printf(KMAG "[Serveur]: max nb of client reached for team %s\n" KRESET,
+								egg_tmp->team->name);
+							clear_egg(serv, egg_tmp);
+							return ;
+						}
+					}
+
+					// set the death time the same as a player. 10 * food.
+					get_time(&egg_tmp->death_time);
+					add_nsec_to_timespec(&egg_tmp->death_time,
+						FOOD_LIFE_TIME * 10 * serv->world_hdl.t_unit * 1000000000);
+
+					// gfx egg eclosion "eht #e\n"
+					asprintf(&gfx_msg, "eht #%d\n", egg_tmp->egg_nb);
+					push_gfx_msg(serv, gfx_msg);
+					free(gfx_msg);
+
+					printf(KGRN "[Serveur]: egg #%d hatched! "
+								"A player can now connect through the egg.\n" KRESET,
+								egg_tmp->egg_nb);
+				}
+			}
+			else // egg already hatched, check death of egg.
+				//	Only a player connection of the same team will save an egg from death.
+			{
+				if (timespec_is_over(egg_tmp->death_time) == 1)
+				{
+					// egg death takes out slot.
+					if (serv->settings_hdl.are_teams_growing == B_TRUE)
+					{
+						egg_tmp->team->available_slots -= 1;
+					}
+					// gfx egg death "edi #e\n"
+					asprintf(&gfx_msg, "edi #%d\n", egg_tmp->egg_nb);
+					push_gfx_msg(serv, gfx_msg);
+					free(gfx_msg);
+
+					printf(KGRN "[Serveur]: egg #%d died of hunger. " 
+								"Egg removed from server.\n" KRESET, egg_tmp->egg_nb);
+
+					// clear node and restart the check.
+					clear_egg(serv, egg_tmp);
+					egg_tmp = serv->world_hdl.eggs;
+				}
+			}
+			if (egg_tmp)
+				egg_tmp = egg_tmp->next;
+		}
+	}
+}
+
+/*
+**	For each team, check if the nb of player by level is the targeted one.
+**	The team is updated at three moments:
+**	- a player connects([LV1] += 1)
+**	- a player gets a lv([NEW LV] += 1 ; [OLD LV] -= 1)
+**	- a player dies ([LV] -= 1)
+*/
+
+void	check_victory(t_serveur *serv)
+{
+	char	*gfx_msg;
+	int		i;
+
+	i = 0;
+	while (i < serv->team_hdl.nb_teams)
+	{
+		if (serv->team_hdl.array_teams[i]
+			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] == 
+			VICTORY_CDT_PLAYER_NB)
+		{
+			printf(KGRN "Victory condition reached for team %s!\n"KRESET,
+				serv->team_hdl.array_teams[i].name);
+			// TODO: Victory code ?
+			sleep(10); //
+			// gfx send victory "seg N\n"
+			asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
+			push_gfx_msg(serv, gfx_msg);
+			free(gfx_msg);
+		}
+		i++;
+	}
+}
+
+/*
+**	Refresh the time of every ongoing action to be coherent with
+**	server's time unit. Used when the time unit is modified during
+**	runtime.
+*/
+
+void	refresh_times(t_serveur *serv, float old_t_unit)
+{
+	t_client_entity			*p_client;
+	struct timespec			timespec_life_left;
+	struct timespec			now;
+	long					time_left;
+	long					nsec_left;
+
+	p_client = serv->client_hdl.list_clients;
+
+	// refresh all eggs on the serv.
+	refresh_eggs_hatching_time(serv, old_t_unit);
+	while (p_client)
+	{
+		refresh_player_dinner_time(serv, p_client, old_t_unit);
+		
+		// refresh cmd for each player
+		if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_TRUE)
+		{
+			get_time(&now);
+			timespec_life_left = timespec_diff(&now, &p_client->list_cmds->end_time);
+
+			// Time conversion to nanoseconds for precise time remaining.
+			nsec_left = convert_timespec_to_nsec(timespec_life_left);
+			time_left = (long)roundf((float)(nsec_left / (float)1000000000) * (1 / old_t_unit));
+
+			get_time(&p_client->list_cmds->end_time);
+			add_nsec_to_timespec(&p_client->list_cmds->end_time,
+				time_left * 1000000000 * serv->world_hdl.t_unit);
+
+			// debug print checks.
+			// timespec_life_left = timespec_diff(&now, &p_client->list_cmds->end_time);
+			// printf("serveur: real sec left: %ld.%ld\n", timespec_life_left.tv_sec,
+			// 		timespec_life_left.tv_nsec);
+			// printf("serveur: t unit left: %ld.\n", time_left);
+		}
+		p_client = p_client->next;
 	}
 }

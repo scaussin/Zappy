@@ -1,54 +1,96 @@
 #include "../../includes/serveur.h"
 
-void	cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
+int		on_start_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
-	(void)serv;
-	(void)client_cur;
-	(void)param;
+	if (param)
+	{
+		printf(KMAG "Bad format to cmd [incantation] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return (-1);
+	}
+	return (init_incantation(serv, client_cur, param));
+}
+
+void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	(void)	param;
+	char	*gfx_msg;
+	int		*target_res;
+
+	// if incantation can be interrupted, recheck the conditions at the end,
+	// then strip the case of the resources.
+	if (serv->settings_hdl.can_interrupt_incantation == B_TRUE)
+	{
+		target_res = set_incantation_target_res(client_cur->player.level);
+		if (are_incantation_cdts_ok(serv, &client_cur->player, target_res))
+		{
+			finish_incantation(serv, client_cur, 1);
+			strip_case_ressources(serv, client_cur, target_res);
+			asprintf(&gfx_msg, "pie %d %d %d\n",
+				client_cur->player.pos.x, client_cur->player.pos.y, 1);
+		}
+		else
+		{
+			finish_incantation(serv, client_cur, 0);
+			asprintf(&gfx_msg, "pie %d %d %d\n",
+				client_cur->player.pos.x, client_cur->player.pos.y, 0);
+		}
+	}
+	// if not, incantation just finishes, res have already been taken.
+	else
+	{
+		finish_incantation(serv, client_cur, 1);
+		asprintf(&gfx_msg, "pie %d %d %d\n",
+			client_cur->player.pos.x, client_cur->player.pos.y, 1);
+	}
+	push_gfx_msg(serv, gfx_msg);
+	free(gfx_msg);
+	
+}
+
+/*
+**	Launched in the incantation on_start(). Will check if the conditions are OK
+**	for starting incantation. If yes, every concerned player except the incanter
+**	will be set at is_incanting = 1, blocking them until the caster launches
+**	the incantation on_end() function.
+*/
+
+int		init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	(void)			param;
 	t_player		*cur_player;
 	int				*target_res;
 	char			*client_msg;
-
-	/*
-		L’objectif de tous est de s’élever dans la hiérarchie Trantorienne. Ce rituel qui permet
-		d’accroître ses capacités physiques et mentales doit être effectué selon un rite particulier.
-		Il faut en effet réunir sur la même unité de terrain :
-		• une combinaison de pierres,
-		• un certain nombre de joueurs de même niveau.
-		Un joueur débute l’incantation et l’élévation est alors en cours. Il n’est pas nécessaire
-		que les joueurs soient de la même équipe. Seul leur niveau importe. Tous les joueurs du
-		groupe réalisant l’incantation atteignent le niveau supérieur.
-	*/
+	
 	cur_player = &client_cur->player;
 	target_res = set_incantation_target_res(cur_player->level);
 	if (are_incantation_cdts_ok(serv, cur_player, target_res))
 	{
+		serv->world_hdl.nb_of_incantations += 1;
+		cur_player->incantation_id = serv->world_hdl.nb_of_incantations;
+		printf(KGRN "[Server]: Incantation #%d starting ...\n", cur_player->incantation_id);
 		// Set incanter to start incanting;
-		client_cur->player.is_incanting = 1;
 		client_cur->player.is_incanter = 1;
 		client_msg = strdup("elevation en cours\n");
 		write_buffer(&client_cur->buff_send, client_msg, strlen(client_msg));
-
-		// Set incanter delay time.
-		get_time(&client_cur->delay_time);
-		add_nsec_to_timespec(&client_cur->delay_time,
-			INCANTATION_TIME * serv->world_hdl.t_unit * 1000000000);
-		get_time(&client_cur->player.incantation_end_time);
-		add_nsec_to_timespec(&client_cur->player.incantation_end_time,
-			INCANTATION_TIME * serv->world_hdl.t_unit * 1000000000);
 
 		// set every other player on the case.
 		set_players_incanting(serv, client_cur);
 
 		// clean the ressources on the case.
-		strip_case_ressources(serv, client_cur, target_res);
+		if (serv->settings_hdl.can_interrupt_incantation == B_FALSE)
+			strip_case_ressources(serv, client_cur, target_res);
+		free(target_res);
+		return (0);
 	}
 	else
 	{
 		write_buffer(&client_cur->buff_send, "ko\n", 3);
-		get_time(&client_cur->delay_time);
+		free(target_res);
+		return (-1);
 	}
 	free(target_res);
+	return (-1);
 }
 
 /*
@@ -127,8 +169,8 @@ int			are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player, int *target
 }
 
 /*
-**	For each player on the same case as the caster and with same level (including the caster),
-**	set it as incanting = 1, and setting the time at which he will get level += 1.
+**	For each player on the same case as the caster and with same level (NOT including the caster),
+**	set it as incanting = 1, blocking it until the caster launches its incantion endpoint.
 */
 
 void	set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
@@ -151,10 +193,14 @@ void	set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
 	while (clients_tmp)
 	{
 		if (&clients_tmp->player != cur_player
+			&& clients_tmp->player.incantation_id == -1
+			&& clients_tmp->player.is_incanting == B_FALSE
+			&& clients_tmp->player.is_incanter == B_FALSE
 			&& clients_tmp->player.pos.x == cur_player->pos.x
 			&& clients_tmp->player.pos.y == cur_player->pos.y
 			&& clients_tmp->player.level == cur_player->level)
 		{
+
 			// send "elevation en cours" to all concerned clients.
 			write_buffer(&clients_tmp->buff_send, client_msg, client_msg_len);
 			// cat player's sock value at each loop turn.
@@ -165,15 +211,9 @@ void	set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
 
 			// set client time to the future level up.
 			clients_tmp->player.is_incanting = 1;
+			clients_tmp->player.incantation_id = cur_player->incantation_id;
 			// only the leader will send "pie" to the gfx.
 			clients_tmp->player.is_incanter = 0;
-			get_time(&clients_tmp->delay_time);
-			add_nsec_to_timespec(&clients_tmp->delay_time,
-				INCANTATION_TIME * serv->world_hdl.t_unit * 1000000000);
-
-			get_time(&clients_tmp->player.incantation_end_time);
-			add_nsec_to_timespec(&clients_tmp->player.incantation_end_time,
-				INCANTATION_TIME * serv->world_hdl.t_unit * 1000000000);
 		}
 		clients_tmp = clients_tmp->next;
 	}
@@ -181,6 +221,85 @@ void	set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
 	free(gfx_msg);
 	push_gfx_msg(serv, gfx_msg_cat);
 	free(gfx_msg_cat);
+}
+
+/*
+**	For each players on the same incantation as the incanter (including him),
+**	makes the level up.
+**	Lots of checks are made to avoid joining ongoing incantation.
+**	Every incantation have an ID to avoid confusing them.
+*/
+
+void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result)
+{
+	t_client_entity		*clients_tmp;
+	t_player			*incanter_player;
+	char				*msg;
+
+	printf(KGRN "[Server]: Incantation #%d ending.\n", cur_client->player.incantation_id);
+	clients_tmp = serv->client_hdl.list_clients;
+	incanter_player = &cur_client->player;
+	while (clients_tmp)
+	{
+		if (&clients_tmp->player != incanter_player
+			&& clients_tmp->player.pos.x == incanter_player->pos.x
+			&& clients_tmp->player.pos.y == incanter_player->pos.y
+			&& clients_tmp->player.level == incanter_player->level
+			&& clients_tmp->player.is_incanting == 1
+			&& clients_tmp->player.incantation_id == incanter_player->incantation_id)
+		{
+			clients_tmp->player.is_incanting = 0;
+			clients_tmp->player.incantation_id = -1;
+
+			// updates team and player level.
+			if (result == 1)
+			{
+				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] -= 1;
+				clients_tmp->player.level += 1;
+				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] += 1;
+			}
+			// send client: "niveau actuel : K"
+			asprintf(&msg, "niveau actuel : %d\n", clients_tmp->player.level);
+			write_buffer(&clients_tmp->buff_send, msg, strlen(msg));
+			free(msg);
+
+			// send gfx : "plv #n L\n"
+			asprintf(&msg, "plv #%d %d\n",
+				clients_tmp->sock, clients_tmp->player.level);
+			push_gfx_msg(serv, msg);
+			free(msg);
+		}
+		clients_tmp = clients_tmp->next;
+	}
+	// Incanter must be lvled up separately and after the others.
+	// Because modifiying his datas makes the upper loop impossible.
+	if (result == 1)
+	{
+		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
+		cur_client->player.level += 1;
+		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
+
+		// send client: "niveau actuel : K"
+		asprintf(&msg, "niveau actuel : %d\n", cur_client->player.level);
+		write_buffer(&cur_client->buff_send, msg, strlen(msg));
+		free(msg);
+
+		// send gfx : "plv #n L\n"
+		asprintf(&msg, "plv #%d %d\n",
+			cur_client->sock, cur_client->player.level);
+		push_gfx_msg(serv, msg);
+		free(msg);
+	}
+	cur_client->player.incantation_id = -1;
+	cur_client->player.is_incanter = 0;
+	serv->world_hdl.nb_of_incantations -= 1;
+
+	// gfx world block ressource update.
+	asprintf(&msg, "bct %d %d\n",
+		cur_client->player.pos.x,
+		cur_client->player.pos.y);
+	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, msg);
+	free(msg);	
 }
 
 /*
@@ -209,16 +328,9 @@ void strip_case_ressources(t_serveur *serv, t_client_entity *client_cur, int *ta
 	}
 
 	// gfx world block ressource update.
-	asprintf(&gfx_msg, "bct %d %d %d %d %d %d %d %d %d\n",
+	asprintf(&gfx_msg, "bct %d %d\n",
 		client_cur->player.pos.x,
-		client_cur->player.pos.y,
-		client_cur->player.cur_case->ressources[FOOD],
-		client_cur->player.cur_case->ressources[LINEMATE],
-		client_cur->player.cur_case->ressources[DERAUMERE],
-		client_cur->player.cur_case->ressources[SIBUR],
-		client_cur->player.cur_case->ressources[MENDIANE],
-		client_cur->player.cur_case->ressources[PHIRAS],
-		client_cur->player.cur_case->ressources[THYSTAME]);
-	push_gfx_msg(serv, gfx_msg);
+		client_cur->player.pos.y);
+	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, gfx_msg);
 	free(gfx_msg);
 }

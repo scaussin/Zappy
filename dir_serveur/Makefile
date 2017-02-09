@@ -17,7 +17,9 @@ src/serveur_data.c \
 src/terrain_generation.c \
 src/serveur_loop.c \
 src/game_events.c \
+src/game_player_events.c \
 src/game_events_helper.c \
+src/egg_handling.c \
 src/player_handler.c \
 src/clock.c \
 src/cmds_functions/cmd_avance.c \
@@ -31,8 +33,16 @@ src/cmds_functions/cmd_expulse.c \
 src/cmds_functions/cmd_broadcast.c \
 src/cmds_functions/cmd_incantation.c \
 src/cmds_functions/cmd_fork.c \
-src/cmds_functions/cmd_connect_nbr.c
-
+src/cmds_functions/cmd_connect_nbr.c \
+src/gfx_cmds_functions/gfx_cmd_msz.c \
+src/gfx_cmds_functions/gfx_cmd_bct.c \
+src/gfx_cmds_functions/gfx_cmd_mct.c \
+src/gfx_cmds_functions/gfx_cmd_tna.c \
+src/gfx_cmds_functions/gfx_cmd_ppo.c \
+src/gfx_cmds_functions/gfx_cmd_plv.c \
+src/gfx_cmds_functions/gfx_cmd_pin.c \
+src/gfx_cmds_functions/gfx_cmd_sgt.c \
+src/gfx_cmds_functions/gfx_cmd_sst.c
 
 OBJ = $(SRC:.c=.o)
 

@@ -100,6 +100,20 @@ void	add_nsec_to_timespec(struct timespec *time, long nanosec)
 }
 
 /*
+**	Extract nanoseconds from a given timespec. Useful for precise time calculations.
+*/
+
+long	convert_timespec_to_nsec(struct timespec time)
+{
+	while (time.tv_sec > 0)
+	{
+		time.tv_sec -= 1;
+		time.tv_nsec += 1000000000;
+	}
+	return (time.tv_nsec);
+}
+
+/*
 **	Will check if time_end is reached compared to current frame time.
 **	If yes, return 1, return 0 otherwise.
 */

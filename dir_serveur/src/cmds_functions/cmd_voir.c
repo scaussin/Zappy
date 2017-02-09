@@ -1,7 +1,28 @@
 #include "../../includes/serveur.h"
 
+int		on_start_cmd_voir(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	(void)	serv;
+
+	if (param)
+	{
+		printf(KMAG "Bad format to cmd [voir] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return (-1);
+	}
+	return (0);
+}
+
+void	on_end_cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
+{
+	// exec command
+	cmd_voir(serv, client_cur, param);
+}
+
+
 void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param)
 {
+	(void)			param;
 	t_world_case	**world;
 	t_player		*player;
 	t_pos			*tab_pos;
@@ -15,7 +36,6 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 	char			*sep_rsrc;
 	char			*sep_case;
 
-	(void) param;
 	player = &(client_cur->player);
 	world = serv->world_hdl.world_board;
 	tab_pos = get_see_case_coordinates(serv, player);
@@ -65,27 +85,11 @@ void	cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *
 				}
 			}
 		}
-		// j = -1;
-		// multi_ressources = 0;
-		// while (++j < world[y][x].nb_players)
-		// {
-		// 	if (multi_ressources)
-		// 	{
-		// 		see_str = str_concat_realloc1(see_str, sep_rsrc);
-		// 		see_str = str_concat_realloc1(see_str, "joueur");
-		// 	}
-		// 	else
-		// 	{
-		// 		see_str = str_concat_realloc1(see_str, "joueur");
-		// 		multi_ressources = 1;
-		// 	}
-		// }
 		if (i != player->nb_see_case - 1)
 			see_str = str_concat_realloc1(see_str, sep_case);
 		else
 			see_str = str_concat_realloc1(see_str, "}\n");
 	}
-
 	//printf("%s\n", see_str);
 	write_buffer(&client_cur->buff_send, see_str, strlen(see_str));
 	free(see_str);

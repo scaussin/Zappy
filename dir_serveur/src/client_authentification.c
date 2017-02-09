@@ -9,11 +9,10 @@
 void	client_authentification(t_serveur *serv, t_client_entity *client)
 {
 	char			*cmd;
-	
 
 	if ((cmd = get_first_cmd(&client->buff_recv)))
 	{
-		if (strcmp(cmd, "GRAPHIC\n") == 0)
+		if (strncmp(cmd, "GRAPHIC\n", 8) == 0)
 		{
 			client_authenticate_gfx(serv, client);
 		}
@@ -57,6 +56,7 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 {
 	t_team_entity	*team;
 	char			*str_to_send;
+	t_egg			*egg;
 
 	// does team exist ?
 	if (!(team = get_team_by_name(serv, cmd)))
@@ -73,15 +73,34 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 		// sending first datas; <nb-client>\n<x><y>\n
 		client->is_in_game = 1;
 		client->team = team;
-		printf(KGRN "Player client recognized. Team: %s\n" KRESET, client->team->name);
-		asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots, serv->world_hdl.map_x, serv->world_hdl.map_y);
+		asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots,
+				serv->world_hdl.map_x, serv->world_hdl.map_y);
 		write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
 		free(str_to_send);
 		// one slot now taken in team.
 		team->available_slots -= 1;
+		team->nb_players_per_lv[client->player.level - 1] += 1;
+		if ((egg = egg_available(serv, client)) != NULL)
+		{
+			client->player.pos.x = egg->pos.x;
+			client->player.pos.y = egg->pos.y;
+			client->player.dir = rand() % 4;
+			clear_egg(serv, egg);
+			// gfx egg connection "ebo #e\n"
+			asprintf(&str_to_send, "ebo #%d\n", egg->egg_nb);
+			free(str_to_send);
 
-		// assign player game datas.
-		assign_random_player_position(serv, &(client->player));
+			printf(KGRN "[Serveur]: Client #%d connected as egg #%d\n" KRESET,
+					client->sock, egg->egg_nb);
+		}
+		else
+		{
+			assign_random_player_position(serv, &(client->player));
+		}
+		printf(KGRN "Client #%d player authentified. Team: [%s]. Position: %dx %dy\n" KRESET,
+			client->sock, client->team->name, client->player.pos.x, client->player.pos.y);
+
+		// assign time of dinner = now + FOOD_LIFE_TIME;
 		get_time(&client->delay_time);
 		assign_player_time_of_dinner(serv, &(client->player));
 
@@ -98,7 +117,8 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 	}
 	else
 	{
-		printf(KRED "No available slot in team %s\n" KRESET, client->team->name);
+		printf(KRED "No available slot in team: %s\n" KRESET, team->name);
+		fflush(stdout);
 		client->is_disconnecting = 1;
 	}
 	return ;

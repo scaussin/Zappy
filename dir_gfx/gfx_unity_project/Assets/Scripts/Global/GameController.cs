@@ -20,8 +20,13 @@ public class GameController : MonoBehaviour {
 	public bool			IsWorldSpawned;
 	public bool			InGame;
 
+	// Events. May be useful to stand alone modules.
+	public UnityEvent	OnTimeUnitModified;
+	public UnityEvent	OnWorldSizeReceived;
+
 	void Awake()
 	{
+		OnTimeUnitModified = new UnityEvent ();
 		CameraViewControl = GameObject.Find ("CameraRoot");
 	}
 
@@ -29,8 +34,7 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
-        //GameManager.instance.ConnectionManager.OnAuthentificationDone.AddListener (OnGfxAuthentifiedAction);
-		GameManager.instance.MsgBroadcastController.OnWorldSizeReceived.AddListener (OnWorldSizeReceivedAction);
+		GameManager.instance.ConnectionManager.OnConnectionWithServer.AddListener (OnConnectionWithServerAction);
 
         // Starting state for the player:
         ActivateMainMenuInput();
@@ -51,12 +55,11 @@ public class GameController : MonoBehaviour {
     /// <summary>
     /// Transition facilitating method. Puts the MainMenu up, and allows the entering of input.
     /// </summary>
-    public void ActivateMainMenuInput()
+    public void		ActivateMainMenuInput()
     {
-        GameManager.instance.MainMenuController.gameObject.transform.Find("MainPanel").gameObject.SetActive(true);
         InMainMenu = true;
         SelectingServerInfos = true;
-        GameManager.instance.MainMenuController.CanEnterInput = true;
+		GameManager.instance.MainMenuController.ActivateMainPanelInput ();
         InGame = false;
         DisablePlayerCameraControl();
     }
@@ -67,22 +70,31 @@ public class GameController : MonoBehaviour {
 	public void		OnServerInfoEntered()
 	{
         // desactivate menu.
-        GameManager.instance.MainMenuController.CanEnterInput = false;
-        GameManager.instance.MainMenuController.gameObject.transform.Find ("MainPanel").gameObject.SetActive (false);
+		//GameManager.instance.MainMenuController.DeactivateMainPanelInput ();
+
+		GameManager.instance.MainMenuController.MainPanelScript.CanEnterInput = false;
 		InMainMenu = false;
 		SelectingServerInfos = false;
         GameManager.instance.ConnectionManager.ConnectToServer ();
 	}
 
+	/// <summary>
+	/// Used when ConnectionManager fires the event when the connection did not work. Gets the menu back up.
+	/// </summary>
+	public void     OnConnectionFailedAction()
+	{
+		ActivateMainMenuInput();
+		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
+		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Failed to connect to server -";
+		DisablePlayerCameraControl ();
+	}
+
     /// <summary>
     /// Used when ConnectionManager fires the event when the connection did not work. Gets the menu back up.
     /// </summary>
-    public void     OnConnectionFailedAction()
+	public void     OnConnectionWithServerAction()
     {
-        ActivateMainMenuInput();
-        GameManager.instance.MainMenuController.ResponseText.color = Color.red;
-        GameManager.instance.MainMenuController.ResponseText.text = "- Failed to connect to server -";
-		DisablePlayerCameraControl ();
+		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("GameStart");
     }
 
     /// <summary>
@@ -92,6 +104,7 @@ public class GameController : MonoBehaviour {
 	{
         CameraViewControl.GetComponent<CameraViewControl>().gameObject.SetActive(true);
         GameManager.instance.WorldManager.WorldBoardSpawner.SpawnBlocks ();
+		OnWorldSizeReceived.Invoke ();
 		EnablePlayerCameraControl ();
 		IsWorldSpawned = true;
 		InGame = true;
@@ -140,9 +153,12 @@ public class GameController : MonoBehaviour {
 	public void OnServerShutdown()
 	{
 		ActivateMainMenuInput();
+		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
+		GameManager.instance.PlayerManager.CleanPlayerManager ();
+		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
-		GameManager.instance.MainMenuController.ResponseText.color = Color.red;
-		GameManager.instance.MainMenuController.ResponseText.text = "- Connection to server lost-";
+		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
+		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost-";
 		DisablePlayerCameraControl ();
 	}
 
@@ -174,6 +190,12 @@ public class GameController : MonoBehaviour {
  *	All these methods may or not call other component to activate.							*
  * 																							*
  * ***************************************************************************************	*/
+
+	public void OnTimeUnitReceived(string msg)
+	{
+		// At this point, the time has been modified in GameManager.instance.WorldSettings.
+		OnTimeUnitModified.Invoke ();
+	}
 
 	/// <summary>
 	/// Called by BroadcastManager, because it will also make UI calls.
@@ -248,7 +270,7 @@ public class GameController : MonoBehaviour {
 
 	public void OnPlayerTakeRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerDropRessource (msg);
+		GameManager.instance.WorldManager.PlayerController.PlayerTakeRessource (msg);
 	}
 
 	public void OnPlayerLayedEgg(string msg)

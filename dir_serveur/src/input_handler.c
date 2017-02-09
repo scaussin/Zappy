@@ -13,8 +13,10 @@
 void	get_input(t_serveur *serv, int argc, char **argv)
 {
 	int i;
+	int y;
 
 	i = 0;
+	y = 0;
 	if (argc < 13)
 	{
 		error_in_args(0, "Invalid number of arguments");
@@ -34,7 +36,14 @@ void	get_input(t_serveur *serv, int argc, char **argv)
 		printf("Team names:");
 		while (i < serv->team_hdl.nb_teams)
 		{
-			printf("  %s", serv->team_hdl.array_teams[i].name);
+			printf("  [%s]", serv->team_hdl.array_teams[i].name);
+			// set team number of players by lvl to zero -> teams are empty.
+			while (y < MAX_LV)
+			{
+				serv->team_hdl.array_teams[i].nb_players_per_lv[y] = 0;
+				y++;
+			}
+			y = 0;
 			i++;
 		}
 		printf("\n");
@@ -181,6 +190,7 @@ void	fill_input(t_serveur *serv, int argc, char **argv)
 		&& strncmp(argv[i], "-c", 2) != 0
 		&& strncmp(argv[i], "-t", 2) != 0)
 		{
+			// -------- Init new team 
 			if (strlen(argv[i]) > 40)
 				error_in_args(i, "Team Name is too long (40 char max)");
 			serv->team_hdl.array_teams[team_i].name =

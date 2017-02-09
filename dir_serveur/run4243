@@ -1,4 +1,4 @@
 #/bin/sh
 
 # arg 1 is time
-./serveur -p 4243 -x 12 -y 12 -n Hello -c 6 -t $1
+./serveur -p 4243 -x 12 -y 12 -n Hello Omni Zaft "Celestial Being" -c 6 -t $1

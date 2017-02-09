@@ -152,7 +152,14 @@ public class PlayerController : MonoBehaviour {
 			{
 				if (player.AssignedNumber == player_nb)
 				{
-					player.Inventory = inventory;
+					player.InventoryStr = inventory;
+					player.FoodTimeLeft = int.Parse (groups [4].Value);
+					player.Linemate = int.Parse (groups [5].Value);
+					player.Deraumere = int.Parse (groups [6].Value);
+					player.Sibur = int.Parse (groups [7].Value);
+					player.Mendiane = int.Parse (groups [8].Value);
+					player.Phiras = int.Parse (groups [9].Value);
+					player.Thystame = int.Parse (groups [10].Value);
 					return ;
 				}
 			}
@@ -203,6 +210,29 @@ public class PlayerController : MonoBehaviour {
 
 	public void PlayerTakeRessource(string msg)
 	{
-		Debug.Log ("TODO: player take ressource");
+		rgx = new Regex ("^pdr #(\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("ArmAction");
+					return ;
+				}
+			}
+		}
+	}
+
+	public void CleanMapOfPlayers()
+	{
+		foreach (PlayerObject player in Players)
+		{
+			Destroy (player.gameObject);
+		}
+		Players.Clear ();
 	}
 }

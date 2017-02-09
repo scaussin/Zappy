@@ -23,7 +23,7 @@ void	init_fd(t_serveur *serv)
 	while (p_client)
 	{
 		FD_SET(p_client->sock, serv->network.read_fs);
-		if (p_client->buff_send.len > 0)
+		if (p_client->buff_send.len > 0 || p_client->buff_send.len_overflow > 0)
 			FD_SET(p_client->sock, serv->network.write_fs);
 		p_client = p_client->next;
 	}
@@ -59,12 +59,10 @@ void	main_loop(t_serveur *serv)
 			if (FD_ISSET(STDIN_FILENO, serv->network.read_fs))
 				return;
 			// Connect new client
-			else if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
+			if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
 				new_client_connection(serv);
 			// Check commands from clients and fill all clients buffers
-			else
-				check_all_clients_communication(serv);
-
+			check_all_clients_communication(serv);
 			// Treat datas from buffers previously filled.
 			manage_clients_input(serv);
 		}
@@ -87,7 +85,15 @@ void manage_clients_input(t_serveur *serv)
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
-		if (p_client->buff_recv.len > 0) // is there something to read ?
+		// must be checked even if there is nothing to read.
+		if (p_client->is_player_dead)
+		{
+			// we must wait for the client to receive "mort\n" before
+			// disconnecting him. Must be done here to have a turn of communication.
+			p_client->is_disconnecting = 1;
+		}
+		// now, is there something to read ?
+		if (p_client->buff_recv.len > 0)
 		{
 			if (!p_client->is_in_game && !p_client->is_gfx && !p_client->is_player_dead)
 			{
@@ -98,17 +104,15 @@ void manage_clients_input(t_serveur *serv)
 			}
 			else if (p_client->is_in_game && !p_client->is_player_dead && !p_client->is_gfx)
 			{
-				// client is in game and not gfx, everything he sends is cmds.
+				// client is in game and not gfx and not dead, everything he sends is cmds.
 				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
 			}
-			else if (p_client->is_player_dead)
+			else if (p_client->is_gfx)
 			{
-				// we must wait for the client to receive "mort\n" before
-				// disconnecting him.
-				p_client->is_disconnecting = 1;
+				// it may be gfx commands.
+				lex_and_parse_gfx_cmds(serv, p_client);
 			}
 		}
 		p_client = p_client->next;
 	}
-
 }

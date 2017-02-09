@@ -29,11 +29,15 @@ void			set_client_player_datas(t_client_entity *new_client)
 	new_client->player.dir = UP;
 	new_client->player.nb_see_case = 4;
 	new_client->player.cur_case = NULL;
+	new_client->player.is_incanting = 0;
+	new_client->player.is_incanter = 0;
+	new_client->player.incantation_id = -1; // id unset.
 	while (res_i < 7)
 	{
 		new_client->player.inventory[res_i] = 0;
 		res_i++;
 	}
+	get_time(&new_client->delay_time);
 	// Set life and death time.
 	new_client->player.inventory[FOOD] = 10;
 	// Dinner time will be set to a value when the player is authenticated.

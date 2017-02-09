@@ -89,11 +89,12 @@ public class WorldBoardSpawner : MonoBehaviour {
 				// location is set through additionning variables -> faster calculation method.
 				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location,
 											Quaternion.identity, BlockContainer.transform);
+				new_block.GetComponent<BlockObject> ().x = cur_x;
+				new_block.GetComponent<BlockObject> ().y = cur_y;
 				Blocks_col[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
 				cur_x++;
 				spawn_location.x += x_base_offset;
-//				new_block.GetComponent<Animator> ().enabled = true;
 			}
 			cur_y++;
 			cur_x = 0;

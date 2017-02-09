@@ -1,20 +1,44 @@
 #include "../../includes/serveur.h"
 
+int		on_start_cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	char	*msg;
+
+	if (param)
+	{
+		printf(KMAG "Bad format to cmd [expulse] "
+					"from sock %d\n" KRESET, client_cur->sock);
+		return (-1);
+	}
+	asprintf(&msg, "pex #%d\n",client_cur->sock);
+	push_gfx_msg(serv, msg);
+	free(msg);
+	return (0);
+}
+
+void	on_end_cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
+{
+	cmd_expulse(serv, client_cur, param);
+	if (client_cur->list_cmds->success == 1)
+	{
+		write_buffer(&client_cur->buff_send, "ok\n", 3);
+	}
+	else
+	{
+		write_buffer(&client_cur->buff_send, "ko\n", 3);
+	}
+}
+
 void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
 	(void)					param;
 	t_player				*cur_player;
 	t_client_entity			*list_clients;
-	char					*msg;
 	int						nb_client_expulsed;
 
 	nb_client_expulsed = 0;
 	cur_player = &(client_cur->player);
 	list_clients = serv->client_hdl.list_clients;
-
-	asprintf(&msg, "pex #%d\n",client_cur->sock);
-	push_gfx_msg(serv, msg);
-	free(msg);
 
 	// bouger les client qui sont sur la meme case que client_cur
 	while (list_clients)
@@ -33,9 +57,9 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 	}
 
 	if (nb_client_expulsed == 0)
-		write_buffer(&client_cur->buff_send, "ko\n", 3);
+		client_cur->list_cmds->success = 1;
 	else
-		write_buffer(&client_cur->buff_send, "ok\n", 3);
+		client_cur->list_cmds->success = 0;
 }
 
 void	expulse_client_in_dir(t_serveur *serv, t_client_entity *client, int dir)

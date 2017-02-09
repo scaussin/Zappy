@@ -15,72 +15,19 @@ void	push_gfx_msg(t_serveur *serv, char *msg)
 
 void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 {
-	char			*msg;
-	int				y;
-	int				x;
-	t_world_case	**world_board;
-
-	// ------------------------------------	//
-	// sending World size					//
-	// ------------------------------------	//
-	// "msz X Y\n"
-	asprintf(&msg, "msz %d %d\n", serv->world_hdl.map_x, serv->world_hdl.map_y);
-	write_buffer(&gfx_client->buff_send, msg, strlen(msg));
-	free(msg);
-
-	// ------------------------------------	//
-	// sending server time unit				//
-	// ------------------------------------	//
-	// "sgt T\n"
-	asprintf(&msg, "sgt %f\n", serv->world_hdl.t_unit);
-	push_gfx_msg(serv, msg);
-	free(msg);
-
-	// ------------------------------------	//
-	// Sending map content					//
-	// ------------------------------------	//
+	char				*msg;
+	t_client_entity		*tmp_client;
+	
+	// sending World size
+	gfx_cmd_msz(serv, gfx_client, "msz\n");
+	// sending server time unit
+	gfx_cmd_sgt(serv, gfx_client, "sgt\n");
+	// Sending map content
 	// "bct X Y q q q q q q q\n" * nbr_cases
-	x = 0;
-	y = 0;
-	world_board = serv->world_hdl.world_board;
-	while (y < serv->world_hdl.map_y)
-	{
-		while (x < serv->world_hdl.map_x)
-		{
-			asprintf(&msg, "bct %d %d %d %d %d %d %d %d %d\n",
-				x,
-				y,
-				world_board[y][x].ressources[FOOD],
-				world_board[y][x].ressources[LINEMATE],
-				world_board[y][x].ressources[DERAUMERE],
-				world_board[y][x].ressources[SIBUR],
-				world_board[y][x].ressources[MENDIANE],
-				world_board[y][x].ressources[PHIRAS],
-				world_board[y][x].ressources[THYSTAME]);
-			push_gfx_msg(serv, msg);
-			free(msg);
-			x++;
-		}
-		y++;
-		x = 0;
-	}
-
-	// ------------------------------------	//
-	// Sending team names					//
-	// ------------------------------------	//
-	x = 0;
-	while (x < serv->team_hdl.nb_teams)
-	{
-		asprintf(&msg, "tna %s\n", serv->team_hdl.array_teams[x].name);
-		push_gfx_msg(serv, msg);
-		free(msg);
-		x++;
-	}
-
-	// ------------------------------------	//
-	// Sending currently connected players	//
-	// ------------------------------------	//
-	t_client_entity	*tmp_client;
+	gfx_cmd_mct(serv, gfx_client, "mct\n");
+	// Sending team names
+	gfx_cmd_tna(serv, gfx_client, "tna\n");
+	// Sending currently connected players
 	tmp_client = serv->client_hdl.list_clients;
 	while (tmp_client)
 	{
@@ -99,4 +46,55 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 		}
 		tmp_client = tmp_client->next;
 	}
+}
+
+void	lex_and_parse_gfx_cmds(t_serveur *serv, t_client_entity *gfx_client)
+{
+	char *cmd;
+
+	while ((cmd = get_first_cmd(&gfx_client->buff_recv))) // -> Buffer lexer.
+	{
+		parse_gfx_cmd(serv, gfx_client, cmd);
+		free(cmd);
+	}
+}
+
+void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
+{
+	int		i;
+	char	*arg_cmd;
+	int		nb_of_parsed_chars;
+
+	i = 0;
+	// Check for arguments
+	if (cmd[0] && cmd[0] != ' ')
+	{
+		if ((arg_cmd = strchr(cmd, ' ')))
+			nb_of_parsed_chars = arg_cmd - cmd;
+		else
+			nb_of_parsed_chars = strlen(cmd);
+		if (nb_of_parsed_chars > 4)
+		{
+			printf(KMAG "[Serveur]: gfx cmd too long (no gfx cmd takes more than 3 char):"
+						"%s on gfx client command parsing." KRESET, cmd);
+			return ;
+		}
+
+		// parsing with gfx match table.
+		while (i < SIZE_GFX_CMD_MATCH_TABLE)
+		{
+			if (strncmp(serv->cmd_hdl.gfx_cmd_match_table[i].name,
+				cmd, nb_of_parsed_chars) == 0)
+			{
+				// -> Direct execution of cmds.
+				serv->cmd_hdl.gfx_cmd_match_table[i].on_end(serv, gfx_client, cmd);
+				return ;
+			}
+			i++;
+		}
+	}
+	printf(KMAG "[Serveur]: Unknown GFX command: %s on sock: %d\n" KRESET, cmd, gfx_client->sock);
+	// send gfx "suc\n"
+	write_buffer(&gfx_client->buff_send, "suc\n", 4);
+	return ;
 }
