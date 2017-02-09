@@ -36,6 +36,11 @@ void	ClientPlayer::voir()
 	bufferSend->pushMsg("voir\n");
 }
 
+void	ClientPlayer::avance()
+{
+	bufferSend->pushMsg("avance\n");
+}
+
 void	ClientPlayer::setInventory(string inventory)
 {
 	char	*item;

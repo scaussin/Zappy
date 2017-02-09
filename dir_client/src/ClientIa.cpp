@@ -10,7 +10,13 @@ ClientIa::~ClientIa()
 
 void	ClientIa::startPlay()
 {
+		pushCallbackEnd(&ClientIa::endPlay);
+		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1);
+}
 
+void	ClientIa::endPlay()
+{
+		cout << "End" << endl;
 }
 
 void	ClientIa::callbackInventory(string inventory)
@@ -18,13 +24,17 @@ void	ClientIa::callbackInventory(string inventory)
 	cout << "inventory: " << inventory << endl;
 }
 
-void	ClientIa::checkFoodStart(int minFood, int nToEat, void (ClientIa::*callbackEnd)())
+void	ClientIa::checkFoodStart(int minFood, int nToEat)
 {
 	this->minFood = minFood;
 	this->nToEat = nToEat;
 	player->inventaire();
 	stackCallbackCommand.push_back(&ClientIa::callbackCheckFoodInventory);
-	pushCallbackEnd(callbackEnd);
+}
+
+void	ClientIa::checkFoodEnd()
+{
+	execCallbackEnd();
 }
 
 void	ClientIa::callbackCheckFoodInventory(string inventory)
@@ -36,9 +46,10 @@ void	ClientIa::callbackCheckFoodInventory(string inventory)
 	if (player->getInventory()[FOOD] < minFood)
 	{
 		itemsToFind[FOOD] = nToEat;
+		pushCallbackEnd(&ClientIa::checkFoodEnd);
 		findItemStart(itemsToFind);
 	}
-	execCallbackEnd();
+	checkFoodEnd();
 }
 
 void	ClientIa::execCallbackEnd()
@@ -55,15 +66,33 @@ void	ClientIa::findItemStart(map<string, int> itemsToFind)
 	this->itemsToFind = itemsToFind;
 	if (this->itemsToFind.find(FOOD) == this->itemsToFind.end() || this->itemsToFind[FOOD] <= 0)
 	{
-		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::findItemSee);
+		pushCallbackEnd(&ClientIa::findItemSee);
+		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1);
 	}
 	else
+	{
 		findItemSee();
+	}
 }
 
 void	ClientIa::findItemSee()
 {
+	player->avance();
+	stackCallbackCommand.push_back(&ClientIa::callbackFindItemSee);
+	cout << "findItemSee" << endl;
+}
 
+void	ClientIa::callbackFindItemSee(string items)
+{
+	cout << "callbackFindItemSee" << endl;
+	nRotate = 0;
+	if (itemsToFindIsEmpty())
+	{
+		execCallbackEnd();
+		return ;
+	}
+	cout << items << endl;
+	execCallbackEnd();
 }
 
 void	ClientIa::receiveCallbackBroadcast(string broadcast)
@@ -82,11 +111,21 @@ void	ClientIa::receiveCallbackCommand(string response)
 void	ClientIa::pushCallbackEnd(void (ClientIa::*callbackEnd)())
 {
 	if (callbackEnd != NULL)
-		stackCallbackEnd.push_back(callbackEnd);
+		stackCallbackEnd.push_front(callbackEnd);
 }
 
 void	ClientIa::pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse))
 {
 	if (callbackCommand != NULL)
 		stackCallbackCommand.push_back(callbackCommand);
+}
+
+bool	ClientIa::itemsToFindIsEmpty()
+{
+	for (map<string, int>::iterator it = itemsToFind.begin(); it != itemsToFind.end(); ++it)
+	{
+		if (it->second > 0)
+			return false;
+	}
+	return true;
 }

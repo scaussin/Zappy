@@ -13,19 +13,24 @@ class ClientIa
 		void						receiveCallbackBroadcast(string broadcast);
 		
 		void						findItemStart(map<string, int> itemsToFind);
-		void						checkFoodStart(int minFood, int nToEat, void (ClientIa::*callbackEnd)());
+		void						checkFoodStart(int minFood, int nToEat);
 
 	private:
+		void						checkFoodEnd();
+		void						endPlay();
 		void						execCallbackEnd();
 		void						findItemSee();
 		void						callbackInventory(string inventory);
 		void						callbackCheckFoodInventory(string inventory);
 		void						pushCallbackEnd(void (ClientIa::*callbackEnd)());
 		void						pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
+		bool						itemsToFindIsEmpty();
+		void						callbackFindItemSee(string items);
 		ClientPlayer				*player;
 		map<string, int>			itemsToFind;
 		int							minFood;
 		int							nToEat;
+		int							nRotate;
 		deque<void (ClientIa::*)(string)>	stackCallbackCommand;
 		deque<void (ClientIa::*)()>	stackCallbackEnd;
 };

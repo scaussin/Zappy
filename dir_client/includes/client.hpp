@@ -70,7 +70,7 @@ class ClientIa;
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define MIN_FOOD_1  500
+# define MIN_FOOD_1  1300
 # define MIN_FOOD_2  1000
 
 # define N_TO_EAT_1 4

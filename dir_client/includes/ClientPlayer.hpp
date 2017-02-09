@@ -22,6 +22,7 @@ class ClientPlayer
 		void						voir(void (ClientIa::*)(string));*/
 		//void						inventaire(void (ClientIa::*)(string));
 		void						inventaire();
+		void						avance();
 		void						voir();
 
 		void						setBufferSend(ClientBuffer *buffer);
@@ -35,6 +36,7 @@ class ClientPlayer
 		int							lifeUnits;
 		vector<string>				vision;
 		ClientBuffer				*bufferSend;
+
 
 };
 
