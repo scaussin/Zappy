@@ -11,7 +11,7 @@ class ClientPlayer
 
 		void						printStat();
 
-		string					teamName;
+		string						teamName;
 		int							worldSizeX;
 		int							worldSizeY;
 		int							teamSlots;
@@ -22,15 +22,18 @@ class ClientPlayer
 		void						voir(void (ClientIa::*)(string));*/
 		//void						inventaire(void (ClientIa::*)(string));
 		void						inventaire();
-		void						setBufferSend(ClientBuffer *buffer);
+		void						voir();
 
-		
+		void						setBufferSend(ClientBuffer *buffer);
+		void						setInventory(string inventory);
+		map<string, int>			getInventory();
+		void						printInventory();
 
 	private:
+		map<string, int>			inventory;
 		int							level;
 		int							lifeUnits;
-		list<string>		inventory;
-		list<string>		vision;
+		vector<string>				vision;
 		ClientBuffer				*bufferSend;
 
 };

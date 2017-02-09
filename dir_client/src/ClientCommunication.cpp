@@ -80,7 +80,7 @@ void	ClientCommunication::manageRecv()
 		else
 		{
 			//if commande
-				ia->receiveCallbackCommande(msg);
+				ia->receiveCallbackCommand(msg);
 			//if broadcast
 				//TODO :)
 		}
@@ -124,7 +124,7 @@ void	ClientCommunication::clientAuthentication()
 			player->printStat();
 			isAuthenticated = true;
 			/**/
-			ia->findItem();
+			ia->startPlay();
 			/**/
 			
 		}
