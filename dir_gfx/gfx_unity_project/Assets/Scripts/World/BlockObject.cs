@@ -7,9 +7,6 @@ using UnityEngine;
 /// </summary>
 public class BlockObject : MonoBehaviour
 {
-	[Header("Object with points of interests")]
-	public GameObject			Points;
-
 	[Header("Block datas")]
 	public int					x;
 	public int					y;
@@ -35,12 +32,12 @@ public class BlockObject : MonoBehaviour
 
 	private Animator			BlockAnimator;
 
+	private GameObject			GroundSelectedModel;
 
 	// Use this for initialization
 	void Awake ()
 	{
 		BlockAnimator = GetComponent<Animator>	();
-		Points = transform.Find ("Points").gameObject;
 		RessourcesContainer = transform.Find ("Ressources").gameObject;
 		FoodModelObject = RessourcesContainer.transform.Find ("Food").gameObject;
 		LinemateModelObject = RessourcesContainer.transform.Find ("Linemate").gameObject;
@@ -49,6 +46,9 @@ public class BlockObject : MonoBehaviour
 		MendianeModelObject = RessourcesContainer.transform.Find ("Mendiane").gameObject;
 		PhirasModelObject = RessourcesContainer.transform.Find ("Phiras").gameObject;
 		ThystameModelObject = RessourcesContainer.transform.Find ("Thystame").gameObject;
+
+		GroundSelectedModel = transform.Find ("Effects").transform.Find ("GroundSelected").gameObject;
+		ToggleSelection (false);
 	}
 
 	/// <summary>
@@ -90,6 +90,11 @@ public class BlockObject : MonoBehaviour
 			ThystameModelObject.SetActive(true);
 		else
 			ThystameModelObject.SetActive(false);
+	}
+
+	public void		ToggleSelection(bool b)
+	{
+		GroundSelectedModel.SetActive (b);
 	}
 
 	/// <summary>

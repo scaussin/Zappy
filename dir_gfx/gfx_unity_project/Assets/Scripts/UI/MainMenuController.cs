@@ -37,6 +37,8 @@ public class MainMenuController : MonoBehaviour {
 		BlackBackground = transform.Find ("BlackBackground").gameObject;
 		MainPanel = transform.Find("MainPanel").gameObject;
 		MainPanelScript = MainPanel.GetComponent<MainPanelScript> ();
+		InGameMenuPanel = transform.Find ("InGameMenuPanel").gameObject;
+		InGameMenuController = InGameMenuPanel.GetComponent<InGameMenuController> ();
 
 		// Clean initatialization ( for when we press play )
 		MainPanel.SetActive(true);

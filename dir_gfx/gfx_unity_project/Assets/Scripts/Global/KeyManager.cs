@@ -20,5 +20,14 @@ public class KeyManager : MonoBehaviour {
 	public KeyCode		StrafeRight = KeyCode.D;
 	public KeyCode		StrafeRightAlt = KeyCode.None;
 
+	[Header("UI Keys")]
+	public KeyCode		Enter;
+	public KeyCode		EnterAlt;
+
+	public KeyCode		Escape;
+	public KeyCode		EscapeAlt;
+
+	public KeyCode		TabPanelKey;
+	public KeyCode		TabPanelKeyAlt;
 
 }

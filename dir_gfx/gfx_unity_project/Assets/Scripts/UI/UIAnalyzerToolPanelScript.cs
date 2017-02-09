@@ -11,6 +11,11 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	[Header("The currently Analyzed Object")]
 	public GameObject	AnalyzedObject;
 
+	[Header("Bool For input blocking")]
+	public bool					CanSelect;
+	[Header("Server communication")]
+	public float				SecondsBetweenServerCalls = 0.8f;
+
 	[Header("Analyzer data references")]
 	// quick ref accesses.
 	public GameObject			AnalyzerToolContainer;
@@ -38,6 +43,7 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	private Ray					ray;
 	private RaycastHit			hit;
 	private ColliderBroadcast	colBroadcast;
+	private ColliderBroadcast	previousColBroadcast;
 
 	// private update references
 	private PlayerObject		analyzedPlayerScript;
@@ -48,7 +54,7 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 		AnalyzerToolContainer = transform.Find ("AnalyzerToolContainer").gameObject;
 		AnalyzerDataContainer = AnalyzerToolContainer.transform.Find ("AnalyzerDataContainer").gameObject;
 		// set analyzer data references for updating.
-		AnalyzerVisual = AnalyzerToolContainer.transform.Find("AnalyzerVisual").gameObject.GetComponent<Image> ();
+		AnalyzerVisual = AnalyzerToolContainer.transform.Find("AnalyzerPicturePanel").transform.Find("AnalyzerVisual").gameObject.GetComponent<Image> ();
 		NumberValue = AnalyzerDataContainer.transform.Find("NumberValue").gameObject.GetComponent<Text> ();
 		Position_x_val = AnalyzerDataContainer.transform.Find("Position_x_val").gameObject.GetComponent<Text> ();
 		Position_y_val = AnalyzerDataContainer.transform.Find("Position_y_val").gameObject.GetComponent<Text> ();
@@ -63,6 +69,7 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	}
 		
 	void OnEnable () {
+		CanSelect = false;
 		AnalyzedObject = null;
 		// let's fetch the visuals right now.
 		PlayerVisual = Resources.Load<Sprite> ("UI/AnalyzerVisuals/analyzer_player");
@@ -78,34 +85,45 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if (Input.GetMouseButtonUp (0))
+		if (CanSelect && Input.GetMouseButtonUp (0))
 		{
+			// ray cast for click on screen.
 			ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			if (Physics.Raycast (ray, out hit, 200.0f, AnalyzerRaycastMask))
 			{
+				previousColBroadcast = colBroadcast;
 				if ((colBroadcast = hit.collider.gameObject.GetComponent<ColliderBroadcast> ()))
 				{
+					// something touched.
 					Debug.Log ("Clicked on " + colBroadcast.ObjectRoot.name);
+					// we only update if it is a new object.
 					if (AnalyzedObject != colBroadcast.ObjectRoot)
 					{
+						DisengageSelectionDisplay ();
 						AnalyzedObject = colBroadcast.ObjectRoot;
 						EngagePanelDisplay ();
 					}
 				}
 				else
 				{
+					// clicked on something not in my colliding matrix, make ui disappear.
+					previousColBroadcast = colBroadcast;
+					DisengageSelectionDisplay ();
+					AnalyzerToolContainer.GetComponent<Animator> ().SetTrigger ("Disappear");
 					AnalyzedObject = null;
 				}
 			}
 			else
 			{
+				// clicked on nothing.
+				previousColBroadcast = colBroadcast;
+				DisengageSelectionDisplay ();
+				AnalyzerToolContainer.GetComponent<Animator> ().SetTrigger ("Disappear");
 				AnalyzedObject = null;
 			}
 		}
 	}
-
-
-
+		
 	/// <summary>
 	/// Updates the panel display. Will select the good ui display function
 	/// according to the type of object analyzed.
@@ -114,11 +132,12 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	{
 		if (AnalyzedObject)
 		{
+			AnalyzerToolContainer.SetActive (true);
 			if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
 			{
 				// the analyzed object is a player. set the UI as such.
 				analyzedPlayerScript = AnalyzedObject.GetComponent<PlayerObject> ();
-
+				analyzedPlayerScript.ToggleSelection (true);
 				// send cmds to serv for data update
 				PlayerAnalyzeServerUpdate();
 				// Delayed function call, set the UI display.
@@ -128,7 +147,7 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 			{
 				// the analyzed object is a ground block. set the UI as such.
 				analyzedBlockScript = AnalyzedObject.GetComponent<BlockObject> ();
-
+				analyzedBlockScript.ToggleSelection (true);
 				// send cmds to serv for data update
 				BlockAnalyzeServerUpdate();
 
@@ -139,29 +158,24 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Routine that will ask the server for update every n seconds.
+	/// Disengages the selection display. Needed in case something is already selected.
 	/// </summary>
-	/// <returns>The analyzer communication display routine.</returns>
-	IEnumerator	AnalyzerCommunicationDisplayRoutine()
+	void DisengageSelectionDisplay()
 	{
-		for (;;)
+		if (AnalyzedObject && previousColBroadcast)
 		{
-			if (AnalyzedObject)
+			if (previousColBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
 			{
-				if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
-				{
-					PlayerAnalyzeServerUpdate ();
-					UpdatePlayerAnalyzerDisplay ();
-				}
-				else if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Block)
-				{
-					BlockAnalyzeServerUpdate ();
-					UpdateBlockAnalyzerDisplay ();
-				}
+				// todo: disengage player selection visuals etc.
+				AnalyzedObject.GetComponent<PlayerObject>().ToggleSelection(false);
 			}
-			yield return StartCoroutine(CoroutineUtils.WaitForRealSeconds(0.8f));
+			else if (previousColBroadcast.ObjType == ColliderBroadcast.ObjectType.Block)
+			{
+				AnalyzedObject.GetComponent<BlockObject> ().ToggleSelection (false);
+			}
 		}
 	}
+
 
 	///
 	///		------ UI UPDATES ------
@@ -213,6 +227,31 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 	///
 	///		------ Communication with server ------
 	///
+
+	/// <summary>
+	/// Routine that will ask the server for update every n seconds.
+	/// </summary>
+	/// <returns>The analyzer communication display routine.</returns>
+	IEnumerator	AnalyzerCommunicationDisplayRoutine()
+	{
+		for (;;)
+		{
+			if (AnalyzedObject)
+			{
+				if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Player)
+				{
+					PlayerAnalyzeServerUpdate ();
+					UpdatePlayerAnalyzerDisplay ();
+				}
+				else if (colBroadcast.ObjType == ColliderBroadcast.ObjectType.Block)
+				{
+					BlockAnalyzeServerUpdate ();
+					UpdateBlockAnalyzerDisplay ();
+				}
+			}
+			yield return StartCoroutine(CoroutineUtils.WaitForRealSeconds(SecondsBetweenServerCalls));
+		}
+	}
 
 
 

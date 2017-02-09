@@ -99,6 +99,7 @@ public class GameController : MonoBehaviour {
 
     /// <summary>
     /// Called when connection is successful and the client is authentified. Starts spawning the world blocks.
+	///  -----------> equals ON GAME START 
     /// </summary>
 	public void		OnWorldSizeReceivedAction()
 	{
@@ -108,6 +109,14 @@ public class GameController : MonoBehaviour {
 		EnablePlayerCameraControl ();
 		IsWorldSpawned = true;
 		InGame = true;
+
+		// activate analyzer tool;
+		GameManager.instance.MainMenuController.InGameMenuController.
+		AnalyzerToolPanel.
+		GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = true;
+		// active time control tool
+		GameManager.instance.MainMenuController.InGameMenuController.
+		TimeControlPanel.SetActive (true);
 	}
 
 	public void		SetWorldBlockRessources(string msg)
@@ -153,6 +162,10 @@ public class GameController : MonoBehaviour {
 	public void OnServerShutdown()
 	{
 		ActivateMainMenuInput();
+		// deactivate analyzer tool;
+		GameManager.instance.MainMenuController.InGameMenuController.
+			AnalyzerToolPanel.
+			GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = false;
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");

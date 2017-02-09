@@ -11,30 +11,40 @@ ModelImporter:
     100006: robot_1_wheel
     100008: robot_arm
     100010: Antenna
+    100012: PlayerSelectedRing
+    100014: PlayerSelectedTriangle
     400000: //RootNode
     400002: robot_1_body
     400004: robot_1_head
     400006: robot_1_wheel
     400008: robot_arm
     400010: Antenna
+    400012: PlayerSelectedRing
+    400014: PlayerSelectedTriangle
     2300000: //RootNode
     2300002: robot_1_body
     2300004: robot_1_head
     2300006: robot_1_wheel
     2300008: robot_arm
     2300010: Antenna
+    2300012: PlayerSelectedRing
+    2300014: PlayerSelectedTriangle
     3300000: //RootNode
     3300002: robot_1_body
     3300004: robot_1_head
     3300006: robot_1_wheel
     3300008: robot_arm
     3300010: Antenna
+    3300012: PlayerSelectedRing
+    3300014: PlayerSelectedTriangle
     4300000: Cube
     4300002: robot_1_head
     4300004: robot_1_wheel
     4300006: robot_1_body
     4300008: robot_arm
     4300010: Antenna
+    4300012: PlayerSelectedRing
+    4300014: PlayerSelectedTriangle
     7400000: Default Take
     9500000: //RootNode
   materials:

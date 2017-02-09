@@ -23,6 +23,7 @@ public class PlayerObject : MonoBehaviour {
 	[Header("Player points of interest")]
 	public GameObject	ModelContainer;
 	public GameObject	CameraPoint;
+	public GameObject	PlayerSelectedObject;
 
 
 
@@ -32,7 +33,11 @@ public class PlayerObject : MonoBehaviour {
 		CameraPoint = transform.Find ("Points").transform.Find ("CameraPoint").gameObject;
 		ModelContainer = transform.Find ("Model").gameObject;
 		GetComponent<PlayerMovement> ().UpdateOrientation ();
+		PlayerSelectedObject = transform.Find ("Effects").transform.Find ("PlayerSelected").gameObject;
 	}
 
-
+	public void ToggleSelection(bool b)
+	{
+		PlayerSelectedObject.SetActive (b);
+	}
 }
