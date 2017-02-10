@@ -1,7 +1,7 @@
 #ifndef CUSTOMEXCEPTION_HPP
 # define CUSTOMEXCEPTION_HPP
 
-#include "Client.hpp"
+#include "client.hpp"
 
 class CustomException : public runtime_error
 {

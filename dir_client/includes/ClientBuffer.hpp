@@ -1,7 +1,7 @@
 #ifndef CLIENTBUFFER_HPP
 # define CLIENTBUFFER_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 class ClientBuffer
 {

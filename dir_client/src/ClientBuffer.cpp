@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 ClientBuffer::ClientBuffer()
 {
@@ -16,8 +16,6 @@ ClientBuffer::~ClientBuffer()
 string ClientBuffer::getFirstMsg()
 {
 	string buff;
-	char *end;
-	int lenCmd;
 
 	buff = getBuffer();
 	size_t found = buff.find(END);

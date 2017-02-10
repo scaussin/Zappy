@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 //------------------------------------------------------------------------------//
 //																				//
@@ -62,6 +62,7 @@ void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 
 void	ClientInputHandler::ParseInput(int argc, char **argv)
 {
+	(void)argc;
 	// Check team name.
 	if (strlen(argv[2]) > 40)
 	{

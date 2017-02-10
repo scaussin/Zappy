@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 {
@@ -10,13 +10,12 @@ ClientIa::~ClientIa()
 
 void	ClientIa::startPlay()
 {
-		pushCallbackEnd(&ClientIa::endPlay);
-		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1);
+		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::endPlay);
 }
 
 void	ClientIa::endPlay()
 {
-		cout << "End" << endl;
+	cout << "End" << endl;
 }
 
 void	ClientIa::callbackInventory(string inventory)
@@ -24,8 +23,9 @@ void	ClientIa::callbackInventory(string inventory)
 	cout << "inventory: " << inventory << endl;
 }
 
-void	ClientIa::checkFoodStart(int minFood, int nToEat)
+void	ClientIa::checkFoodStart(int minFood, int nToEat, void (ClientIa::*caller)())
 {
+	pushCallbackCallerContinue(caller);
 	this->minFood = minFood;
 	this->nToEat = nToEat;
 	player->inventaire();
@@ -34,7 +34,7 @@ void	ClientIa::checkFoodStart(int minFood, int nToEat)
 
 void	ClientIa::checkFoodEnd()
 {
-	execCallbackEnd();
+	execCallbackCallerContinue();
 }
 
 void	ClientIa::callbackCheckFoodInventory(string inventory)
@@ -46,72 +46,79 @@ void	ClientIa::callbackCheckFoodInventory(string inventory)
 	if (player->getInventory()[FOOD] < minFood)
 	{
 		itemsToFind[FOOD] = nToEat;
-		pushCallbackEnd(&ClientIa::checkFoodEnd);
-		findItemStart(itemsToFind);
-	}
-	checkFoodEnd();
-}
-
-void	ClientIa::execCallbackEnd()
-{
-	if (stackCallbackEnd.size() > 0)
-	{
-		(this->*stackCallbackEnd.front())();
-		stackCallbackEnd.pop_front();
-	}
-}
-
-void	ClientIa::findItemStart(map<string, int> itemsToFind)
-{
-	this->itemsToFind = itemsToFind;
-	if (this->itemsToFind.find(FOOD) == this->itemsToFind.end() || this->itemsToFind[FOOD] <= 0)
-	{
-		pushCallbackEnd(&ClientIa::findItemSee);
-		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1);
+		findItemStart(itemsToFind, &ClientIa::checkFoodEnd);
 	}
 	else
+		checkFoodEnd();
+}
+
+void	ClientIa::execCallbackCallerContinue()
+{
+	if (stackCallbackCallerContinue.size() > 0)
 	{
-		findItemSee();
+		void (ClientIa::*func)() = stackCallbackCallerContinue.front();
+		stackCallbackCallerContinue.pop_front();
+		(this->*func)();
 	}
+}
+
+void	ClientIa::findItemStart(map<string, int> itemsToFind, void (ClientIa::*caller)())
+{
+	pushCallbackCallerContinue(caller);
+	nRotate = 0;
+	this->itemsToFind = itemsToFind;
+	if (this->itemsToFind.find(FOOD) == this->itemsToFind.end() || this->itemsToFind[FOOD] <= 0)
+		checkFoodStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::findItemSee);
+	else
+		findItemSee();
 }
 
 void	ClientIa::findItemSee()
 {
-	player->avance();
+	player->voir();
 	stackCallbackCommand.push_back(&ClientIa::callbackFindItemSee);
 	cout << "findItemSee" << endl;
 }
 
 void	ClientIa::callbackFindItemSee(string items)
 {
+	player->setItemsSeen(items);
+	player->printItemsSeen();
 	cout << "callbackFindItemSee" << endl;
-	nRotate = 0;
+	// itemtofind = item
 	if (itemsToFindIsEmpty())
 	{
-		execCallbackEnd();
+		execCallbackCallerContinue();
 		return ;
 	}
 	cout << items << endl;
-	execCallbackEnd();
+	checkItemAvailable();
+}
+
+int		ClientIa::checkItemAvailable()
+{
+	return 1;
 }
 
 void	ClientIa::receiveCallbackBroadcast(string broadcast)
 {
+	(void)broadcast;
 }
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
 	if (stackCallbackCommand.size() > 0)
 	{
-		(this->*stackCallbackCommand.front())(response);
+		void (ClientIa::*func)(string) = stackCallbackCommand.front();
 		stackCallbackCommand.pop_front();
+		(this->*func)(response);
 	}
 }
 
-void	ClientIa::pushCallbackEnd(void (ClientIa::*callbackEnd)())
+void	ClientIa::pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinue)())
 {
-	if (callbackEnd != NULL)
-		stackCallbackEnd.push_front(callbackEnd);
+	if (callbackCallerContinue != NULL)
+		stackCallbackCallerContinue.push_front(callbackCallerContinue);
 }
 
 void	ClientIa::pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse))

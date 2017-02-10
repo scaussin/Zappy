@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 //------------------------------------------------------------------------------//
 //																				//
@@ -80,4 +80,54 @@ void	ClientPlayer::printInventory()
 void	ClientPlayer::setBufferSend(ClientBuffer *buffer)
 {
 	bufferSend = buffer;
+}
+
+
+void	ClientPlayer::setItemsSeen(string items)
+{
+	/*(void)items;*/
+	map<string, int>	mapCase;
+	char				*caseItems;
+	char				*dup;
+	char				*item;
+	char				*lstItems;
+
+	itemsSeen.clear();
+	items = items.substr(1, items.size() - 2);
+	dup = strdup(items.c_str());
+	caseItems = strtok(dup, ",");
+	while (caseItems)
+	{
+		lstItems = strdup(caseItems);
+		mapCase.clear();
+		item = strtok(lstItems, " ");
+		while (item)
+		{
+			if (mapCase.find(item) == mapCase.end())
+				mapCase[item] = 1;
+			else
+				mapCase[item]++;
+			item = strtok(NULL, " ");
+		}
+		itemsSeen.push_back(mapCase);
+		free(lstItems);
+		lstItems = NULL;
+		caseItems = strtok(NULL, ",");
+	}
+	free(dup);
+}
+
+void	ClientPlayer::printItemsSeen()
+{
+	unsigned int		i = 0;
+
+	while (i < itemsSeen.size())
+	{
+		for(map<string, int>::iterator it = itemsSeen[i].begin(); it != itemsSeen[i].end(); ++it)
+		{
+			cout << it->first << ":" << it->second << "  ";
+		}
+		cout << endl;
+		i++;
+	}
 }

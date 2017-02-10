@@ -1,32 +1,36 @@
-NAME = client
+NAME =		client
 
-HEADER = includes/ClientMain.hpp
+CC =		g++ $(FLAGS) $(INCLUDES)
 
-SRC = src/main.cpp \
-src/ClientInputHandler.cpp \
-src/ClientCommunication.cpp \
-src/ClientPlayer.cpp \
-src/CustomException.cpp \
-src/ClientBuffer.cpp \
-src/ClientIa.cpp \
-src/ClientController.cpp
+INCLUDES =	-I./includes
 
+SRC = 		src/main.cpp \
+			src/ClientInputHandler.cpp \
+			src/ClientCommunication.cpp \
+			src/ClientPlayer.cpp \
+			src/CustomException.cpp \
+			src/ClientBuffer.cpp \
+			src/ClientIa.cpp \
+			src/ClientController.cpp
 
-OBJ = $(SRC:.cpp=.o)
+OBJ =		$(SRC:%.cpp=%.o)
 
-CC = g++ -g -Wall -Werror -Wextra
+FLAGS =		-Wall -Wextra -Werror -g
 
-all : $(NAME)
+all :		$(NAME)
 
-$(NAME) : $(OBJ)
-	$(CC) -o $(NAME) $(OBJ)
+$(NAME):	$(OBJ)
+			$(CC) $(OBJ) -o $(NAME)
 
 clean :
-	rm -rf $(OBJ)
+			rm -rf $(OBJ)
 
-fclean : clean
-	rm -rf $(NAME)
+fclean : 	clean
+			rm -rf $(NAME)
 
-re : fclean all
+re : 		fclean all
+
+%.o:		%.cpp
+				$(CC) -c $< -o $@
 
 .PHONY : all clean fclean re

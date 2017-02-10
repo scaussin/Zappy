@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 //------------------------------------------------------------------------------//
 //																				//
@@ -7,7 +7,7 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientCommunication::ClientCommunication(string _hostName, int _port, ClientPlayer *_player, ClientIa *_ia) : hostName(_hostName), port(_port), player(_player), ia(_ia)
+ClientCommunication::ClientCommunication(string _hostName, int _port, ClientPlayer *_player, ClientIa *_ia) : player(_player), ia(_ia), hostName(_hostName), port(_port)
 {
 	isConnected = false;
 	isAuthenticated = false;

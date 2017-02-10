@@ -1,7 +1,7 @@
 #ifndef CLIENTPLAYER_HPP
 # define CLIENTPLAYER_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 class ClientPlayer
 {
@@ -29,6 +29,8 @@ class ClientPlayer
 		void						setInventory(string inventory);
 		map<string, int>			getInventory();
 		void						printInventory();
+		void						setItemsSeen(string items);
+		void						printItemsSeen();
 
 	private:
 		map<string, int>			inventory;
@@ -36,6 +38,7 @@ class ClientPlayer
 		int							lifeUnits;
 		vector<string>				vision;
 		ClientBuffer				*bufferSend;
+		vector<map<string, int> >	itemsSeen;
 
 
 };

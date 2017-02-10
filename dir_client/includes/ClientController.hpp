@@ -1,7 +1,7 @@
 #ifndef CLIENTCONTROLLER_HPP
 # define CLIENTCONTROLLER_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 /*
 **	Main instance of the client. Controls every other client class;

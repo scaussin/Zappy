@@ -1,7 +1,7 @@
 #ifndef CLIENTINPUTHANDLER_HPP
 # define CLIENTINPUTHANDLER_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 class ClientInputHandler
 {

@@ -1,7 +1,7 @@
 #ifndef CLIENTCOMMUNICATION_HPP
 # define CLIENTCOMMUNICATION_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 class ClientCommunication
 {
@@ -35,8 +35,8 @@ class ClientCommunication
 		int						stateProcessAuth;
 		fd_set					read_fs;
 		fd_set					write_fs;
-		int						port;
 		string					hostName;
+		int						port;
 		int						sock;
 		struct protoent			*proto;
 		struct sockaddr_in		sin;

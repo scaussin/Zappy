@@ -24,7 +24,7 @@
 # include <sys/time.h>
 # include <netdb.h>
 
-# define BUFF_SIZE 128
+# define BUFF_SIZE 8192
 # define END "\n"
 # define LEN_END 1
 

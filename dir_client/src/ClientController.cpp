@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 ClientController::ClientController(int argc, char **argv)
 {
