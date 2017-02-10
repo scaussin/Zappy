@@ -41,13 +41,21 @@ void	ClientPlayer::avance()
 	bufferSend->pushMsg("avance\n");
 }
 
+void	ClientPlayer::droite()
+{
+	bufferSend->pushMsg("droite\n");
+}
+void	ClientPlayer::gauche()
+{
+	bufferSend->pushMsg("gauche\n");
+}
 void	ClientPlayer::setInventory(string inventory)
 {
 	char	*item;
 	char	*n;
 	char	*dup;
 
-	inventory = inventory.substr(1, inventory.size() - 2);
+	inventory = inventory.substr(1, inventory.size() - 3);
 	dup = strdup(inventory.c_str());
 	item = strtok(dup, ", ");
 	while (item)
@@ -82,25 +90,20 @@ void	ClientPlayer::setBufferSend(ClientBuffer *buffer)
 	bufferSend = buffer;
 }
 
-
 void	ClientPlayer::setItemsSeen(string items)
 {
-	/*(void)items;*/
 	map<string, int>	mapCase;
-	char				*caseItems;
-	char				*dup;
-	char				*item;
+	vector<string>		casesItems;
 	char				*lstItems;
+	char				*item;
 
-	itemsSeen.clear();
-	items = items.substr(1, items.size() - 2);
-	dup = strdup(items.c_str());
-	caseItems = strtok(dup, ",");
-	while (caseItems)
+	items = items.substr(1, items.size() - 3);
+	casesItems = strSplit(items, ",");
+	for (vector<string>::iterator it = casesItems.begin() ; it != casesItems.end() ; ++it)
 	{
-		lstItems = strdup(caseItems);
-		mapCase.clear();
+		lstItems = strdup(it->c_str());
 		item = strtok(lstItems, " ");
+		mapCase.clear();
 		while (item)
 		{
 			if (mapCase.find(item) == mapCase.end())
@@ -111,10 +114,7 @@ void	ClientPlayer::setItemsSeen(string items)
 		}
 		itemsSeen.push_back(mapCase);
 		free(lstItems);
-		lstItems = NULL;
-		caseItems = strtok(NULL, ",");
 	}
-	free(dup);
 }
 
 void	ClientPlayer::printItemsSeen()
@@ -130,4 +130,14 @@ void	ClientPlayer::printItemsSeen()
 		cout << endl;
 		i++;
 	}
+}
+
+int		ClientPlayer::getHeightVision()
+{
+	return (level + 1);
+}
+
+vector<map<string, int> >	ClientPlayer::getItemsSeen()
+{
+	return (itemsSeen);
 }

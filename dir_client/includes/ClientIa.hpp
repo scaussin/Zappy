@@ -20,13 +20,13 @@ class ClientIa
 		void								endPlay();
 		void								execCallbackCallerContinue();
 		void								findItemSee();
-		void								callbackInventory(string inventory);
 		void								callbackCheckFoodInventory(string inventory);
 		void								pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinue)());
 		void								pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
 		bool								itemsToFindIsEmpty();
 		void								callbackFindItemSee(string items);
-		int									checkItemAvailable();
+		pair<string, int>					checkItemAvailable();
+		void								receiveCallbackCommandIgnore(string response);
 		ClientPlayer						*player;
 		map<string, int>					itemsToFind;
 		int									minFood;

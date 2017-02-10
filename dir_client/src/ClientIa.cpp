@@ -18,11 +18,6 @@ void	ClientIa::endPlay()
 	cout << "End" << endl;
 }
 
-void	ClientIa::callbackInventory(string inventory)
-{
-	cout << "inventory: " << inventory << endl;
-}
-
 void	ClientIa::checkFoodStart(int minFood, int nToEat, void (ClientIa::*caller)())
 {
 	pushCallbackCallerContinue(caller);
@@ -77,27 +72,83 @@ void	ClientIa::findItemSee()
 {
 	player->voir();
 	stackCallbackCommand.push_back(&ClientIa::callbackFindItemSee);
-	cout << "findItemSee" << endl;
+}
+
+void	ClientIa::callbackTake(string response)
+{
+	/*if (ok)
+		itemsToFind[itemAvailable.first]--;*/
 }
 
 void	ClientIa::callbackFindItemSee(string items)
 {
 	player->setItemsSeen(items);
 	player->printItemsSeen();
-	cout << "callbackFindItemSee" << endl;
-	// itemtofind = item
 	if (itemsToFindIsEmpty())
 	{
 		execCallbackCallerContinue();
 		return ;
 	}
-	cout << items << endl;
-	checkItemAvailable();
+	pair<string, int> itemAvailable = checkItemAvailable();
+	if (itemAvailable.second == 0) /*!= -1*/
+	{
+		//move to case ;)
+		player->prendre(itemAvailable.first);
+		stackCallbackCommand.push_back(&ClientIa::);
+	}
+	else if (nRotate < 3)
+	{
+		player->droite();
+		stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+		nRotate++;
+		findItemSee();
+	}
+	else
+	{
+		int nRand = rand() % 3;
+		if (nRand == 0)
+		{
+			player->droite();
+			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+		}
+		else if (nRand == 1)
+		{
+			player->gauche();
+			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+		}
+		int nAvance = (player->getHeightVision() * 2) - 1;
+		while (nAvance >= 0)
+		{
+			player->avance();
+			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			nAvance--;
+		}
+		findItemStart(itemsToFind, NULL);
+	}
 }
 
-int		ClientIa::checkItemAvailable()
+void	ClientIa::receiveCallbackCommandIgnore(string response)
 {
-	return 1;
+	(void)response;
+}
+
+pair<string, int>	ClientIa::checkItemAvailable()
+{
+	size_t						i = 0;
+	vector<map<string, int> >	itemsSeen = player->getItemsSeen();
+
+	while (i < player->getItemsSeen().size())
+	{
+		for (map<string, int>::iterator item = itemsToFind.begin() ; item != itemsToFind.end() ; ++item)
+		{
+			if (itemsSeen[i].find(item->first) != itemsSeen[i].end())
+			{
+				return (make_pair(item->first, i));
+			}
+		}
+		i++;
+	}
+	return make_pair("", -1);
 }
 
 void	ClientIa::receiveCallbackBroadcast(string broadcast)

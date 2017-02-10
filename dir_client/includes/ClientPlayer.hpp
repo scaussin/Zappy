@@ -24,17 +24,21 @@ class ClientPlayer
 		void						inventaire();
 		void						avance();
 		void						voir();
+		void						gauche();
+		void						droite();
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
 		map<string, int>			getInventory();
+		vector<map<string, int> >	getItemsSeen();
 		void						printInventory();
 		void						setItemsSeen(string items);
 		void						printItemsSeen();
+		int							getHeightVision();
 
 	private:
-		map<string, int>			inventory;
 		int							level;
+		map<string, int>			inventory;
 		int							lifeUnits;
 		vector<string>				vision;
 		ClientBuffer				*bufferSend;

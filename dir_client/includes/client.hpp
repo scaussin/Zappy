@@ -22,7 +22,8 @@
 # include <netdb.h>
 # include <fcntl.h>
 # include <sys/time.h>
-# include <netdb.h>
+# include <ctime>
+
 
 # define BUFF_SIZE 8192
 # define END "\n"
@@ -58,6 +59,7 @@ class ClientIa;
 # include "ClientController.hpp"
 # include "ClientIa.hpp"
 
+vector<string>		strSplit(string str, string delimiters);
 
 // color in text;
 # define KNRM  "\x1B[0m"
