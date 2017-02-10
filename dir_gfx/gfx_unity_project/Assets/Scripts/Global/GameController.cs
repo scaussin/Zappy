@@ -24,14 +24,19 @@ public class GameController : MonoBehaviour {
 	public UnityEvent	OnTimeUnitModified;
 	public UnityEvent	OnWorldSizeReceived;
 
+	// optimization references
+	private PlayerController	PlayerControllerScript;
+
 	void Awake()
 	{
 		OnTimeUnitModified = new UnityEvent ();
 		CameraViewControl = GameObject.Find ("CameraRoot");
+
 	}
 
 	// Use this for initialization
 	void Start () {
+		PlayerControllerScript = GameManager.instance.WorldManager.PlayerController;
 		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
 		GameManager.instance.ConnectionManager.OnConnectionWithServer.AddListener (OnConnectionWithServerAction);
@@ -161,22 +166,30 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public void OnServerShutdown()
 	{
+		// ------------------------------- Visual cleaning 
 		ActivateMainMenuInput();
 		// deactivate analyzer tool;
 		GameManager.instance.MainMenuController.InGameMenuController.
 			AnalyzerToolPanel.
 			GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = false;
+		// hide and desactivate ui time control.
+		GameManager.instance.MainMenuController.InGameMenuController.HideTimeControlMenu();
+		// set the menu animation in motion.
+		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
+
+		// ------------------------------- Data cleaning.
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
-		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
+
+		// set Main menu UI message.
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost-";
 		DisablePlayerCameraControl ();
 	}
 
 	/// <summary>
-	/// Called when a team has won, or all players are dead.
+	/// Called when a team has won, or all players are dead(optionnal?).
 	/// </summary>
 	public void	OnGameOver(string msg)
 	{
@@ -200,7 +213,7 @@ public class GameController : MonoBehaviour {
 /* *************************************************************************************** 	*
  * 																							*		
  *	Game events Methods																		*
- *	All these methods may or not call other component to activate.							*
+ *	All these methods may or not call other components to activate.							*
  * 																							*
  * ***************************************************************************************	*/
 
@@ -228,41 +241,40 @@ public class GameController : MonoBehaviour {
 
 	public void OnPlayerMovement(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.MovePlayer (msg);
+		PlayerControllerScript.MovePlayer (msg);
 	}
 
 	// Also handle player disconnection.
 	public void OnPlayerDeath(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.KillPlayer (msg);
+		PlayerControllerScript.KillPlayer (msg);
 	}
 
 	public void OnPlayerLevelReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.SetPlayerLevel (msg);
+		PlayerControllerScript.SetPlayerLevel (msg);
 	}
 
 	public void OnPlayerInventoryReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.SetPlayerInventory (msg);
+		PlayerControllerScript.SetPlayerInventory (msg);
 	}
 
 	public void OnPlayerExpulseReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerExpulse (msg);
+		PlayerControllerScript.PlayerExpulse (msg);
 	}
 
 	public void OnPlayerBroadcast(string msg)
 	{
 		Debug.Log ("Received broadcast cmd, but its not yet implemented");
 		// TODO: think about the broadcast system. Spawn an object? make a particle effect?
-		// 		  need to be defined.
+		// 		  needs to be defined.
 	}
 
 	public void OnPlayerIncantation(string msg)
 	{
-		Debug.Log ("Received incantation cmd, but its not yet implemented");
-		// TODO: think about the incantation system.
+		PlayerControllerScript.IncantationStart (msg);
 	}
 
 	public void OnIncantationEnd(string msg)
@@ -271,24 +283,26 @@ public class GameController : MonoBehaviour {
 		// TODO: think about the incantation system.
 	}
 
-	public void OnPlayerStartLayEgg(string msg)
-	{
-		Debug.Log ("Received Player starts lay egg, but its not yet implemented");
-	}
+
 
 	public void OnPlayerDropRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerDropRessource (msg);
+		PlayerControllerScript.PlayerDropRessource (msg);
 	}
 
 	public void OnPlayerTakeRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerTakeRessource (msg);
+		PlayerControllerScript.PlayerTakeRessource (msg);
+	}
+
+	public void OnPlayerStartLayEgg(string msg)
+	{
+		PlayerControllerScript.PlayerStartsLaying (msg);
 	}
 
 	public void OnPlayerLayedEgg(string msg)
 	{
-		Debug.Log ("Received Player layed egg, but its not yet implemented");
+		PlayerControllerScript.PlayerFinishEggLaying (msg);
 	}
 
 	public void OnEggHatched(string msg)

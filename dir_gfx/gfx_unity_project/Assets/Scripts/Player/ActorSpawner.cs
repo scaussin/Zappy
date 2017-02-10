@@ -11,16 +11,16 @@ public class ActorSpawner : MonoBehaviour
 	[Header("Associated Objects")]
 	public GameObject		ActorContainer;
 	public GameObject		PlayerPrefab;
-	public GameObject		BoardZeroPoint;
+	private Vector3			BoardZeroPoint;
 
 	private Vector3			SpawnLocation;
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
 		ActorContainer = transform.Find ("ActorContainer").gameObject;
 		PlayerPrefab = Resources.Load ("Prefabs/Actors/Player") as GameObject;
-		BoardZeroPoint = GameManager.instance.WorldManager.WorldBoardSpawner.ZeroPoint;
+		BoardZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
 	}
 	
 	public void SpawnNewPlayer(string msg)
@@ -31,7 +31,7 @@ public class ActorSpawner : MonoBehaviour
 		GroupCollection groups = match.Groups;
 
 		// ---- Preparing spawn position variables.
-		SpawnLocation = BoardZeroPoint.transform.position;
+		SpawnLocation = BoardZeroPoint;
 
 		SpawnLocation.x += (GameManager.instance.WorldSettings.BlockSize +
 		GameManager.instance.WorldSettings.BlockSpacing) * (int.Parse (groups [2].Value));
@@ -49,7 +49,14 @@ public class ActorSpawner : MonoBehaviour
 		newPlayer.GetComponent<PlayerObject> ().Dir = int.Parse (groups [4].Value);
 		newPlayer.GetComponent<PlayerObject> ().Level = int.Parse (groups [5].Value);
 		newPlayer.GetComponent<PlayerObject> ().Team = groups [6].Value;
+
+		// Player Added to list of players.
 		GameManager.instance.PlayerManager.ConnectedPlayers.Add(newPlayer.GetComponent<PlayerObject> ());
 		//GetComponent<PlayerController> ().Players.Add(newPlayer.GetComponent<PlayerObject> ());
+	}
+
+	public void SpawnNewEgg(int egg_nb, PlayerObject player, int egg_x, int egg_y)
+	{
+		Debug.Log ("Laying new egg !");
 	}
 }

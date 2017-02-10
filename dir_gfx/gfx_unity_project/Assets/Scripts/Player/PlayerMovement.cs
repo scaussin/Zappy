@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private PlayerObject	playerObjInstance;
 	private Animator		playerAnimator;
-	private GameObject		boardZeroPoint;
+	private Vector3			boardZeroPoint;
 
 	// Init vars at spawn.
 	void OnEnable()
@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
 						+ GameManager.instance.WorldSettings.BlockSpacing;
 		playerObjInstance = GetComponent<PlayerObject> ();
 		playerAnimator =  GetComponent<Animator> ();
-		boardZeroPoint = transform.parent.transform.parent.GetComponent<ActorSpawner> ().BoardZeroPoint;
+		boardZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
 		timeUnit = GameManager.instance.WorldSettings.TimeUnit;
 	}
 
@@ -76,7 +76,12 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void StartMovement(int x, int y, int dir)
 	{
-		moveStartTime = Time.time;
+		// if ppo is received again during a movement,
+		// we dont want the linear interpolation frac to be changed.
+		if (IsAdvancing == false)
+		{
+			moveStartTime = Time.time;
+		}
 		SetTargetWorldPos (x, y, dir);
 		IsAdvancing = true;
 		IsRotating = false;
@@ -105,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void Teleport(int x, int y, int dir)
 	{
-		TargetPos = boardZeroPoint.transform.position;
+		TargetPos = boardZeroPoint;
 
 		TargetPos.x += (GameManager.instance.WorldSettings.BlockSize +
 			GameManager.instance.WorldSettings.BlockSpacing) * x;

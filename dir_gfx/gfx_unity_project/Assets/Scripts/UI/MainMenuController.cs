@@ -39,11 +39,15 @@ public class MainMenuController : MonoBehaviour {
 		MainPanelScript = MainPanel.GetComponent<MainPanelScript> ();
 		InGameMenuPanel = transform.Find ("InGameMenuPanel").gameObject;
 		InGameMenuController = InGameMenuPanel.GetComponent<InGameMenuController> ();
-
 		// Clean initatialization ( for when we press play )
 		MainPanel.SetActive(true);
 		BlackBackground.SetActive (true);
     }
+
+	void Start()
+	{
+		InGameMenuController.TabPanel.SetActive (false);
+	}
 
 	/// <summary>
 	/// Activates the main panel input for entering server host and port. Used by the GameController.

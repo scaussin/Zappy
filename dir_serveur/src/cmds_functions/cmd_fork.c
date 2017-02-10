@@ -33,7 +33,11 @@ void	on_end_cmd_fork(t_serveur *serv, t_client_entity *client_cur, char *param)
 	add_new_egg(serv, client_cur);
 	write_buffer(&client_cur->buff_send, "ok\n", 3);
 	// send gfx: "enw #e #n X Y\n"
-	asprintf(&gfx_msg, "enw #%d\n", client_cur->sock);
+	asprintf(&gfx_msg, "enw #%d #%d %d %d\n",
+		serv->world_hdl.nb_of_eggs,
+		client_cur->sock,
+		client_cur->player.pos.x,
+		client_cur->player.pos.y);
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
 }

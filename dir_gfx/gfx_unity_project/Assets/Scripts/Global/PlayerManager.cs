@@ -7,6 +7,7 @@ public class PlayerManager : MonoBehaviour {
 	[Header("List of team names")]
 	public List<string>			PlayerTeams;
 	public List<PlayerObject>	ConnectedPlayers;
+	public List<GameObject>		EggList;
 
 	/// <summary>
 	/// Cleans the player manager of their teams and players.

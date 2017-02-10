@@ -21,6 +21,14 @@ public class PlayerController : MonoBehaviour {
 	private int					new_y;
 	private int					new_dir;
 
+	// incantation
+	private string				players_incanting_str;
+	private string[]			players_incanting_strarray;
+	private List<int>			players_incanting_nb;
+	private int					incantation_x;
+	private int					incantation_y;
+	private int					incantation_lv;
+
 	// Use this for initialization
 	void Start () {
 		ActorContainer = transform.Find ("ActorContainer").gameObject;
@@ -186,29 +194,10 @@ public class PlayerController : MonoBehaviour {
 				}
 			}
 		}
-		// Players move by theirselves.
+		// Expulsed players move by theirselves.
 	}
 
 	public void PlayerDropRessource(string msg)
-	{
-		rgx = new Regex ("^pgt #(\\d+) (\\d+)$");
-		match = rgx.Match (msg);
-		if (match.Success)
-		{
-			groups = match.Groups;
-			player_nb = int.Parse (groups [1].Value);
-			foreach (PlayerObject player in Players)
-			{
-				if (player.AssignedNumber == player_nb)
-				{
-					player.GetComponent<Animator> ().SetTrigger ("ArmAction");
-					return ;
-				}
-			}
-		}
-	}
-
-	public void PlayerTakeRessource(string msg)
 	{
 		rgx = new Regex ("^pdr #(\\d+) (\\d+)$");
 		match = rgx.Match (msg);
@@ -227,6 +216,120 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	public void PlayerTakeRessource(string msg)
+	{
+		rgx = new Regex ("^pgt #(\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("ArmAction");
+					return ;
+				}
+			}
+		}
+	}
+
+	public void IncantationStart(string msg)
+	{
+		// "pic X Y L #n #n …\n"
+		rgx = new Regex ("^pic (\\d+) (\\d+) (\\d+)((?: #\\d+)+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			incantation_x = int.Parse (groups [1].Value);
+			incantation_y = int.Parse (groups [2].Value);
+			incantation_lv = int.Parse (groups [3].Value);
+			players_incanting_str = groups [4].Value;
+
+			players_incanting_str = players_incanting_str.TrimStart (' ');
+			players_incanting_strarray = players_incanting_str.Split (new string[] { " " }, System.StringSplitOptions.None);
+			players_incanting_nb = new List<int> ();
+			foreach (string player_str_id in players_incanting_strarray) {
+				Debug.Log ("[" + player_str_id + "]");
+				rgx = new Regex ("^#(\\d+)$");
+				match = rgx.Match (player_str_id);
+				if (match.Success)
+				{
+					groups = match.Groups;
+					players_incanting_nb.Add (int.Parse (groups [1].Value));
+				}
+			}
+
+			foreach (PlayerObject player in Players)
+			{
+				if (players_incanting_nb.IndexOf(player.AssignedNumber) != -1)
+				{
+					player.GetComponent<Animator> ().SetBool ("IsIncanting", true);
+				}
+			}
+		}
+	}
+
+	public void IncantationEnd(string msg)
+	{
+
+	}
+
+	public void PlayerStartsLaying(string msg)
+	{
+		// "pfk #n\n"
+		rgx = new Regex ("^pfk #(\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetBool ("LayingEgg", true);
+					return ;
+				}
+			}
+		}
+	}
+
+	public void PlayerFinishEggLaying(string msg)
+	{
+		int		egg_nb;
+		int		egg_x;
+		int		egg_y;
+
+		//"enw #e #n X Y\n"
+		rgx = new Regex ("^enw #(\\d+) #(\\d+) (\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		Debug.Log ("player finish egg laying");
+		if (match.Success)
+		{
+			groups = match.Groups;
+			egg_nb = int.Parse (groups [1].Value);
+			player_nb = int.Parse (groups [2].Value);
+			egg_x = int.Parse (groups [3].Value);
+			egg_y = int.Parse (groups [4].Value);
+
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetBool ("LayingEgg", false);
+					GameManager.instance.WorldManager.ActorSpawner.SpawnNewEgg (egg_nb, player, egg_x, egg_y);
+					return ;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Cleans the map of all connected players. Called when the server connection is lost.
+	/// </summary>
 	public void CleanMapOfPlayers()
 	{
 		foreach (PlayerObject player in Players)

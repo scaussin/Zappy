@@ -7,7 +7,8 @@ using UnityEngine.UI;
 /// <summary>
 /// User interface tab panel. Mirror to UITeamOverviewPanelController.
 /// Except this one focuses on connected player and is only visible when
-/// tab btn is pressed;
+/// tab btn is pressed; When tab is not pressed, all this script is desactived.
+/// Look at UIInGameMenuController for details on activating this script.
 /// </summary>
 public class UITabPanel : MonoBehaviour {
 	[Header("server sending delay")]
@@ -40,6 +41,7 @@ public class UITabPanel : MonoBehaviour {
 
 	void OnDisable()
 	{
+		GetComponent<ScrollRect> ().verticalNormalizedPosition = 1.0f;
 		StopCoroutine ("UpdatePlayerTabRoutine");
 	}
 
@@ -61,7 +63,6 @@ public class UITabPanel : MonoBehaviour {
 		i = 1;
 		foreach (PlayerObject player in playerObjsRef)
 		{
-			//SetTeamInfosFromName (playerTeamsRef[team_count]);
 			SetPlayerTabValues (SpawnPlayerTabPanel (player), player);
 		}
 	}
@@ -78,28 +79,28 @@ public class UITabPanel : MonoBehaviour {
 	{
 		NewPlayerTabPanel.transform.Find ("PlayerTabPanelValue").GetComponent<Text> ().text = playerObj.AssignedNumber.ToString();
 		NewPlayerTabPanel.transform.Find ("TeamNameValue").GetComponent<Text> ().text = playerObj.Team;
-		NewPlayerTabPanel.transform.Find ("Position_x_value").GetComponent<Text> ().text = playerObj.X.ToString() + "x";
-		NewPlayerTabPanel.transform.Find ("Position_y_value").GetComponent<Text> ().text = playerObj.Y.ToString() + "y";
+//		NewPlayerTabPanel.transform.Find ("Position_x_value").GetComponent<Text> ().text = playerObj.X.ToString() + "x";
+//		NewPlayerTabPanel.transform.Find ("Position_y_value").GetComponent<Text> ().text = playerObj.Y.ToString() + "y";
 		NewPlayerTabPanel.transform.Find ("LevelValue").GetComponent<Text> ().text = playerObj.Level.ToString();
-		NewPlayerTabPanel.transform.Find ("FoodValue").GetComponent<Text> ().text = playerObj.FoodTimeLeft.ToString();
-		NewPlayerTabPanel.transform.Find ("LinemateValue").GetComponent<Text> ().text = playerObj.Linemate.ToString();
-		NewPlayerTabPanel.transform.Find ("DeraumereValue").GetComponent<Text> ().text = playerObj.Deraumere.ToString();
-		NewPlayerTabPanel.transform.Find ("SiburValue").GetComponent<Text> ().text = playerObj.Sibur.ToString();
-		NewPlayerTabPanel.transform.Find ("MendianeValue").GetComponent<Text> ().text = playerObj.Mendiane.ToString();
-		NewPlayerTabPanel.transform.Find ("PhirasValue").GetComponent<Text> ().text = playerObj.Phiras.ToString();
-		NewPlayerTabPanel.transform.Find ("ThystameValue").GetComponent<Text> ().text = playerObj.Thystame.ToString();
+//		NewPlayerTabPanel.transform.Find ("FoodValue").GetComponent<Text> ().text = playerObj.FoodTimeLeft.ToString();
+//		NewPlayerTabPanel.transform.Find ("LinemateValue").GetComponent<Text> ().text = playerObj.Linemate.ToString();
+//		NewPlayerTabPanel.transform.Find ("DeraumereValue").GetComponent<Text> ().text = playerObj.Deraumere.ToString();
+//		NewPlayerTabPanel.transform.Find ("SiburValue").GetComponent<Text> ().text = playerObj.Sibur.ToString();
+//		NewPlayerTabPanel.transform.Find ("MendianeValue").GetComponent<Text> ().text = playerObj.Mendiane.ToString();
+//		NewPlayerTabPanel.transform.Find ("PhirasValue").GetComponent<Text> ().text = playerObj.Phiras.ToString();
+//		NewPlayerTabPanel.transform.Find ("ThystameValue").GetComponent<Text> ().text = playerObj.Thystame.ToString();
 	}
 
 	public void AskForAllPlayersDatas()
 	{
 		foreach (PlayerObject player in playerObjsRef)
 		{
-			GameManager.instance.MsgBroadcastController
-					.PushMsg ("ppo #" + player.AssignedNumber + "\n");
+//			GameManager.instance.MsgBroadcastController
+//					.PushMsg ("ppo #" + player.AssignedNumber + "\n");
 			GameManager.instance.MsgBroadcastController
 					.PushMsg ("plv #" + player.AssignedNumber + "\n");
-			GameManager.instance.MsgBroadcastController
-					.PushMsg ("pin #" + player.AssignedNumber + "\n");
+//			GameManager.instance.MsgBroadcastController
+//					.PushMsg ("pin #" + player.AssignedNumber + "\n");
 		}
 	}
 

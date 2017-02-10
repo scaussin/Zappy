@@ -28,6 +28,7 @@ public class InGameMenuController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+		// Check for the tab panel up or not.
 		if ((Input.GetKeyDown (tabPanelKey) || Input.GetKeyDown (tabPanelKeyAlt))
 			&& tabPanelUp == false)
 		{
@@ -40,5 +41,13 @@ public class InGameMenuController : MonoBehaviour {
 			tabPanelUp = false;
 			TabPanel.SetActive (false);
 		}
+	}
+
+	/// <summary>
+	/// Hides the time control menu. Used when connection to server lost.
+	/// </summary>
+	public void HideTimeControlMenu()
+	{
+		TimeControlPanel.GetComponent<Animator> ().SetTrigger ("Disappear");
 	}
 }

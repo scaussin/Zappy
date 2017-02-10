@@ -7,9 +7,8 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 	[Header("Associated objects")]
 	public GameObject					BlockPrefab;
-	public GameObject					ZeroPoint;
+	public Vector3						ZeroPoint;
 	public GameObject					BlockContainer;
-
 
 	[System.Serializable]
 	public class WorldBoard
@@ -19,7 +18,6 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 	[Header("Access to each spawned block")]
 	public List <WorldBoard> Blocks_col;
-
 
 	public int							map_size_x;
 	public int							map_size_y;
@@ -36,8 +34,9 @@ public class WorldBoardSpawner : MonoBehaviour {
 	private float						z_base_offset;
 
 	// Use this for initialization
-	void Awake () {
-		ZeroPoint = transform.Find("ZeroPoint").gameObject;
+	void Awake ()
+	{
+		ZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
 		BlockContainer = transform.Find("BlockContainer").gameObject;
 		BlockPrefab = Resources.Load ("Prefabs/World/Block") as GameObject;
 		OnWorldBoardSpawned = new UnityEvent ();
@@ -75,7 +74,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 							GameManager.instance.WorldSettings.BlockSpacing;
 		z_base_offset = GameManager.instance.WorldSettings.BlockSize +
 							GameManager.instance.WorldSettings.BlockSpacing;
-		spawn_location = ZeroPoint.transform.position;
+		spawn_location = ZeroPoint;
 
 		// ---- Actual block spawn.
 		Debug.Log ("Spawning World Blocks!!");
@@ -99,7 +98,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 			cur_y++;
 			cur_x = 0;
 			// reset x positionning.
-			spawn_location.x = ZeroPoint.transform.position.x;
+			spawn_location.x = ZeroPoint.x;
 			spawn_location.z += z_base_offset;
 		}
 		OnWorldBoardSpawned.Invoke ();
