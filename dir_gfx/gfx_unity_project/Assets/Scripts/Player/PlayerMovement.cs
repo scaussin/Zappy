@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Player movement. Each Player object handles its own movement, but none of them
-/// activate their methods by theirselves.
+/// activate their methods by theirselves. This class handle the actual player unity object's movement.
 /// </summary>
 public class PlayerMovement : MonoBehaviour
 {

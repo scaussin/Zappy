@@ -17,7 +17,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 	}
 
 	[Header("Access to each spawned block")]
-	public List <WorldBoard> Blocks_col;
+	public List <WorldBoard>			GameWorldBoard; // access with GameWorldBoard[y].Row[x]
 
 	public int							map_size_x;
 	public int							map_size_y;
@@ -50,7 +50,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 	/// <param name="y">The y coordinate. (server map)</param>
 	public BlockObject	GetBlockObject(int x, int y)
 	{
-		return (Blocks_col[y].Row[x].GetComponent<BlockObject> ());
+		return (GameWorldBoard[y].Row[x].GetComponent<BlockObject> ());
 	}
 
 	/// <summary>
@@ -78,11 +78,11 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 		// ---- Actual block spawn.
 		Debug.Log ("Spawning World Blocks!!");
-		Blocks_col = new List<WorldBoard> ();
+		GameWorldBoard = new List<WorldBoard> ();
 		while (cur_y < map_size_y)
 		{
-			Blocks_col.Add(new WorldBoard ());
-			Blocks_col[cur_y].Row = new List<GameObject> ();
+			GameWorldBoard.Add(new WorldBoard ());
+			GameWorldBoard[cur_y].Row = new List<GameObject> ();
 			while (cur_x < map_size_x)
 			{
 				// location is set through additionning variables -> faster calculation method.
@@ -90,7 +90,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 											Quaternion.identity, BlockContainer.transform);
 				new_block.GetComponent<BlockObject> ().x = cur_x;
 				new_block.GetComponent<BlockObject> ().y = cur_y;
-				Blocks_col[cur_y].Row.Add(new_block);
+				GameWorldBoard[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
 				cur_x++;
 				spawn_location.x += x_base_offset;
@@ -106,13 +106,13 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 	public void DeleteWorld()
 	{
-		for (int i = 0; i < Blocks_col.Count; i++)
+		for (int i = 0; i < GameWorldBoard.Count; i++)
 		{
-			for (int y = 0; y < Blocks_col [i].Row.Count; y++)
+			for (int y = 0; y < GameWorldBoard [i].Row.Count; y++)
 			{
-				Destroy (Blocks_col [i].Row[y].gameObject);
+				Destroy (GameWorldBoard [i].Row[y].gameObject);
 			}
 		}
-		Blocks_col.Clear ();
+		GameWorldBoard.Clear ();
 	}
 }

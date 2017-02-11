@@ -2,6 +2,10 @@
 using System.Collections;
 
 public class PlayerObject : MonoBehaviour {
+	[Header("Player Status flags")]
+	public bool			IsIncanting;
+	public int			IncantationId = -1; // -1 == incantation not started.
+
 	[Header("Player Datas")]
 	public int			AssignedNumber; // #n
 	public int			X; // X

@@ -267,7 +267,7 @@ public class GameController : MonoBehaviour {
 
 	public void OnPlayerBroadcast(string msg)
 	{
-		Debug.Log ("Received broadcast cmd, but its not yet implemented");
+		PlayerControllerScript.PlayerBroadcast (msg);
 		// TODO: think about the broadcast system. Spawn an object? make a particle effect?
 		// 		  needs to be defined.
 	}
@@ -279,11 +279,8 @@ public class GameController : MonoBehaviour {
 
 	public void OnIncantationEnd(string msg)
 	{
-		Debug.Log ("Received incantation end, but its not yet implemented");
-		// TODO: think about the incantation system.
+		PlayerControllerScript.IncantationEnd (msg);
 	}
-
-
 
 	public void OnPlayerDropRessource(string msg)
 	{

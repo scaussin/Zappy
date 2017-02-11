@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public class BlockObject : MonoBehaviour
 {
+	[Header("Block events")]
+	public List<int>			Incantations_id;
+
 	[Header("Block datas")]
 	public int					x;
 	public int					y;

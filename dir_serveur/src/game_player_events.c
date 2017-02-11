@@ -30,13 +30,15 @@ void	check_players_events(t_serveur *serv)
 **	For current player, we check if he must die of hunger.
 **	At zero, the player dies at ~12.6 sec for 126 of food life time
 **	and t_unit 100.
+**	Exception : incanter cant die, or else the incantation will be lost in suspens.
+**	He will die at the end of his incantation and NOT get his level up.
 */
 
 void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 {
 	char				*gfx_msg;
 	
-	if (cur_client->player.inventory[FOOD] == 0) // Works. 
+	if (cur_client->player.is_incanter == 0 && cur_client->player.inventory[FOOD] <= 0)
 	{
 		cur_client->is_player_dead = 1;
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;

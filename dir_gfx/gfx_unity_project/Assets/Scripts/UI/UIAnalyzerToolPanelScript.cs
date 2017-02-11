@@ -118,7 +118,8 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 				// clicked on nothing.
 				previousColBroadcast = colBroadcast;
 				DisengageSelectionDisplay ();
-				AnalyzerToolContainer.GetComponent<Animator> ().SetTrigger ("Disappear");
+				if (AnalyzerToolContainer.GetComponent<Animator> ().enabled == true)
+					AnalyzerToolContainer.GetComponent<Animator> ().SetTrigger ("Disappear");
 				AnalyzedObject = null;
 			}
 		}

@@ -43,6 +43,8 @@ void	gfx_cmd_pin(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		{
 			// client found
 			time_left = get_food_as_time(serv, client_tmp);
+			if (time_left < 0)
+				time_left = 0;
 			// send inventaire "pin #n X Y q q q q q q q\n"
 			asprintf(&gfx_msg, "pin #%d %d %d %ld %d %d %d %d %d %d\n",
 			client_tmp->sock,

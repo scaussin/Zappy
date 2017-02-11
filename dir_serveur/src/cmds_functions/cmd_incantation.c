@@ -246,6 +246,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 			&& clients_tmp->player.pos.y == incanter_player->pos.y
 			&& clients_tmp->player.level == incanter_player->level
 			&& clients_tmp->player.is_incanting == 1
+			&& clients_tmp->is_player_dead == 0
 			&& clients_tmp->player.incantation_id == incanter_player->incantation_id)
 		{
 			clients_tmp->player.is_incanting = 0;
@@ -273,7 +274,9 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	}
 	// Incanter must be lvled up separately and after the others.
 	// Because modifiying his datas makes the upper loop impossible.
-	if (result == 1)
+	// Also, if he died of hunger during incantation, he does not level up,
+	// and dies after the incantation is over.
+	if (result == 1 && cur_client->player.inventory[FOOD] > 0)
 	{
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 		cur_client->player.level += 1;

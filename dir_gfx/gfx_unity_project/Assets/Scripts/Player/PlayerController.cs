@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour {
 	public GameObject			ActorContainer;
 	public List<PlayerObject>	Players;
 
+	[Header("Ongoing incantion nb and ids")]
+	public int					Incantation_nb = 0;
+
 	// Private tmp variables.
 	private Regex				rgx;
 	private Match				match;
@@ -28,6 +31,8 @@ public class PlayerController : MonoBehaviour {
 	private int					incantation_x;
 	private int					incantation_y;
 	private int					incantation_lv;
+	private GameObject			incantation_block_obj;
+	private int					incantation_result;
 
 	// Use this for initialization
 	void Start () {
@@ -37,7 +42,7 @@ public class PlayerController : MonoBehaviour {
 
 	/// <summary>
 	/// Moves the player. Called by the GameController, this function parse the msg
-	/// in variables and search the player it corresponds to, and call is move action
+	/// in variables and search the player it corresponds to, and calls its move action.
 	/// It can be advance, gauche, or droite.
 	/// </summary>
 	/// <param name="msg">Message.</param>
@@ -69,7 +74,8 @@ public class PlayerController : MonoBehaviour {
 					// if not, its an advance.
 					//				   	 /\__/\
 					// Boundary check   (= _ =')
-					if ((player.X == (GameManager.instance.WorldSettings.WorldX - 1) && new_x == 0) 
+					if (GameManager.instance.WorldSettings.InstantTimeMode == true ||
+						(player.X == (GameManager.instance.WorldSettings.WorldX - 1) && new_x == 0) 
 						|| (player.Y == (GameManager.instance.WorldSettings.WorldY - 1) && new_y == 0)
 						|| (player.X == 0 && new_x == (GameManager.instance.WorldSettings.WorldX - 1))
 						|| (player.Y == 0 && new_y == (GameManager.instance.WorldSettings.WorldY - 1)))
@@ -197,6 +203,26 @@ public class PlayerController : MonoBehaviour {
 		// Expulsed players move by theirselves.
 	}
 
+	public void PlayerBroadcast(string msg)
+	{
+		rgx = new Regex ("^pbc #(\\d+) (\\w+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			player_nb = int.Parse (groups [1].Value);
+			foreach (PlayerObject player in Players)
+			{
+				if (player.AssignedNumber == player_nb)
+				{
+					player.GetComponent<Animator> ().SetTrigger ("Broadcasting");
+					player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive(false);
+					player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive(true);
+				}
+			}
+		}
+	}
+
 	public void PlayerDropRessource(string msg)
 	{
 		rgx = new Regex ("^pdr #(\\d+) (\\d+)$");
@@ -247,11 +273,14 @@ public class PlayerController : MonoBehaviour {
 			incantation_y = int.Parse (groups [2].Value);
 			incantation_lv = int.Parse (groups [3].Value);
 			players_incanting_str = groups [4].Value;
+			Incantation_nb += 1;
 
+			// parse cmd to get every player incanting and set them in the animation.
 			players_incanting_str = players_incanting_str.TrimStart (' ');
 			players_incanting_strarray = players_incanting_str.Split (new string[] { " " }, System.StringSplitOptions.None);
 			players_incanting_nb = new List<int> ();
-			foreach (string player_str_id in players_incanting_strarray) {
+			foreach (string player_str_id in players_incanting_strarray)
+			{
 				Debug.Log ("[" + player_str_id + "]");
 				rgx = new Regex ("^#(\\d+)$");
 				match = rgx.Match (player_str_id);
@@ -261,20 +290,66 @@ public class PlayerController : MonoBehaviour {
 					players_incanting_nb.Add (int.Parse (groups [1].Value));
 				}
 			}
-
 			foreach (PlayerObject player in Players)
 			{
 				if (players_incanting_nb.IndexOf(player.AssignedNumber) != -1)
 				{
+					player.IsIncanting = true;
+					player.IncantationId = Incantation_nb;
 					player.GetComponent<Animator> ().SetBool ("IsIncanting", true);
 				}
 			}
+			// set block status datas.
+			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.
+				GameWorldBoard [incantation_y].Row [incantation_x].gameObject;
+
+			// add one ongoing incantation to the world block.
+			incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.Add(Incantation_nb);
+
+			// set the ground particle effect ON.
+			incantation_block_obj.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
+				gameObject.SetActive (true);
 		}
 	}
 
 	public void IncantationEnd(string msg)
 	{
+		// "pie X Y R\n"
+		rgx = new Regex ("^pie (\\d+) (\\d+) (\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			incantation_x = int.Parse (groups [1].Value);
+			incantation_y = int.Parse (groups [2].Value);
+			incantation_result = int.Parse (groups [3].Value);
+			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.
+				GameWorldBoard [incantation_y].Row [incantation_x].gameObject;
+			if (incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.Count > 0)
+			{
+				Debug.Log ("incantation end");
+				// we want the first launched incantation, because they finish in a chronological order(first in, first out);
+				int cur_incantation = incantation_block_obj.GetComponent<BlockObject> ().Incantations_id [0];
 
+				foreach (PlayerObject player in Players)
+				{
+					if (player.IsIncanting == true && player.IncantationId == cur_incantation)
+					{
+						player.IsIncanting = false;
+						player.IncantationId = -1;
+						player.GetComponent<Animator> ().SetBool ("IsIncanting", false);
+						if (incantation_result == 1) {
+							// turn off, turn on for particle effect launch.
+							player.gameObject.transform.Find ("Effects").transform.Find ("LevelUpEffect").gameObject.SetActive (false);
+							player.gameObject.transform.Find ("Effects").transform.Find ("LevelUpEffect").gameObject.SetActive (true);
+						}
+					}
+				}
+				// set the ground particle effect OFF.
+				incantation_block_obj.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
+					gameObject.SetActive (false);
+			}
+		}
 	}
 
 	public void PlayerStartsLaying(string msg)

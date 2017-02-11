@@ -13,6 +13,7 @@ ModelImporter:
     100010: Antenna
     100012: PlayerSelectedRing
     100014: PlayerSelectedTriangle
+    100016: EggBase
     400000: //RootNode
     400002: robot_1_body
     400004: robot_1_head
@@ -21,6 +22,7 @@ ModelImporter:
     400010: Antenna
     400012: PlayerSelectedRing
     400014: PlayerSelectedTriangle
+    400016: EggBase
     2300000: //RootNode
     2300002: robot_1_body
     2300004: robot_1_head
@@ -29,6 +31,7 @@ ModelImporter:
     2300010: Antenna
     2300012: PlayerSelectedRing
     2300014: PlayerSelectedTriangle
+    2300016: EggBase
     3300000: //RootNode
     3300002: robot_1_body
     3300004: robot_1_head
@@ -37,6 +40,7 @@ ModelImporter:
     3300010: Antenna
     3300012: PlayerSelectedRing
     3300014: PlayerSelectedTriangle
+    3300016: EggBase
     4300000: Cube
     4300002: robot_1_head
     4300004: robot_1_wheel
@@ -45,6 +49,7 @@ ModelImporter:
     4300010: Antenna
     4300012: PlayerSelectedRing
     4300014: PlayerSelectedTriangle
+    4300016: EggBase
     7400000: Default Take
     9500000: //RootNode
   materials:
