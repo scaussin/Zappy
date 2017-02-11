@@ -45,10 +45,17 @@ void	ClientPlayer::droite()
 {
 	bufferSend->pushMsg("droite\n");
 }
+
 void	ClientPlayer::gauche()
 {
 	bufferSend->pushMsg("gauche\n");
 }
+
+void	ClientPlayer::prend(string item)
+{
+	bufferSend->pushMsg("prend " + item + "\n");
+}
+
 void	ClientPlayer::setInventory(string inventory)
 {
 	char	*item;
@@ -90,13 +97,19 @@ void	ClientPlayer::setBufferSend(ClientBuffer *buffer)
 	bufferSend = buffer;
 }
 
-void	ClientPlayer::setItemsSeen(string items)
+void	ClientPlayer::setCaseItemsSeen(int indexCase, string item, int n)
+{
+	itemsSeen[indexCase][item] = n;
+}
+
+void	ClientPlayer::initItemsSeen(string items)
 {
 	map<string, int>	mapCase;
 	vector<string>		casesItems;
 	char				*lstItems;
 	char				*item;
 
+	itemsSeen.clear();
 	items = items.substr(1, items.size() - 3);
 	casesItems = strSplit(items, ",");
 	for (vector<string>::iterator it = casesItems.begin() ; it != casesItems.end() ; ++it)
@@ -121,11 +134,12 @@ void	ClientPlayer::printItemsSeen()
 {
 	unsigned int		i = 0;
 
+	cout << KRED << "voir : " << KRESET << endl;
 	while (i < itemsSeen.size())
 	{
 		for(map<string, int>::iterator it = itemsSeen[i].begin(); it != itemsSeen[i].end(); ++it)
 		{
-			cout << it->first << ":" << it->second << "  ";
+			cout << KCYN << it->first << ": " <<KRESET<< it->second << " | ";
 		}
 		cout << endl;
 		i++;

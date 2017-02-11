@@ -151,9 +151,10 @@ void	ClientCommunication::connectToServer()
 	if (!isConnected)
 	{
 		//cout << KCYN "- Connection attempt... -" KRESET << endl;
+		//char * dupHostName = strdup(hostName.c_str());
 		if ((host = gethostbyname(hostName.c_str())))
 			hostName = inet_ntoa(*((struct in_addr **)(host->h_addr_list))[0]);
-
+		//free(dupHostName);
 		proto = getprotobyname("tcp");
 		if (!proto)
 			throw (CustomException("getprotobyname() error"));

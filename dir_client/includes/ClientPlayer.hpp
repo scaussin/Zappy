@@ -26,13 +26,15 @@ class ClientPlayer
 		void						voir();
 		void						gauche();
 		void						droite();
+		void						prend(string item);
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
 		map<string, int>			getInventory();
 		vector<map<string, int> >	getItemsSeen();
 		void						printInventory();
-		void						setItemsSeen(string items);
+		void						initItemsSeen(string items);
+		void						setCaseItemsSeen(int indexCase, string item, int n);
 		void						printItemsSeen();
 		int							getHeightVision();
 

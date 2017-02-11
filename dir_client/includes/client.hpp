@@ -72,11 +72,12 @@ vector<string>		strSplit(string str, string delimiters);
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define MIN_FOOD_1  1300
+# define MIN_FOOD_1  1200
 # define MIN_FOOD_2  1000
 
 # define N_TO_EAT_1 4
 # define N_TO_EAT_2 6
 # define FOOD "nourriture"
+# define SUCCESS "ok\n"
 
 #endif
