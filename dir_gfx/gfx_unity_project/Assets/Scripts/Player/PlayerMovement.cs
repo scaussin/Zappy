@@ -8,6 +8,8 @@ using UnityEngine;
 /// </summary>
 public class PlayerMovement : MonoBehaviour
 {
+	public float			Offset_x;
+	public float			Offset_z;
 	public bool				IsAdvancing;
 	public bool				IsRotating;
 	public Vector3			TargetPos;
@@ -46,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
 		{
 			playerAnimator.SetBool ("IsMoving", true);
 			timeSinceStarted = Time.time - moveStartTime;
-			fracComplete = timeSinceStarted / (advanceDelay * timeUnit);
+			fracComplete = timeSinceStarted / (advanceDelay * (1.0f / timeUnit));
 			//transform.position = TargetPos;
 			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete);
 			if (Vector3.Distance (transform.position, TargetPos) < 0.02f)
@@ -111,12 +113,16 @@ public class PlayerMovement : MonoBehaviour
 	public void Teleport(int x, int y, int dir)
 	{
 		TargetPos = boardZeroPoint;
-
 		TargetPos.x += (GameManager.instance.WorldSettings.BlockSize +
 			GameManager.instance.WorldSettings.BlockSpacing) * x;
 		TargetPos.z += (GameManager.instance.WorldSettings.BlockSize +
 			GameManager.instance.WorldSettings.BlockSpacing) * y;
-		
+
+		// adding personal offset for visual appreciation.
+		TargetPos.x += Offset_x;
+		TargetPos.x += Offset_z;
+
+		// apply final value.
 		transform.position = TargetPos;
 
 	}

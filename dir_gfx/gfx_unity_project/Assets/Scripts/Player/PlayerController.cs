@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour {
 	private int					incantation_lv;
 	private GameObject			incantation_block_obj;
 	private int					incantation_result;
+	private int					asked_egg_nb;
 
 	// Use this for initialization
 	void Start () {
@@ -381,7 +382,6 @@ public class PlayerController : MonoBehaviour {
 		//"enw #e #n X Y\n"
 		rgx = new Regex ("^enw #(\\d+) #(\\d+) (\\d+) (\\d+)$");
 		match = rgx.Match (msg);
-		Debug.Log ("player finish egg laying");
 		if (match.Success)
 		{
 			groups = match.Groups;
@@ -397,6 +397,63 @@ public class PlayerController : MonoBehaviour {
 					player.GetComponent<Animator> ().SetBool ("LayingEgg", false);
 					GameManager.instance.WorldManager.ActorSpawner.SpawnNewEgg (egg_nb, player, egg_x, egg_y);
 					return ;
+				}
+			}
+		}
+	}
+
+	public void HatchEgg(string msg)
+	{
+		// "eht #e\n"
+		rgx = new Regex ("^eht #(\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			asked_egg_nb = int.Parse(groups [1].Value);
+			foreach (EggObject egg in GameManager.instance.PlayerManager.EggList)
+			{
+				if (egg.egg_nb == asked_egg_nb)
+				{
+					egg.gameObject.GetComponent<Animator> ().SetTrigger ("EggHatch");
+				}
+			}
+		}
+	}
+
+	public void EggDeath(string msg)
+	{
+		// "edi #e\n"
+		rgx = new Regex ("^edi #(\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			asked_egg_nb = int.Parse(groups [1].Value);
+			foreach (EggObject egg in GameManager.instance.PlayerManager.EggList)
+			{
+				if (egg.egg_nb == asked_egg_nb)
+				{
+					egg.gameObject.GetComponent<Animator> ().SetTrigger ("Disappear");
+				}
+			}
+		}
+	}
+
+	public void EggPlayerConnection(string msg)
+	{
+		// "ebo #e\n"
+		rgx = new Regex ("^ebo #(\\d+)$");
+		match = rgx.Match (msg);
+		if (match.Success)
+		{
+			groups = match.Groups;
+			asked_egg_nb = int.Parse(groups [1].Value);
+			foreach (EggObject egg in GameManager.instance.PlayerManager.EggList)
+			{
+				if (egg.egg_nb == asked_egg_nb)
+				{
+					egg.gameObject.GetComponent<Animator> ().SetTrigger ("Disappear");
 				}
 			}
 		}

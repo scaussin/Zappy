@@ -304,16 +304,16 @@ public class GameController : MonoBehaviour {
 
 	public void OnEggHatched(string msg)
 	{
-		Debug.Log ("Received egg hatched, but its not yet implemented");
+		PlayerControllerScript.HatchEgg (msg);
 	}
 
 	public void OnEggPlayerConnection(string msg)
 	{
-		Debug.Log ("Received egg player connection, but its not yet implemented");
+		PlayerControllerScript.EggPlayerConnection (msg);
 	}
 
 	public void OnHatchedEggDeath(string msg)
 	{
-		Debug.Log ("Received hatched egg death, but its not yet implemented");
+		PlayerControllerScript.EggDeath (msg);
 	}
 }

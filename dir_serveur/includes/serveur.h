@@ -301,6 +301,7 @@ typedef	struct				s_event_client
 typedef struct				s_egg
 {
 	int						egg_nb;
+	int						father_nb;
 	t_team_entity			*team;
 	t_pos					pos;
 
