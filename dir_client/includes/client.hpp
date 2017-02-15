@@ -28,6 +28,7 @@
 # define BUFF_SIZE 8192
 # define END "\n"
 # define LEN_END 1
+# define LEVEL_MAX 8
 
 using namespace std;
 /*
@@ -79,5 +80,7 @@ vector<string>	strSplit(string str, char c);
 # define N_TO_EAT_2 6
 # define FOOD "nourriture"
 # define SUCCESS "ok\n"
+
+# define MODULO_BROADCAST 5
 
 #endif

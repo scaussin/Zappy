@@ -80,6 +80,10 @@ int		ClientPlayer::move(int to)
 	return (nMove);
 }
 
+int		ClientPlayer::getLevel()
+{
+	return (level);
+}
 
 int		ClientPlayer::poshorizontale(int pos)	//return pos par rapport au milieu
 {

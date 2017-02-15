@@ -18,13 +18,13 @@ void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 		{
 			// child
 			execve(player->argv[0], player->argv, NULL);
-			cout << "! child is not dead" << endl;
 		}
 	}
-	execCallbackCallerContinue();
+	newClientEnd();
+	
 }
 
 void	ClientIa::newClientEnd()
 {
-	findItemStart(&itemsToFind, &ClientIa::endPlay);
+	execCallbackCallerContinue();
 }

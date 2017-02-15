@@ -2,6 +2,7 @@
 
 ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 {
+	nBroadcast = 0;
 }
 
 ClientIa::~ClientIa()
@@ -17,9 +18,12 @@ void	ClientIa::startPlay()
 	itemsToFind["nourriture"] = 5;
 	itemsToFind["sibur"] = 5;
 	itemsToFind["mendiane"] = 5;
+	itemsToFind["deraumere"] = 5;
+	itemsToFind["thystame"] = 5;
 
-	newClientStart(&ClientIa::newClientEnd);
-
+	levelUpStart(&ClientIa::endPlay);
+	//newClientStart(&ClientIa::newClientEnd);
+	//findItemStart(&itemsToFind, &ClientIa::endPlay);
 }
 
 void	ClientIa::endPlay()
@@ -40,11 +44,6 @@ void	ClientIa::execCallbackCallerContinue()
 void	ClientIa::receiveCallbackCommandIgnore(string response)
 {
 	(void)response;
-}
-
-void	ClientIa::receiveCallbackBroadcast(string broadcast)
-{
-	(void)broadcast;
 }
 
 void	ClientIa::receiveCallbackCommand(string response)

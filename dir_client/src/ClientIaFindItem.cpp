@@ -6,9 +6,9 @@ void	ClientIa::findItemStart(map<string, int> *newItemsToFind, void (ClientIa::*
 	nRotate = 0;
 	concatItemsToFind(newItemsToFind);
 	if (this->itemsToFind.find(FOOD) == this->itemsToFind.end() || this->itemsToFind[FOOD] <= 0)
-		checkStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::findItemSee);
+		checkStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::callbackContinueFindItemSee);
 	else
-		findItemSee();
+		callbackContinueFindItemSee();
 }
 
 void	ClientIa::concatItemsToFind(map<string, int> *newItemsToFind)
@@ -25,13 +25,13 @@ void	ClientIa::concatItemsToFind(map<string, int> *newItemsToFind)
 	}
 }
 
-void	ClientIa::findItemSee()
+void	ClientIa::callbackContinueFindItemSee()
 {
 	player->voir();
-	stackCallbackCommand.push_back(&ClientIa::callbackCommandSee);
+	stackCallbackCommand.push_back(&ClientIa::callbackCommandFindItemSee);
 }
 
-void	ClientIa::callbackTake(string response)
+void	ClientIa::callbackCommandFindItemTake(string response)
 {
 	if (response == SUCCESS)
 	{
@@ -57,7 +57,6 @@ void	ClientIa::findItemMove()
 	{
 		itemTryToTake = itemAvailable;
 		int nMove = player->move(itemAvailable.second);
-		cout << "nMove: " << nMove << endl; 
 		while (nMove > 0)
 		{
 
@@ -65,14 +64,14 @@ void	ClientIa::findItemMove()
 			nMove--;
 		}
 		player->prend(itemAvailable.first);
-		stackCallbackCommand.push_back(&ClientIa::callbackTake);
+		stackCallbackCommand.push_back(&ClientIa::callbackCommandFindItemTake);
 	}
 	else if (nRotate < 3)
 	{
 		player->droite();
 		stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
 		nRotate++;
-		findItemSee();
+		callbackContinueFindItemSee();
 	}
 	else
 	{
@@ -98,11 +97,10 @@ void	ClientIa::findItemMove()
 	}
 }
 
-void	ClientIa::callbackCommandSee(string items)
+void	ClientIa::callbackCommandFindItemSee(string items)
 {
 	player->initItemsSeen(items);
 	player->printItemsSeen();
-	player->printInventory();
 	findItemMove();
 }
 

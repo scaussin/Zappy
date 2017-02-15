@@ -35,10 +35,11 @@ class ClientPlayer
 		void						setCaseItemsSeen(int indexCase, string item, int n);
 		void						printItemsSeen();
 		int							getHeightVision();
+		int							getLevel();
 
 	private:
-		int							position;
 		int							level;
+		int							position;
 		map<string, int>			inventory;
 		int							lifeUnits;
 		vector<string>				vision;
