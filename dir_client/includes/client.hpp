@@ -59,7 +59,7 @@ class ClientIa;
 # include "ClientController.hpp"
 # include "ClientIa.hpp"
 
-vector<string>		strSplit(string str, string delimiters);
+vector<string>	strSplit(string str, char c);
 
 // color in text;
 # define KNRM  "\x1B[0m"

@@ -113,10 +113,17 @@ void	ClientIa::findItemMove()
 		return ;
 	}
 	pair<string, int> itemAvailable = checkItemAvailable();
-	if (itemAvailable.second == 0) /*!= -1*/
+	if (itemAvailable.second != -1) //move
 	{
-		//move to case ;)
 		itemTryToTake = itemAvailable;
+		int nMove = player->move(itemAvailable.second);
+		cout << "nMove: " << nMove << endl; 
+		while (nMove > 0)
+		{
+
+			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			nMove--;
+		}
 		player->prend(itemAvailable.first);
 		stackCallbackCommand.push_back(&ClientIa::callbackTake);
 	}
@@ -155,6 +162,7 @@ void	ClientIa::callbackCommandSee(string items)
 {
 	player->initItemsSeen(items);
 	player->printItemsSeen();
+	player->printInventory();
 	findItemMove();
 }
 

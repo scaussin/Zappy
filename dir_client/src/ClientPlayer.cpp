@@ -56,6 +56,118 @@ void	ClientPlayer::prend(string item)
 	bufferSend->pushMsg("prend " + item + "\n");
 }
 
+int		ClientPlayer::move(int to)
+{
+	int nMove = 0;
+	int posxdebut = poshorizontale(position);
+	int posydebut = posverticale(position);
+	int posxfin = poshorizontale(to);
+	int posyfin = posverticale(to);
+	int monte = posyfin - posydebut;
+
+	if (monte == 0)
+		nMove += memeligne(posxdebut, posxfin);
+	if (monte > 0)
+		nMove += monter(posydebut, posyfin, posxdebut, posxfin);
+	if (monte < 0)
+		nMove += descendre(posydebut, posyfin, posxdebut, posxfin);
+	position = to;
+	return (nMove);
+}
+
+
+int		ClientPlayer::poshorizontale(int pos)	//return pos par rapport au milieu
+{
+	int milieu = 0;
+	int debutline = 0;
+	int nbcaseinline = 0;
+	int carre = 0;
+	while (carre * carre < pos)
+		carre++;
+	if (carre * carre > pos)
+		carre--;	// calcul dans quelle ligne on est
+	nbcaseinline = carre * 2 + 1;
+	debutline = carre * carre;
+	milieu = debutline + carre;
+	while (debutline != pos)
+	{
+		debutline++;
+	}
+	return (debutline - milieu);
+}
+
+int		ClientPlayer::posverticale(int pos)	//return ligne
+{
+	int carre = 0;
+	while (carre * carre < pos)
+		carre++;
+	if (carre * carre > pos)
+		carre--;
+	return (carre);
+}
+
+int		ClientPlayer::memeligne(int debut, int fin)
+{
+	int nMove = 0;
+
+	if (debut == fin)
+		return (nMove);
+	if (debut < fin)
+	{
+		droite();
+		while (debut != fin)
+		{
+			nMove++;
+			debut++;
+			avance();
+		}
+		gauche();
+	}
+	else if (debut > fin)
+	{
+		gauche();
+		while (debut != fin)
+		{
+			debut--;
+			nMove++;
+			avance();
+		}
+		droite();
+	}
+	return (nMove + 2);
+}
+
+int		ClientPlayer::monter(int debuty, int finy, int debutx, int finx)
+{
+	int nMove = 0;
+
+	while (debuty < finy)
+	{
+		debuty++;
+		nMove++;
+		avance();
+	}
+	return (memeligne(debutx, finx) + nMove);
+}
+
+int		ClientPlayer::descendre(int debuty, int finy, int debutx, int finx)
+{
+	int nMove = 0;
+
+	nMove = memeligne(debutx, finx);
+	droite();
+	droite();
+	while (debuty > finy)
+	{
+		debuty--;
+		nMove++;
+		avance();
+	}
+	droite();
+	droite();
+	return(nMove + 4);
+}
+
 void	ClientPlayer::setInventory(string inventory)
 {
 	char	*item;
@@ -109,9 +221,10 @@ void	ClientPlayer::initItemsSeen(string items)
 	char				*lstItems;
 	char				*item;
 
+	position = 0;
 	itemsSeen.clear();
 	items = items.substr(1, items.size() - 3);
-	casesItems = strSplit(items, ",");
+	casesItems = strSplit(items, ',');
 	for (vector<string>::iterator it = casesItems.begin() ; it != casesItems.end() ; ++it)
 	{
 		lstItems = strdup(it->c_str());

@@ -27,6 +27,7 @@ class ClientPlayer
 		void						gauche();
 		void						droite();
 		void						prend(string item);
+		int							move(int to);
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
@@ -39,12 +40,19 @@ class ClientPlayer
 		int							getHeightVision();
 
 	private:
+		int							position;
 		int							level;
 		map<string, int>			inventory;
 		int							lifeUnits;
 		vector<string>				vision;
 		ClientBuffer				*bufferSend;
 		vector<map<string, int> >	itemsSeen;
+
+		int							poshorizontale(int pos);
+		int							posverticale(int pos);
+		int							memeligne(int debut, int fin);
+		int							monter(int debuty, int finy, int debutx, int finx);
+		int							descendre(int debuty, int finy, int debutx, int finx);
 
 
 };
