@@ -24,6 +24,7 @@ public class BlockObject : MonoBehaviour
 	public int					ThystameUnits = 0;
 
 	[Header ("Links to ressources 3d models")]
+	public GameObject			DecorationsObj;
 	public GameObject			BlockModelObj;
 	public GameObject			RessourcesContainer;
 	public GameObject			FoodModelObject;
@@ -42,6 +43,7 @@ public class BlockObject : MonoBehaviour
 	void Awake ()
 	{
 		BlockAnimator = GetComponent<Animator>	();
+		DecorationsObj = transform.Find ("Decorations").gameObject;
 		BlockModelObj =  transform.Find ("Model").transform.Find ("Root").transform.Find ("MainBlock").
 			transform.Find ("MainBlockModel").gameObject;
 		RessourcesContainer = transform.Find ("Ressources").gameObject;

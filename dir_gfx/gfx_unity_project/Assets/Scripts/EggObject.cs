@@ -13,5 +13,7 @@ public class EggObject : MonoBehaviour {
 	public void DesactiveObject()
 	{
 		gameObject.SetActive (false);
+		GameManager.instance.PlayerManager.EggList.Remove (this.GetComponent<EggObject> ());
+		GameObject.Destroy (this.gameObject);
 	}
 }

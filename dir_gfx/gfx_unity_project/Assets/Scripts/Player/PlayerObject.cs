@@ -25,7 +25,9 @@ public class PlayerObject : MonoBehaviour {
 	public int		Thystame;
 
 	[Header("Player points of interest")]
-	public GameObject	ModelContainer;
+//	public GameObject	ModelContainer;
+//	public GameObject	HeadModelContainer;
+//	public GameObject	BodyModelContainer;
 	public GameObject	CameraPoint;
 	public GameObject	PlayerSelectedObject;
 
@@ -35,7 +37,9 @@ public class PlayerObject : MonoBehaviour {
 	void Start ()
 	{
 		CameraPoint = transform.Find ("Points").transform.Find ("CameraPoint").gameObject;
-		ModelContainer = transform.Find ("Model").gameObject;
+//		ModelContainer = transform.Find ("Model").gameObject;
+//		HeadModelContainer = ModelContainer.transform.Find ("Root").transform.Find ("Head").transform.Find ("HeadModel").gameObject;
+//		BodyModelContainer = ModelContainer.transform.Find ("Root").transform.Find ("Body").transform.Find ("BodyModel").gameObject;
 		GetComponent<PlayerMovement> ().UpdateOrientation ();
 		PlayerSelectedObject = transform.Find ("Effects").transform.Find ("PlayerSelected").gameObject;
 	}

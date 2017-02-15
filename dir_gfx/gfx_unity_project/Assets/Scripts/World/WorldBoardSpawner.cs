@@ -10,6 +10,9 @@ public class WorldBoardSpawner : MonoBehaviour {
 	public Vector3						ZeroPoint;
 	public GameObject					BlockContainer;
 
+	[Header("Block random mats")]
+	public List<Material>				BlockMats;
+
 	[System.Serializable]
 	public class WorldBoard
 	{
@@ -29,6 +32,8 @@ public class WorldBoardSpawner : MonoBehaviour {
 	private int							cur_x;
 
 	private Vector3						spawn_location;
+	private Vector3						spawn_rotation;
+	private float						spawn_rotation_val;
 
 	private float						x_base_offset;
 	private float						z_base_offset;
@@ -40,6 +45,13 @@ public class WorldBoardSpawner : MonoBehaviour {
 		BlockContainer = transform.Find("BlockContainer").gameObject;
 		BlockPrefab = Resources.Load ("Prefabs/World/Block") as GameObject;
 		OnWorldBoardSpawned = new UnityEvent ();
+
+		// Get blocks material for randomization
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_1") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_2") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_3") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_4") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_5") as Material);
 	}
 
 	/// <summary>
@@ -76,6 +88,8 @@ public class WorldBoardSpawner : MonoBehaviour {
 							GameManager.instance.WorldSettings.BlockSpacing;
 		spawn_location = ZeroPoint;
 
+		spawn_rotation = this.transform.eulerAngles;
+
 		// ---- Actual block spawn.
 		Debug.Log ("Spawning World Blocks!!");
 		GameWorldBoard = new List<WorldBoard> ();
@@ -85,11 +99,21 @@ public class WorldBoardSpawner : MonoBehaviour {
 			GameWorldBoard[cur_y].Row = new List<GameObject> ();
 			while (cur_x < map_size_x)
 			{
+				int rand;
+				rand = Random.Range (0, 1);
+				if (rand == 1)
+					spawn_rotation.y += 90;
+				else
+					spawn_rotation.y -= 90;
 				// location is set through additionning variables -> faster calculation method.
 				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location,
-											Quaternion.identity, BlockContainer.transform);
+					Quaternion.Euler(spawn_rotation), BlockContainer.transform);
 				new_block.GetComponent<BlockObject> ().x = cur_x;
 				new_block.GetComponent<BlockObject> ().y = cur_y;
+
+				// 
+				new_block.GetComponent<BlockObject> ().BlockModelObj.GetComponent<MeshRenderer> ().material = BlockMats[Random.Range (0, BlockMats.Count)];
+
 				GameWorldBoard[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
 				cur_x++;

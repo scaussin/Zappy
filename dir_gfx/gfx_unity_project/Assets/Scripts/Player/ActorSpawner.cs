@@ -20,6 +20,14 @@ public class ActorSpawner : MonoBehaviour
 	private float			offset_x;
 	private float			offset_z;
 
+	[Header("Player randomization")]
+	public List<Material>	HeadMats;
+	public List<Material>	BodyMats;
+	private int				HeadMatCount;
+	private int				BodyMatCount;
+
+	private List<string>	PlayerTeamsRef;
+
 	// Use this for initialization
 	void Awake ()
 	{
@@ -27,6 +35,24 @@ public class ActorSpawner : MonoBehaviour
 		PlayerPrefab = Resources.Load ("Prefabs/Actors/Player") as GameObject;
 		EggPrefab = Resources.Load ("Prefabs/Actors/Egg") as GameObject;
 		BoardZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
+
+		// Get Head materials for color randomization.
+		HeadMats.Add(Resources.Load ("Materials/Players/robot_0_black/robot_0_black-Head_mat") as Material);
+		HeadMats.Add(Resources.Load ("Materials/Players/robot_1_red/robot_1_red-Head_mat") as Material);
+		HeadMats.Add(Resources.Load ("Materials/Players/robot_2_blue/robot_2_blue-Head_mat") as Material);
+		HeadMats.Add(Resources.Load ("Materials/Players/robot_3_green/robot_3_green-Head_mat") as Material);
+		HeadMats.Add(Resources.Load ("Materials/Players/robot_4_purple/robot_4_purple-Head_mat") as Material);
+
+		// Get Body materials for color randomization.
+		BodyMats.Add(Resources.Load ("Materials/Players/robot_0_black/robot_0_black-Body_mat") as Material);
+		BodyMats.Add(Resources.Load ("Materials/Players/robot_1_red/robot_1_red-Body_mat") as Material);
+		BodyMats.Add(Resources.Load ("Materials/Players/robot_2_blue/robot_2_blue-Body_mat") as Material);
+		BodyMats.Add(Resources.Load ("Materials/Players/robot_3_green/robot_3_green-Body_mat") as Material);
+		BodyMats.Add(Resources.Load ("Materials/Players/robot_4_purple/robot_4_purple-Body_mat") as Material);
+
+		HeadMatCount = HeadMats.Count;
+		BodyMatCount = BodyMats.Count;
+		PlayerTeamsRef = GameManager.instance.PlayerManager.PlayerTeams;
 	}
 	
 	public void SpawnNewPlayer(string msg)
@@ -61,6 +87,9 @@ public class ActorSpawner : MonoBehaviour
 		newPlayer.GetComponent<PlayerMovement> ().Offset_x = offset_x;
 		newPlayer.GetComponent<PlayerMovement> ().Offset_z = offset_z;
 
+		// ---- Set player color according to team.
+		SetPlayerColor(NewPlayerScriptRef);
+
 		// Player Added to list of players.
 		GameManager.instance.PlayerManager.ConnectedPlayers.Add(newPlayer.GetComponent<PlayerObject> ());
 	}
@@ -86,5 +115,17 @@ public class ActorSpawner : MonoBehaviour
 
 		// Egg Added to list of Eggs.
 		GameManager.instance.PlayerManager.EggList.Add(newEgg.GetComponent<EggObject> ());
+	}
+
+	public void SetPlayerColor(PlayerObject player)
+	{
+		player.gameObject.transform.Find("Model").transform.Find ("Root").transform
+			.Find ("Head").transform.Find ("HeadModel")
+			.gameObject.GetComponent<MeshRenderer> ().material
+			= HeadMats[PlayerTeamsRef.IndexOf (player.Team) % HeadMatCount];
+		player.gameObject.transform.Find("Model").transform.Find ("Root").transform
+			.Find ("Body").transform.Find ("BodyModel")
+			.gameObject.GetComponent<MeshRenderer> ().material
+			= BodyMats[PlayerTeamsRef.IndexOf (player.Team) % BodyMatCount];
 	}
 }

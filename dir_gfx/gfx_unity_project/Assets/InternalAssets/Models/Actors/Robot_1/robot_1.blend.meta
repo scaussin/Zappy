@@ -16,6 +16,8 @@ ModelImporter:
     100016: EggBase
     100018: EggArm
     100020: EggArmBase
+    100022: robot_1_body_001
+    100024: BodyHatching
     400000: //RootNode
     400002: robot_1_body
     400004: robot_1_head
@@ -27,6 +29,8 @@ ModelImporter:
     400016: EggBase
     400018: EggArm
     400020: EggArmBase
+    400022: robot_1_body_001
+    400024: BodyHatching
     2300000: //RootNode
     2300002: robot_1_body
     2300004: robot_1_head
@@ -38,6 +42,8 @@ ModelImporter:
     2300016: EggBase
     2300018: EggArm
     2300020: EggArmBase
+    2300022: robot_1_body_001
+    2300024: BodyHatching
     3300000: //RootNode
     3300002: robot_1_body
     3300004: robot_1_head
@@ -49,6 +55,8 @@ ModelImporter:
     3300016: EggBase
     3300018: EggArm
     3300020: EggArmBase
+    3300022: robot_1_body_001
+    3300024: BodyHatching
     4300000: Cube
     4300002: robot_1_head
     4300004: robot_1_wheel
@@ -60,6 +68,8 @@ ModelImporter:
     4300016: EggBase
     4300018: EggArmBase
     4300020: EggArm
+    4300022: robot_1_body_001
+    4300024: BodyHatching
     7400000: Default Take
     9500000: //RootNode
   materials:
