@@ -11,6 +11,10 @@ SRC = 		src/main.cpp \
 			src/CustomException.cpp \
 			src/ClientBuffer.cpp \
 			src/ClientIa.cpp \
+			src/ClientIaCheck.cpp \
+			src/ClientIaFindItem.cpp \
+			src/ClientIaLevelUp.cpp \
+			src/ClientIaNewClient.cpp \
 			src/ClientController.cpp
 
 OBJ =		$(SRC:%.cpp=%.o)

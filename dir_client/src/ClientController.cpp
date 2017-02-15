@@ -6,7 +6,7 @@ ClientController::ClientController(int argc, char **argv)
 	try
 	{
 		inputHandler = new ClientInputHandler(argc, argv);
-		player = new ClientPlayer(inputHandler->teamName);
+		player = new ClientPlayer(inputHandler->teamName, argv);
 		ia = new ClientIa(player);
 		communication = new ClientCommunication(inputHandler->hostName, inputHandler->port, player, ia);
 	}

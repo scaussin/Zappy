@@ -6,7 +6,7 @@
 class ClientPlayer
 {
 	public:
-		ClientPlayer(string teamName);
+		ClientPlayer(string, char **);
 		~ClientPlayer();
 
 		void						printStat();
@@ -15,18 +15,15 @@ class ClientPlayer
 		int							worldSizeX;
 		int							worldSizeY;
 		int							teamSlots;
+		char						**argv;
 
-		/*void						avance(void (ClientIa::*)(string));
-		void						droite(void (ClientIa::*)(string));
-		void						gauche(void (ClientIa::*)(string));
-		void						voir(void (ClientIa::*)(string));*/
-		//void						inventaire(void (ClientIa::*)(string));
 		void						inventaire();
 		void						avance();
 		void						voir();
 		void						gauche();
 		void						droite();
 		void						prend(string item);
+		void						connect_nbr();
 		int							move(int to);
 
 		void						setBufferSend(ClientBuffer *buffer);

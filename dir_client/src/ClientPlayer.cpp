@@ -7,7 +7,7 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientPlayer::ClientPlayer(string _teamName) : teamName(_teamName)
+ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName), argv(_argv)
 {
 	level = 1;
 	lifeUnits = 10;
@@ -49,6 +49,11 @@ void	ClientPlayer::droite()
 void	ClientPlayer::gauche()
 {
 	bufferSend->pushMsg("gauche\n");
+}
+
+void	ClientPlayer::connect_nbr()
+{
+	bufferSend->pushMsg("connect_nbr\n");
 }
 
 void	ClientPlayer::prend(string item)
