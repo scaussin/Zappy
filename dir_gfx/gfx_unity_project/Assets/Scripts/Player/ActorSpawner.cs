@@ -86,6 +86,15 @@ public class ActorSpawner : MonoBehaviour
 		NewPlayerScriptRef.Team = groups [6].Value;
 		newPlayer.GetComponent<PlayerMovement> ().Offset_x = offset_x;
 		newPlayer.GetComponent<PlayerMovement> ().Offset_z = offset_z;
+		// if world is too fast, no animation on player.
+		if (GameManager.instance.WorldSettings.InstantTimeMode == true) {
+			newPlayer.GetComponent<Animator> ().enabled = false;
+		}
+		else
+		{
+			newPlayer.GetComponent<Animator> ().enabled = true;
+		}
+
 
 		// ---- Set player color according to team.
 		SetPlayerColor(NewPlayerScriptRef);

@@ -145,6 +145,8 @@ public class MsgBroadcastController : MonoBehaviour
 			return;
 		else if (msg.StartsWith ("sbp") && CatchBadParameterForCmd (msg))
 			return;
+		else
+			Debug.LogError ("Unknown Command received from the server: " + msg);
 	}
 
 /* *************************************************************************************** 	*
@@ -210,21 +212,27 @@ public class MsgBroadcastController : MonoBehaviour
 			// makes a reverse calculation of the time unit, as the reference is 1.
 			calculatedTimescale = (float) (1.0f / GameManager.instance.WorldSettings.TimeUnit);
 			Debug.Log ("calculated timescale = " + calculatedTimescale.ToString ());
-			if (calculatedTimescale > 10.0f)
+
+			// Unity timescale limit check
+			if (calculatedTimescale <= 100)
 			{
-				GameManager.instance.WorldSettings.InstantTimeMode = false;
-				Time.timeScale = 2;
+				Time.timeScale = (int)calculatedTimescale;
 			}
-			else if (calculatedTimescale > 30.0f)
+			else
+			{
+				Time.timeScale = 100;
+			}
+
+			// soft optimization limit for animation disabling.
+			if (calculatedTimescale > 50)
 			{
 				GameManager.instance.WorldSettings.InstantTimeMode = true;
-				Time.timeScale = 10;
+				GameManager.instance.GameController.TurnOffAllAnimator ();
 			}
 			else
 			{
 				GameManager.instance.WorldSettings.InstantTimeMode = false;
-				//Time.timeScale = (int)calculatedTimescale;
-				Time.timeScale = 1;
+				GameManager.instance.GameController.TurnOnAllAnimator ();
 			}
 			Debug.Log ("Success - Received World Time unit");
 			GameManager.instance.GameController.OnTimeUnitReceived(msg);

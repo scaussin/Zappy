@@ -120,6 +120,14 @@ public class CircularBuffer
 		return (len);
 	}
 
+	/// <summary>
+	/// Resets the buffer. Called by managers to impeach any waiting msg sending to the server.
+	/// </summary>
+	public void						ResetBuffer()
+	{
+		len = 0;
+	}
+
 	public void				pushMsg(string msg)
 	{
 		byte[] bytes_to_push;

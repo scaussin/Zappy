@@ -90,8 +90,8 @@
 */
 
 # define MAX_LV 8
-# define VICTORY_CDT_PLAYER_NB 6
-# define VICTORY_CDT_PLAYER_LV 8
+# define VICTORY_CDT_PLAYER_NB 2
+# define VICTORY_CDT_PLAYER_LV 2
 
 /*
 **	Server structures.
@@ -360,6 +360,8 @@ typedef struct				s_serveur
 	t_client_hdl			client_hdl;
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
+
+	int						victory_reached;
 
 	t_game_settings			settings_hdl;
 }							t_serveur;

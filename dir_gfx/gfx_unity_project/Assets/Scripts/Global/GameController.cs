@@ -37,7 +37,7 @@ public class GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		PlayerControllerScript = GameManager.instance.WorldManager.PlayerController;
-		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
+		//GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
 		GameManager.instance.ConnectionManager.OnConnectionWithServer.AddListener (OnConnectionWithServerAction);
 
@@ -74,12 +74,12 @@ public class GameController : MonoBehaviour {
     /// </summary>
 	public void		OnServerInfoEntered()
 	{
-        // desactivate menu.
-		//GameManager.instance.MainMenuController.DeactivateMainPanelInput ();
-
 		GameManager.instance.MainMenuController.MainPanelScript.CanEnterInput = false;
+		GameManager.instance.MainMenuController.DeactivateMainPanelInputs ();
 		InMainMenu = false;
 		SelectingServerInfos = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isHostnameSet = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isPortSet = false;
         GameManager.instance.ConnectionManager.ConnectToServer ();
 	}
 
@@ -91,6 +91,8 @@ public class GameController : MonoBehaviour {
 		ActivateMainMenuInput();
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Failed to connect to server -";
+		GameManager.instance.MainMenuController.MainPanelScript.isHostnameSet = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isPortSet = false;
 		DisablePlayerCameraControl ();
 	}
 
@@ -166,18 +168,23 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public void OnServerShutdown()
 	{
-		// ------------------------------- Visual cleaning 
+		// ----- Visual cleaning 
 		ActivateMainMenuInput();
 		// deactivate analyzer tool;
 		GameManager.instance.MainMenuController.InGameMenuController.
 			AnalyzerToolPanel.
 			GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = false;
+		GameManager.instance.MainMenuController.InGameMenuController.
+		AnalyzerToolPanel.GetComponent<UIAnalyzerToolPanelScript> ().DesactivateAnalyzerTool ();
+
 		// hide and desactivate ui time control.
 		GameManager.instance.MainMenuController.InGameMenuController.HideTimeControlMenu();
 		// set the menu animation in motion.
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 
-		// ------------------------------- Data cleaning.
+		// ----- Data cleaning.
+		InGame = false;
+		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
@@ -189,25 +196,21 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Called when a team has won, or all players are dead(optionnal?).
+	/// Called when a team has won.
 	/// </summary>
 	public void	OnGameOver(string msg)
 	{
-		Debug.Log ("Received Game over, but its not yet implemented");
+		GameManager.instance.MainMenuController.GameOverMenuController.ActivateGameOver (msg);
 	}
 
 	public void OnUnknownCmdReception(string msg)
 	{
-		Debug.Log ("Received an unknown command");
-		// TODO: think about this, maybe we should ask for some infos
-		// 		 from server?
+		Debug.LogError ("Server received an unknown command");
 	}
 
 	public void OnBadParameterForCmd(string msg)
 	{
-		Debug.Log ("Received a bad parameter for a command");
-		// TODO: think about this, maybe we should ask for some infos
-		// 		 from server?
+		Debug.LogError ("Server received a bad parameter for a command");
 	}
 
 /* *************************************************************************************** 	*
@@ -216,6 +219,23 @@ public class GameController : MonoBehaviour {
  *	All these methods may or not call other components to activate.							*
  * 																							*
  * ***************************************************************************************	*/
+
+	/// <summary>
+	/// Turns the off all animators. Optimization method for high time scale use.
+	/// </summary>
+	public void TurnOffAllAnimator()
+	{
+		foreach (PlayerObject player in GameManager.instance.PlayerManager.ConnectedPlayers) {
+			player.gameObject.GetComponent<Animator> ().enabled = false;
+		}
+	}
+
+	public void TurnOnAllAnimator()
+	{
+		foreach (PlayerObject player in GameManager.instance.PlayerManager.ConnectedPlayers) {
+			player.gameObject.GetComponent<Animator> ().enabled = true;
+		}
+	}
 
 	public void OnTimeUnitReceived(string msg)
 	{
@@ -232,6 +252,7 @@ public class GameController : MonoBehaviour {
 		if (IsWorldSpawned) // we dont want player to spawn on empty ground.
 		{
 			GameManager.instance.WorldManager.ActorSpawner.SpawnNewPlayer (msg);
+			GameManager.instance.StatisticManager.NbOfConnections += 1;
 		}
 		else
 		{
@@ -242,12 +263,14 @@ public class GameController : MonoBehaviour {
 	public void OnPlayerMovement(string msg)
 	{
 		PlayerControllerScript.MovePlayer (msg);
+		GameManager.instance.StatisticManager.MoveActionNb += 1;
 	}
 
 	// Also handle player disconnection.
 	public void OnPlayerDeath(string msg)
 	{
 		PlayerControllerScript.KillPlayer (msg);
+		GameManager.instance.StatisticManager.DeathNumber += 1;
 	}
 
 	public void OnPlayerLevelReception(string msg)
@@ -268,13 +291,13 @@ public class GameController : MonoBehaviour {
 	public void OnPlayerBroadcast(string msg)
 	{
 		PlayerControllerScript.PlayerBroadcast (msg);
-		// TODO: think about the broadcast system. Spawn an object? make a particle effect?
-		// 		  needs to be defined.
+		GameManager.instance.StatisticManager.BroadcastNb += 1;
 	}
 
 	public void OnPlayerIncantation(string msg)
 	{
 		PlayerControllerScript.IncantationStart (msg);
+		GameManager.instance.StatisticManager.IncantationCount += 1;
 	}
 
 	public void OnIncantationEnd(string msg)
@@ -285,11 +308,13 @@ public class GameController : MonoBehaviour {
 	public void OnPlayerDropRessource(string msg)
 	{
 		PlayerControllerScript.PlayerDropRessource (msg);
+		GameManager.instance.StatisticManager.DropNb += 1;
 	}
 
 	public void OnPlayerTakeRessource(string msg)
 	{
 		PlayerControllerScript.PlayerTakeRessource (msg);
+		GameManager.instance.StatisticManager.PickUpNb += 1;
 	}
 
 	public void OnPlayerStartLayEgg(string msg)
@@ -300,6 +325,7 @@ public class GameController : MonoBehaviour {
 	public void OnPlayerLayedEgg(string msg)
 	{
 		PlayerControllerScript.PlayerFinishEggLaying (msg);
+		GameManager.instance.StatisticManager.EggCount += 1;
 	}
 
 	public void OnEggHatched(string msg)

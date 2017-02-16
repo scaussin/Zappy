@@ -51,6 +51,7 @@ void	init_serveur(t_serveur *serv)
 	serv->client_hdl.gfx_client = NULL;
 
 	// set worlds default values.
+	serv->victory_reached = 0;
 	serv->world_hdl.nb_of_eggs = 0;
 	serv->world_hdl.nb_of_incantations = 0;
 	serv->world_hdl.ongoing_events = NULL;

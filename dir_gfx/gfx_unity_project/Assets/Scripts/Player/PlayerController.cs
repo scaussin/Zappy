@@ -89,6 +89,8 @@ public class PlayerController : MonoBehaviour {
 					player.X = new_x;
 					player.Y = new_y;
 					player.Dir = new_dir;
+					// stat add;
+					GameManager.instance.StatisticManager.MoveActionNb += 1;
 					return ;
 				}
 			}

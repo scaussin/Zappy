@@ -177,6 +177,19 @@ public class UIAnalyzerToolPanelScript : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Desactivates the analyzer tool. Called by the gamecontroller on server connection lost
+	/// or player entered shutdown.
+	/// </summary>
+	public void DesactivateAnalyzerTool()
+	{
+		previousColBroadcast = colBroadcast;
+		DisengageSelectionDisplay ();
+		if (AnalyzerToolContainer.GetComponent<Animator> ().enabled == true)
+			AnalyzerToolContainer.GetComponent<Animator> ().SetTrigger ("Disappear");
+		AnalyzedObject = null;
+	}
+
 
 	///
 	///		------ UI UPDATES ------

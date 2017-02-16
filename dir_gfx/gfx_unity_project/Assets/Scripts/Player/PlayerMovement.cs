@@ -22,7 +22,9 @@ public class PlayerMovement : MonoBehaviour
 	private float			AdvanceDistance;
 
 	private float			moveStartTime;
-	private float			timeSinceStarted;
+	private float			movTimeSinceStarted;
+	private float			rotStartTime;
+	private float			rotTimeSinceStarted;
 	private float			fracComplete;
 	private float			timeUnit = 1.0f;
 	private float			advanceDelay = 7.0f;
@@ -47,8 +49,8 @@ public class PlayerMovement : MonoBehaviour
 		if (IsAdvancing)
 		{
 			playerAnimator.SetBool ("IsMoving", true);
-			timeSinceStarted = Time.time - moveStartTime;
-			fracComplete = timeSinceStarted / (advanceDelay * (1.0f / timeUnit));
+			movTimeSinceStarted = Time.time - moveStartTime;
+			fracComplete = movTimeSinceStarted / (advanceDelay * timeUnit);
 			//transform.position = TargetPos;
 			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete);
 			if (Vector3.Distance (transform.position, TargetPos) < 0.02f)
@@ -59,11 +61,12 @@ public class PlayerMovement : MonoBehaviour
 		}
 		if (IsRotating)
 		{
-			timeSinceStarted = Time.time - moveStartTime;
-			fracComplete = timeSinceStarted / (advanceDelay * timeUnit);
+			rotTimeSinceStarted = Time.time - moveStartTime;
+			fracComplete = rotTimeSinceStarted / (advanceDelay * timeUnit);
 			TargetRotationQuat = Quaternion.Euler (TargetRotation);
 			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete);
-			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f) {
+			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f)
+			{
 				IsRotating = false;
 			}
 		}
@@ -86,7 +89,6 @@ public class PlayerMovement : MonoBehaviour
 		}
 		SetTargetWorldPos (x, y, dir);
 		IsAdvancing = true;
-		IsRotating = false;
 	}
 
 	/// <summary>
@@ -97,9 +99,8 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void StartRotation(int x, int y, int dir)
 	{
-		moveStartTime = Time.time;
+		rotStartTime = Time.time;
 		SetTargetWorldRot (x, y, dir);
-		IsAdvancing = false;
 		IsRotating = true;
 	}
 
@@ -124,7 +125,6 @@ public class PlayerMovement : MonoBehaviour
 
 		// apply final value.
 		transform.position = TargetPos;
-
 	}
 
 	/// <summary>

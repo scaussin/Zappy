@@ -9,12 +9,10 @@ using UnityEngine.UI;
 /// Here, we will have access to starting menu, game menu, end menu .... etc.
 /// </summary>
 public class MainMenuController : MonoBehaviour {
-    /// <summary>
-    /// Will be invoked when user press enter with infos entered in the server info inputfields.
-    /// </summary>
-    public UnityEvent   OnServerInfoSelected;
-
-	public UnityEvent   OnTimeUnitModified;
+	/// <summary>
+	/// The on time unit modified event, for when the user changes the time in the UI.
+	/// </summary>
+	public UnityEvent   			OnTimeUnitModified;
 
     // menu references;
 
@@ -28,7 +26,13 @@ public class MainMenuController : MonoBehaviour {
 	public GameObject				InGameMenuPanel;
 	public InGameMenuController		InGameMenuController;
 
+	// escape menu
+	public GameObject				EscapeMenuPanel;
+	public EscapeMenuController		EscapeMenuController;
 
+	// GameOver menu
+	public GameObject				GameOverMenuPanel;
+	public GameOverMenuController	GameOverMenuController;
 
     // Use this for initialization
     void Awake()
@@ -39,22 +43,26 @@ public class MainMenuController : MonoBehaviour {
 		MainPanelScript = MainPanel.GetComponent<MainPanelScript> ();
 		InGameMenuPanel = transform.Find ("InGameMenuPanel").gameObject;
 		InGameMenuController = InGameMenuPanel.GetComponent<InGameMenuController> ();
+		EscapeMenuPanel = transform.Find ("EscapeMenuPanel").gameObject;
+		EscapeMenuController = EscapeMenuPanel.GetComponent<EscapeMenuController> ();
+		GameOverMenuPanel = transform.Find ("GameOverMenuPanel").gameObject;
+		GameOverMenuController = GameOverMenuPanel.GetComponent<GameOverMenuController> ();
+
 		// Clean initatialization ( for when we press play )
 		MainPanel.SetActive(true);
 		BlackBackground.SetActive (true);
-    }
-
-	void Start()
-	{
+		InGameMenuPanel.SetActive (true);
+		EscapeMenuPanel.SetActive (true);
+		GameOverMenuPanel.SetActive (true);
 		InGameMenuController.TabPanel.SetActive (false);
-	}
+    }
 
 	/// <summary>
 	/// Activates the main panel input for entering server host and port. Used by the GameController.
 	/// </summary>
 	public void ActivateMainPanelInput()
 	{
-		//MainPanel.SetActive (true);
+		MainPanelScript.ActivateMainPanelHover();
 		MainPanelScript.HostnameInputField.enabled = true;
 		MainPanelScript.PortInputField.enabled = true;
 		MainPanelScript.CanEnterInput = true;
@@ -66,6 +74,7 @@ public class MainMenuController : MonoBehaviour {
 	/// </summary>
 	public void DeactivateMainPanelInputs()
 	{
+		MainPanelScript.DesactivateMainPanelHover ();
 		MainPanelScript.HostnameInputField.enabled = false;
 		MainPanelScript.HostnameInputField.text = "";
 		MainPanelScript.PortInputField.enabled = false;
@@ -88,6 +97,8 @@ public class MainMenuController : MonoBehaviour {
 	{
 		BlackBackground.SetActive (true);
 	}
+
+
 
    
 }
