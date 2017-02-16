@@ -3,6 +3,10 @@
 ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 {
 	nBroadcast = 0;
+	flagWaitingForIncantation = false;
+	flagGoToBroadcaster = false;
+	flagBroadcastMode = false;
+	pid = getpid();
 }
 
 ClientIa::~ClientIa()
@@ -52,8 +56,10 @@ void	ClientIa::receiveCallbackCommand(string response)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
 		stackCallbackCommand.pop_front();
-		(this->*func)(response);
+		if (flagBroadcastMode == false)
+			(this->*func)(response);
 	}
+	flagBroadcastMode = false;
 }
 
 void	ClientIa::pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinue)())

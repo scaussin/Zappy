@@ -19,7 +19,7 @@ SRC = 		src/main.cpp \
 
 OBJ =		$(SRC:%.cpp=%.o)
 
-FLAGS =		-Wall -Wextra -Werror -g
+FLAGS =		-Wall -Wextra -Werror -g -std=c++11
 
 all :		$(NAME)
 

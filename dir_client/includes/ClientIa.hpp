@@ -10,7 +10,7 @@ class ClientIa
 		~ClientIa();
 		void								startPlay();
 		void								receiveCallbackCommand(string response);
-		void								receiveCallbackBroadcast(string broadcast);
+		void								receiveBroadcast(string broadcast);
 
 	private:
 		void								findItemStart(map<string, int> *newItemsToFind, void (ClientIa::*caller)());
@@ -33,20 +33,34 @@ class ClientIa
 		pair<string, int>					checkItemAvailable();
 		void								receiveCallbackCommandIgnore(string response);
 		void								printItemsToFind();
+		void								subItemsToFind(map<string, int> *newItemsToFind);
+		void								callbackCommandLevelUpBroadcast(string response);
 		void								callbackCommandConnectNbr(string connectNbr);
 		void								callbackContinueCheckInventory();
 		void								callbackCommandLevelUpInventory(string inventory);
 		void								callbackContinueLevelUpFindItem();
 		void								callbackContinueLevelUpCheck();
+		void								callbackContinueLevelUpNewClient();
+		void								callbackCommandLevelUpCheckBroadcastResponse(string response);
+		void								goToBroadcaster(int target);
+
+		bool								flagWaitingForIncantation;
+		bool								flagGoToBroadcaster;
+		bool								flagBroadcastMode;
+		pid_t								pid;
 		ClientPlayer						*player;
 		map<string, int>					itemsToFind;
 		int									minFood;
 		int									nToEat;
+
+		int									nPlayersBroadcastResponse;
+		int									nPlayersReadyForIncantation;
 		pair<string, int>					itemTryToTake;
 		int									nRotate;
 		int									nBroadcast;
 		deque<void (ClientIa::*)(string)>	stackCallbackCommand;
 		deque<void (ClientIa::*)()>			stackCallbackCallerContinue;
+		
 };
 
 #endif

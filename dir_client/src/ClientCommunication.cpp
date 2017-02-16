@@ -79,10 +79,11 @@ void	ClientCommunication::manageRecv()
 		}
 		else
 		{
-			//if commande
+			regex reg ("message [0-8],.+\n");
+			if (regex_match(msg, reg))
+				ia->receiveBroadcast(msg);
+			else
 				ia->receiveCallbackCommand(msg);
-			//if broadcast
-				//TODO :)
 		}
 	}
 	else

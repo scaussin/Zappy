@@ -3,13 +3,13 @@
 void	ClientIa::checkStart(int minFood, int nToEat, void (ClientIa::*caller)())
 {
 	pushCallbackCallerContinue(caller);
+	this->minFood = minFood;
+	this->nToEat = nToEat;
 	newClientStart(&ClientIa::callbackContinueCheckInventory);
 }
 
 void	ClientIa::callbackContinueCheckInventory()
 {
-	this->minFood = minFood;
-	this->nToEat = nToEat;
 	player->inventaire();
 	stackCallbackCommand.push_back(&ClientIa::callbackCommandCheckInventory);
 }

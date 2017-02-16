@@ -11,7 +11,50 @@ ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName)
 {
 	level = 1;
 	lifeUnits = 10;
-	teamSlots = -1;
+	teamSlots = -1;	
+	levelUpItems.resize(7);
+
+	levelUpItems[0]["linemate"] = 1;
+
+	levelUpItems[1]["linemate"] = 1;
+	levelUpItems[1]["deraumere"] = 1;
+	levelUpItems[1]["sibur"] = 1;
+
+	levelUpItems[2]["linemate"] = 2;
+	levelUpItems[2]["sibur"] = 1;
+	levelUpItems[2]["phiras"] = 2;
+
+	levelUpItems[3]["linemate"] = 1;
+	levelUpItems[3]["deraumere"] = 1;
+	levelUpItems[3]["sibur"] = 2;
+	levelUpItems[3]["phiras"] = 1;
+
+	levelUpItems[4]["linemate"] = 1;
+	levelUpItems[4]["deraumere"] = 2;
+	levelUpItems[4]["sibur"] = 1;
+	levelUpItems[4]["mendiane"] = 3;
+
+	levelUpItems[5]["linemate"] = 1;
+	levelUpItems[5]["deraumere"] = 2;
+	levelUpItems[5]["sibur"] = 3;
+	levelUpItems[5]["phiras"] = 1;
+
+	levelUpItems[6]["linemate"] = 2;
+	levelUpItems[6]["deraumere"] = 2;
+	levelUpItems[6]["sibur"] = 2;
+	levelUpItems[6]["phiras"] = 2;
+	levelUpItems[6]["mendiane"] = 2;
+	levelUpItems[6]["thystame"] = 1;
+
+
+	nPlayersLevelUp.resize(7);
+	nPlayersLevelUp[0] = 1;
+	nPlayersLevelUp[1] = 2;
+	nPlayersLevelUp[2] = 2;
+	nPlayersLevelUp[3] = 4;
+	nPlayersLevelUp[4] = 4;
+	nPlayersLevelUp[5] = 6;
+	nPlayersLevelUp[6] = 6;
 }
 
 ClientPlayer::~ClientPlayer()
@@ -59,6 +102,24 @@ void	ClientPlayer::connect_nbr()
 void	ClientPlayer::prend(string item)
 {
 	bufferSend->pushMsg("prend " + item + "\n");
+}
+
+void	ClientPlayer::broadcast(string broadcast)
+{
+	bufferSend->pushMsg(broadcast + "\n");
+}
+
+map<string, int>	ClientPlayer::getItemsLevelUp()
+{
+	map<string, int> ret;
+	
+	ret = levelUpItems[level - 1];
+	return (ret);
+}
+
+int		ClientPlayer::getNPlayerLevelUp()
+{
+	return (nPlayersLevelUp[level - 1]);
 }
 
 int		ClientPlayer::move(int to)
