@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
 		timeUnit = GameManager.instance.WorldSettings.TimeUnit;
 	}
 
-	void FixedUpdate ()
+	void Update ()
 	{
 		if (IsAdvancing)
 		{
@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 			movTimeSinceStarted = Time.time - moveStartTime;
 			fracComplete = movTimeSinceStarted / (advanceDelay * timeUnit);
 			//transform.position = TargetPos;
-			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete);
+			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete * Time.fixedDeltaTime);
 			if (Vector3.Distance (transform.position, TargetPos) < 0.02f)
 			{
 				IsAdvancing = false;
@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
 			rotTimeSinceStarted = Time.time - moveStartTime;
 			fracComplete = rotTimeSinceStarted / (advanceDelay * timeUnit);
 			TargetRotationQuat = Quaternion.Euler (TargetRotation);
-			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete);
+			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete * Time.fixedDeltaTime);
 			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f)
 			{
 				IsRotating = false;

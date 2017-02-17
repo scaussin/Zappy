@@ -9,21 +9,28 @@ using UnityEngine.UI;
 /// </summary>
 public class MainPanelScript : MonoBehaviour {
 
+	[Header("Center panel inputs")]
 	public InputField   		HostnameInputField;
 	public InputField   		PortInputField;
 	public Text         		ResponseText;
-
-	private MainMenuController	MainMenuController;
-	private Text				MainMenuHelpText;
 
 	// input field variable helper.
 	public bool        			isHostnameSet;
 	public bool        			isPortSet;
 	public bool        			CanEnterInput;
 
+	[Header("Control buttons")]
+	public Button				ExitBtn;
+	public Button				ExternalCreditsBtn;
+
+	// private vars
+	private MainMenuController	MainMenuController;
+	private Text				MainMenuHelpText;
+
 	// Use this for initialization
 	void Awake ()
 	{
+		// get main references.
 		MainMenuController = transform.parent.GetComponent<MainMenuController> ();
 		HostnameInputField = transform
 			.Find("CenterAreaPanel").transform
@@ -45,16 +52,27 @@ public class MainPanelScript : MonoBehaviour {
 			.Find("MainMenuHelpText").GetComponent<Text>();
 		isHostnameSet = false;
 		isPortSet = false;
+
+		// get btn refs
+		ExitBtn = transform.Find ("ExitGameBtn").GetComponent<Button> ();
+		ExternalCreditsBtn = transform
+			.Find ("FooterPanel").transform.Find ("ExternalCreditsBtn").GetComponent<Button> ();
 	}
 
 	void OnEnable()
 	{
 		HostnameInputField.onEndEdit.AddListener(OnEndEditHostname);
 		PortInputField.onEndEdit.AddListener(OnEndEditPort);
+		ExitBtn.onClick.AddListener (OnClickExitBtn);
+		ExternalCreditsBtn.onClick.AddListener (OnClickExternalCreditsBtn);
 	}
 
 	void OnDisable()
 	{
+		HostnameInputField.onEndEdit.RemoveListener(OnEndEditHostname);
+		PortInputField.onEndEdit.RemoveListener(OnEndEditPort);
+		ExitBtn.onClick.RemoveListener (OnClickExitBtn);
+		ExternalCreditsBtn.onClick.RemoveListener (OnClickExternalCreditsBtn);
 		isHostnameSet = false;
 		isPortSet = false;
 	}
@@ -148,5 +166,28 @@ public class MainPanelScript : MonoBehaviour {
 		HostnameInputField.GetComponent<UIMainMenuBtn> ().enabled =  true;
 		PortInputField.GetComponent<UIMainMenuBtn> ().enabled =  true;
 		MainMenuHelpText.text = "";
+	}
+
+	/// <summary>
+	/// Raises the click exit button event. Leaves the game.
+	/// </summary>
+	public void OnClickExitBtn()
+	{
+		if (GameManager.instance.GameController.InGame == false)
+		{
+			Debug.Log ("Exiting game!");
+			Application.Quit ();
+		}
+	}
+
+	public void OnClickExternalCreditsBtn()
+	{
+		if (GameManager.instance.GameController.InGame == false)
+		{
+			if (transform.parent.GetComponent<MainMenuController> ().CreditPanelController.CreditUp == false)
+				transform.parent.GetComponent<MainMenuController> ().CreditPanelController.ActivateCreditPanel ();
+			else
+				transform.parent.GetComponent<MainMenuController> ().CreditPanelController.CloseCreditPanel ();
+		}
 	}
 }

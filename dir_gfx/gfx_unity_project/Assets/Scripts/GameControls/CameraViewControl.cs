@@ -4,27 +4,33 @@ using UnityEngine;
 
 public class CameraViewControl : MonoBehaviour {
 	// Control settings variables.
-	private float		CameraMoveSensitivity;
-	private float		CameraRotateSensitivity;
+	private float				CameraMoveSensitivity;
+	private float				CameraRotateSensitivity;
 
-	private KeyCode		Advance;
-	private KeyCode		AdvanceAlt;
+	private KeyCode				Advance;
+	private KeyCode				AdvanceAlt;
 
-	private KeyCode		StepBack;
-	private KeyCode		StepBackAlt;
+	private KeyCode				StepBack;
+	private KeyCode				StepBackAlt;
 
-	private KeyCode		StrafeLeft;
-	private KeyCode		StrafeLeftAlt;
+	private KeyCode				StrafeLeft;
+	private KeyCode				StrafeLeftAlt;
 
-	private KeyCode		StrafeRight;
-	private KeyCode		StrafeRightAlt;
-
-	private Vector3		NewPos;
+	private KeyCode				StrafeRight;
+	private KeyCode				StrafeRightAlt;
 
 	// camera objects variables.
-	public GameObject	CameraOffsetObject;
-	public GameObject	CameraAngleObject;
+	public GameObject			CameraYRotation;
+	public GameObject			CameraXRotation;
 		
+	// Camera rotation
+	private Vector3				newAngle;
+	private float				AngleXCount = 0.0f;
+	private float				AngleYCount = 0.0f;
+
+	// camera zoom
+	private Vector3				newpos;
+	private float				curAltitude;
 
 	/// <summary>
 	/// Updates the camera view control keys. Call this when the keys are changed in game.
@@ -51,34 +57,72 @@ public class CameraViewControl : MonoBehaviour {
 	// Use this for initialization
 	void Awake ()
 	{
-		CameraOffsetObject = transform.Find ("CameraOffset").gameObject;
-		CameraAngleObject = transform.Find ("CameraOffset").transform.Find("CameraAngle").gameObject;
+		CameraYRotation = transform.Find ("CameraYRotation").gameObject;
+		CameraXRotation = CameraYRotation.transform.Find ("CameraXRotation").gameObject;
 	}
-	
+
 	// Update is called once per frame
 	void Update ()
 	{
-		NewPos = transform.position;
-
 		// Advance / step back.
 		if (Input.GetKey (Advance) || Input.GetKey (AdvanceAlt))
 		{
-			NewPos.z += 0.1f * CameraMoveSensitivity;
+			CameraYRotation.transform.Translate (CameraYRotation.transform.forward * CameraMoveSensitivity * Time.fixedDeltaTime, Space.World);
 		}
 		else if (Input.GetKey (StepBack) || Input.GetKey (StepBackAlt))
 		{
-			NewPos.z -= 0.1f * CameraMoveSensitivity;
+			CameraYRotation.transform.Translate (-CameraYRotation.transform.forward * CameraMoveSensitivity * Time.fixedDeltaTime, Space.World);
 		}
 
 		// Strafe right / Strafe left
 		if (Input.GetKey (StrafeRight) || Input.GetKey (StrafeRightAlt))
 		{
-			NewPos.x += 0.1f * CameraMoveSensitivity;
+			CameraYRotation.transform.Translate (CameraYRotation.transform.right * CameraMoveSensitivity * Time.fixedDeltaTime, Space.World);
 		}
 		else if (Input.GetKey (StrafeLeft) || Input.GetKey (StrafeLeftAlt))
 		{
-			NewPos.x -= 0.1f * CameraMoveSensitivity;
+			CameraYRotation.transform.Translate (-CameraYRotation.transform.right * CameraMoveSensitivity * Time.fixedDeltaTime, Space.World);
 		}
-		transform.position = NewPos;
+
+		// Camera rotations
+		if (Input.GetMouseButton (1))
+		{
+			// Y rotation -> looking left or right.
+			newAngle.x = 0.0f;
+			newAngle.y = Input.GetAxis ("Mouse X") * CameraRotateSensitivity;
+			newAngle.z = 0.0f;
+			CameraYRotation.transform.Rotate (newAngle);
+
+			// X rotation -> looking up or down.
+			newAngle.x = -Input.GetAxis ("Mouse Y") * CameraRotateSensitivity;
+			newAngle.y = 0.0f;
+			newAngle.z = 0.0f;
+			// limiting X rotation. I keep count of the movement done each move
+			// to limit the up and down rotation.
+			AngleXCount += Input.GetAxis ("Mouse Y");
+			if (AngleXCount > -20.0f && AngleXCount < 35.0f) // these values look natural enough.
+			{
+				CameraXRotation.transform.Rotate (newAngle);
+			}
+			else
+			{
+				AngleXCount = Mathf.Clamp (AngleXCount, -25.0f, 35.0f);
+			}
+		}
+
+		// Camera altitude
+		newpos = CameraYRotation.transform.position;
+		float d = Input.GetAxis("Mouse ScrollWheel");
+		if (d > 0f)
+		{
+			// scroll up
+			newpos.y -= 1.0f;
+		}
+		else if (d < 0f)
+		{
+			// scroll down
+			newpos.y += 1.0f;
+		}
+		CameraYRotation.transform.position = newpos;
 	}
 }

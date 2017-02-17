@@ -183,6 +183,7 @@ public class GameController : MonoBehaviour {
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
 
 		// ----- Data cleaning.
+		GameManager.instance.ConnectionManager.DisconnectServer();
 		InGame = false;
 		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();

@@ -164,9 +164,19 @@ public class ConnectionManager : MonoBehaviour
             OnConnectionFailed.Invoke();
             Debug.Log("Error" + e.ToString());
         }
-
-
     }
+
+	/// <summary>
+	/// Disconnects the server. Closes the socket to make sure the connection is cut.
+	/// </summary>
+	public void DisconnectServer()
+	{
+		if (ClientSocket.Connected == true)
+		{
+			ClientSocket.Close ();
+			IsConnected = false;
+		}
+	}
 }
 
 /*

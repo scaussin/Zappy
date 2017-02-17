@@ -34,6 +34,10 @@ public class MainMenuController : MonoBehaviour {
 	public GameObject				GameOverMenuPanel;
 	public GameOverMenuController	GameOverMenuController;
 
+	// Credit Menu
+	public GameObject				CreditPanel;
+	public CreditPanelController	CreditPanelController;
+
     // Use this for initialization
     void Awake()
     {
@@ -47,6 +51,8 @@ public class MainMenuController : MonoBehaviour {
 		EscapeMenuController = EscapeMenuPanel.GetComponent<EscapeMenuController> ();
 		GameOverMenuPanel = transform.Find ("GameOverMenuPanel").gameObject;
 		GameOverMenuController = GameOverMenuPanel.GetComponent<GameOverMenuController> ();
+		CreditPanel = transform.Find ("CreditPanel").gameObject;
+		CreditPanelController = CreditPanel.GetComponent<CreditPanelController> ();
 
 		// Clean initatialization ( for when we press play )
 		MainPanel.SetActive(true);

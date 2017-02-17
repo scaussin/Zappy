@@ -26,11 +26,19 @@ public class EscapeMenuController : MonoBehaviour {
 		escapeKeyAlt = GameManager.instance.KeyManager.EscapeAlt;
 	}
 
-	void Start()
+	void OnEnable()
 	{
 		LeaveServerBtn.onClick.AddListener (OnClickLeaveServer);
+		QuitGameBtn.onClick.AddListener (OnClickQuitGame);
+		SettingsBtn.onClick.AddListener (OnClickSettings);
 	}
 
+	void OnDisable()
+	{
+		LeaveServerBtn.onClick.RemoveListener (OnClickLeaveServer);
+		QuitGameBtn.onClick.RemoveListener (OnClickQuitGame);
+		SettingsBtn.onClick.RemoveListener (OnClickSettings);
+	}
 
 	// Update is called once per frame
 	void Update ()
@@ -70,12 +78,14 @@ public class EscapeMenuController : MonoBehaviour {
 
 	public void OnClickQuitGame()
 	{
+		Debug.Log ("Exiting game!");
 		Application.Quit ();
 	}
 
 	public void OnClickSettings()
 	{
 		// nothing for now. Maybe later.
+		Debug.Log ("No settings for now.");
 	}
 
 	/// <summary>
