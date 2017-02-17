@@ -34,7 +34,7 @@ class ClientIa
 		void								callbackCommandFindItemTake(string response);
 		void								callbackCommandFindItemSee(string items);
 		pair<string, int>					checkItemAvailable();
-		void								receiveCallbackCommandIgnore(string response);
+		void								callbackCommandIgnore(string response);
 		void								printItemsToFind();
 		void								subItemsToFind(map<string, int> *newItemsToFind);
 		void								callbackCommandLevelUpBroadcast(string response);
@@ -49,6 +49,7 @@ class ClientIa
 		void								callbackCommandLevelUpIncantationEnd(string response);
 		void								callbackCommandLevelUpRepeatBroadcast(string response);
 		void								goToBroadcaster(int target);
+		void								printStack();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;

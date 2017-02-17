@@ -46,13 +46,14 @@ void	ClientIa::execCallbackCallerContinue()
 	}
 }
 
-void	ClientIa::receiveCallbackCommandIgnore(string response)
+void	ClientIa::callbackCommandIgnore(string response)
 {
 	(void)response;
 }
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
+	printStack();
 	if (stackCallbackCommand.size() > 0)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
@@ -80,5 +81,41 @@ void	ClientIa::pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string
 {
 	if (callbackCommand != NULL)
 		stackCallbackCommand.push_front(callbackCommand);
+}
+
+void	ClientIa::printStack()
+{
+	bool falg = false;
+	vector<pair<void (ClientIa::*)(string reponse), string> > tab;
+	ostringstream s;
+
+	tab.push_back(make_pair(&ClientIa::callbackCommandCheckInventory, "callbackCommandCheckInventory"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandFindItemTake, "callbackCommandFindItemTake"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandFindItemSee, "callbackCommandFindItemSee"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandIgnore, "callbackCommandIgnore"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpBroadcast, "callbackCommandLevelUpBroadcast"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandConnectNbr, "callbackCommandConnectNbr"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpInventory, "callbackCommandLevelUpInventory"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpCheckBroadcastResponse, "callbackCommandLevelUpCheckBroadcastResponse"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationStart, "callbackCommandLevelUpIncantationStart"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationEnd, "callbackCommandLevelUpIncantationEnd"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpRepeatBroadcast, "callbackCommandLevelUpRepeatBroadcast"));
+
+	cout <<KMAG<< "stack callbackCommand:" << endl;
+	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
+	{
+		falg = false;
+		for (auto itTab = tab.begin() ; itTab != tab.end(); ++itTab)
+		{
+			if (itTab->first == *it)
+			{
+				falg = true;
+				s << "\t" << itTab->second << endl;
+			}
+		}
+		if (!falg)
+			s << "\t" << "ERROR" << endl;
+	}
+	cout << s.str() << KRESET;
 }
 

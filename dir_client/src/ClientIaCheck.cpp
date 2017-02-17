@@ -22,7 +22,7 @@ void	ClientIa::checkEnd()
 void	ClientIa::callbackCommandCheckInventory(string inventory)
 {
 	player->setInventory(inventory);
-	player->printInventory();
+	//player->printInventory();
 	if (player->getInventory()[FOOD] < minFood)
 	{
 		itemsToFind[FOOD] = nToEat;

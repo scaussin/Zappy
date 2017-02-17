@@ -38,7 +38,7 @@ void	ClientIa::callbackCommandFindItemTake(string response)
 		itemsToFind[itemTryToTake.first]--;
 		player->setCaseItemsSeen(itemTryToTake.second, itemTryToTake.first,	player->getItemsSeen()[itemTryToTake.second][itemTryToTake.first] - 1);
 		cout << itemTryToTake.first << ": " << player->getItemsSeen()[itemTryToTake.second][itemTryToTake.first] << endl;
-		printItemsToFind();
+		//printItemsToFind();
 	}
 	else
 		player->setCaseItemsSeen(itemTryToTake.second, itemTryToTake.first, 0);
@@ -60,7 +60,7 @@ void	ClientIa::findItemMove()
 		while (nMove > 0)
 		{
 
-			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			stackCallbackCommand.push_back(&ClientIa::callbackCommandIgnore);
 			nMove--;
 		}
 		player->prend(itemAvailable.first);
@@ -69,7 +69,7 @@ void	ClientIa::findItemMove()
 	else if (nRotate < 3)
 	{
 		player->droite();
-		stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+		stackCallbackCommand.push_back(&ClientIa::callbackCommandIgnore);
 		nRotate++;
 		callbackContinueFindItemSee();
 	}
@@ -79,18 +79,18 @@ void	ClientIa::findItemMove()
 		if (nRand == 0)
 		{
 			player->droite();
-			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			stackCallbackCommand.push_back(&ClientIa::callbackCommandIgnore);
 		}
 		else if (nRand == 1)
 		{
 			player->gauche();
-			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			stackCallbackCommand.push_back(&ClientIa::callbackCommandIgnore);
 		}
 		int nAvance = (player->getHeightVision() * 2) - 1;
 		while (nAvance > 0)
 		{
 			player->avance();
-			stackCallbackCommand.push_back(&ClientIa::receiveCallbackCommandIgnore);
+			stackCallbackCommand.push_back(&ClientIa::callbackCommandIgnore);
 			nAvance--;
 		}
 		findItemStart(NULL, NULL);
@@ -100,7 +100,7 @@ void	ClientIa::findItemMove()
 void	ClientIa::callbackCommandFindItemSee(string items)
 {
 	player->initItemsSeen(items);
-	player->printItemsSeen();
+	//player->printItemsSeen();
 	findItemMove();
 }
 

@@ -28,7 +28,7 @@ void	ClientIa::callbackCommandLevelUpInventory(string inventory)
 
 	itemsToFind.clear(); //alegay
 	player->setInventory(inventory);
-	player->printInventory();
+	//player->printInventory();
 
 	itemsToLevelUp = player->getItemsLevelUp();
 	subItemsToFind(&itemsToLevelUp);
@@ -53,6 +53,7 @@ void	ClientIa::subItemsToFind(map<string, int> *newItemsToFind)
 					(*newItemsToFind)[it->first] = 0;
 			}
 		}
+
 	}
 }
 
@@ -72,6 +73,7 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 
 void	ClientIa::pushFrontElevationEnd()
 {
+
 	pushFrontCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationEnd);
 }
 
@@ -123,17 +125,17 @@ void	ClientIa::callbackCommandLevelUpBroadcast(string response)
 	nPlayersBroadcastResponse = 0;
 	nPlayersReadyForIncantation = 0;
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
-	pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 	player->gauche();
 	pushCallbackCommand(&ClientIa::callbackCommandLevelUpCheckBroadcastResponse);
 }
@@ -170,7 +172,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			flagWaitingForIncantation = false;
 			flagGoToBroadcaster = true;
 			player->broadcast("j'arrive pour incantation level " + to_string(player->getLevel() + 1));
-			pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 			nCommandIgnore = stackCallbackCommand.size();
 			stackCallbackCallerContinue.clear();
 			itemsToFind.clear();
@@ -183,7 +185,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			stackCallbackCallerContinue.clear();
 			itemsToFind.clear();
 			player->broadcast("je suis sur zone level " + to_string(player->getLevel() + 1));
-			pushCallbackCommand(&ClientIa::receiveCallbackCommandIgnore);
+			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 		}
 	}
 	else if (flagWaitingForIncantation && regex_search(broadcast, match, regex("message ([0-8]),j'arrive pour incantation level ([2-7])\n")))
