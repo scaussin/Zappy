@@ -9,6 +9,7 @@ void	ClientIa::newClientStart(void (ClientIa::*caller)())
 
 void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 {
+	cout << "connect_nbr: " << connectNbr << endl;
 	int nb = stoi(connectNbr);
 
 	if (nb > 0)

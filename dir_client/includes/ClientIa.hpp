@@ -47,6 +47,7 @@ class ClientIa
 		void								callbackCommandLevelUpCheckBroadcastResponse(string response);
 		void								callbackCommandLevelUpIncantationStart(string response);
 		void								callbackCommandLevelUpIncantationEnd(string response);
+		void								callbackCommandLevelUpRepeatBroadcast(string response);
 		void								goToBroadcaster(int target);
 
 		bool								flagWaitingForIncantation;
