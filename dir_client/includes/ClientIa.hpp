@@ -11,8 +11,11 @@ class ClientIa
 		void								startPlay();
 		void								receiveCallbackCommand(string response);
 		void								receiveBroadcast(string broadcast);
-
+		void								pushFrontElevationEnd();
+		bool								flagIsIncantationCaller;
+		
 	private:
+		void								pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
 		void								findItemStart(map<string, int> *newItemsToFind, void (ClientIa::*caller)());
 		void								checkStart(int minFood, int nToEat, void (ClientIa::*caller)());
 		void								newClientStart(void (ClientIa::*caller)());
@@ -42,11 +45,14 @@ class ClientIa
 		void								callbackContinueLevelUpCheck();
 		void								callbackContinueLevelUpNewClient();
 		void								callbackCommandLevelUpCheckBroadcastResponse(string response);
+		void								callbackCommandLevelUpIncantationStart(string response);
+		void								callbackCommandLevelUpIncantationEnd(string response);
 		void								goToBroadcaster(int target);
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;
-		bool								flagBroadcastMode;
+		int									nCommandIgnore;
+		
 		pid_t								pid;
 		ClientPlayer						*player;
 		map<string, int>					itemsToFind;

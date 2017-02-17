@@ -26,6 +26,7 @@ class ClientPlayer
 		void						connect_nbr();
 		void						broadcast(string broadcast);
 		int							move(int to);
+		void						incantation();
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
@@ -36,16 +37,19 @@ class ClientPlayer
 		void						initItemsSeen(string items);
 		void						setCaseItemsSeen(int indexCase, string item, int n);
 		void						printItemsSeen();
+		void						printVectMap(vector<map<string, int> > items);
+		void						printMap(map<string, int> items);
 		int							getHeightVision();
 		int							getNPlayerLevelUp();
 		int							getLevel();
+		void						setLevel(int _level);
 
 	private:
 		int							level;
 		int							position;
 		map<string, int>			inventory;
-		int							lifeUnits;
-		vector<string>				vision;
+		//int							lifeUnits;
+		//vector<string>				vision;
 		ClientBuffer				*bufferSend;
 		vector<map<string, int> >	itemsSeen;
 		vector<map<string, int> >	levelUpItems;

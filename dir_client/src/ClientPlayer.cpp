@@ -10,7 +10,7 @@
 ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName), argv(_argv)
 {
 	level = 1;
-	lifeUnits = 10;
+	/*lifeUnits = 10;*/
 	teamSlots = -1;	
 	levelUpItems.resize(7);
 
@@ -62,11 +62,11 @@ ClientPlayer::~ClientPlayer()
 
 void	ClientPlayer::printStat()
 {
-	cout << KGRN << "Player Game datas:" << KRESET << endl;
+	/*cout << KGRN << "Player Game datas:" << KRESET << endl;
 	cout << "  World size: " << worldSizeX << "x " << worldSizeY << "y " << endl;
 	cout << "  Team: " << teamName << " - Level: " << level << endl;
 	cout << "  Life Units: " << lifeUnits << endl;
-	cout << "  Inventory size: " << inventory.size() << endl;
+	cout << "  Inventory size: " << inventory.size() << endl;*/
 }
 
 void	ClientPlayer::inventaire()
@@ -77,6 +77,10 @@ void	ClientPlayer::inventaire()
 void	ClientPlayer::voir()
 {
 	bufferSend->pushMsg("voir\n");
+}
+void	ClientPlayer::incantation()
+{
+	bufferSend->pushMsg("incantation\n");
 }
 
 void	ClientPlayer::avance()
@@ -106,7 +110,7 @@ void	ClientPlayer::prend(string item)
 
 void	ClientPlayer::broadcast(string broadcast)
 {
-	bufferSend->pushMsg(broadcast + "\n");
+	bufferSend->pushMsg("broadcast " + broadcast + "\n");
 }
 
 map<string, int>	ClientPlayer::getItemsLevelUp()
@@ -144,6 +148,11 @@ int		ClientPlayer::move(int to)
 int		ClientPlayer::getLevel()
 {
 	return (level);
+}
+
+void		ClientPlayer::setLevel(int _level)
+{
+	level = _level;
 }
 
 int		ClientPlayer::poshorizontale(int pos)	//return pos par rapport au milieu
@@ -326,6 +335,31 @@ void	ClientPlayer::printItemsSeen()
 		}
 		cout << endl;
 		i++;
+	}
+}
+
+void	ClientPlayer::printVectMap(vector<map<string, int> > items)
+{
+	unsigned int		i = 0;
+
+	cout << KRED << "vectmap : " << KRESET << endl;
+	while (i < items.size())
+	{
+		for(map<string, int>::iterator it = items[i].begin(); it != items[i].end(); ++it)
+		{
+			cout << KCYN << it->first << ": " <<KRESET<< it->second << " | ";
+		}
+		cout << endl;
+		i++;
+	}
+}
+
+void	ClientPlayer::printMap(map<string, int> items)
+{
+	cout << KRED << "map : " << KRESET << endl;
+	for(map<string, int>::const_iterator it = items.cbegin(); it != items.cend(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
 	}
 }
 

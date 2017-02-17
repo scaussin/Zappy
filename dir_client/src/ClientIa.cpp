@@ -5,7 +5,8 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	nBroadcast = 0;
 	flagWaitingForIncantation = false;
 	flagGoToBroadcaster = false;
-	flagBroadcastMode = false;
+	nCommandIgnore = 0;
+	flagIsIncantationCaller = false;
 	pid = getpid();
 }
 
@@ -15,7 +16,7 @@ ClientIa::~ClientIa()
 
 void	ClientIa::startPlay()
 {
-	map<string, int> itemsToFind;
+	/*map<string, int> itemsToFind;
 
 	itemsToFind["linemate"] = 5;
 	itemsToFind["phiras"] = 5;
@@ -23,7 +24,7 @@ void	ClientIa::startPlay()
 	itemsToFind["sibur"] = 5;
 	itemsToFind["mendiane"] = 5;
 	itemsToFind["deraumere"] = 5;
-	itemsToFind["thystame"] = 5;
+	itemsToFind["thystame"] = 5;*/
 
 	levelUpStart(&ClientIa::endPlay);
 	//newClientStart(&ClientIa::newClientEnd);
@@ -56,10 +57,11 @@ void	ClientIa::receiveCallbackCommand(string response)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
 		stackCallbackCommand.pop_front();
-		if (flagBroadcastMode == false)
+		if (nCommandIgnore == 0)
 			(this->*func)(response);
+		else
+			nCommandIgnore--;
 	}
-	flagBroadcastMode = false;
 }
 
 void	ClientIa::pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinue)())
@@ -72,5 +74,11 @@ void	ClientIa::pushCallbackCommand(void (ClientIa::*callbackCommand)(string repo
 {
 	if (callbackCommand != NULL)
 		stackCallbackCommand.push_back(callbackCommand);
+}
+
+void	ClientIa::pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string reponse))
+{
+	if (callbackCommand != NULL)
+		stackCallbackCommand.push_front(callbackCommand);
 }
 

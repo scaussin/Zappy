@@ -21,7 +21,6 @@ void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 		}
 	}
 	newClientEnd();
-	
 }
 
 void	ClientIa::newClientEnd()

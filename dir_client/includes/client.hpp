@@ -80,6 +80,6 @@ vector<string>	strSplit(string str, char c);
 # define FOOD "nourriture"
 # define SUCCESS "ok\n"
 
-# define MODULO_BROADCAST 5
+# define MODULO_BROADCAST 8
 
 #endif

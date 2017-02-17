@@ -75,7 +75,7 @@
 **	cmd time defines
 */
 
-# define MOVE_CMDS_TIME 1			// default 7
+# define MOVE_CMDS_TIME 7			// default 7
 # define VOIR_CMD_TIME 7			// default 7
 # define INVENTAIRE_CMD_TIME 1		// default 1
 # define ITEM_CMD_TIME 7			// default 7
