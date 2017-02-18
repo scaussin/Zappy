@@ -13,6 +13,7 @@ class ClientIa
 		void								receiveBroadcast(string broadcast);
 		void								pushFrontElevationEnd();
 		bool								flagIsIncantationCaller;
+		void								printStack(string);
 		
 	private:
 		void								pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
@@ -49,7 +50,6 @@ class ClientIa
 		void								callbackCommandLevelUpIncantationEnd(string response);
 		void								callbackCommandLevelUpRepeatBroadcast(string response);
 		void								goToBroadcaster(int target);
-		void								printStack();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;

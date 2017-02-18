@@ -148,11 +148,11 @@ void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 	{
 		if (nPlayersReadyForIncantation == nPlayersBroadcastResponse)
 		{
-			cout << getpid() << "peut lancer nouvelle incantation" << endl;
-			/*player->pose();
-			pushCallbackCommand(&ClientIa::);
-			player->incantation();
+			/*cout << getpid() << "peut lancer nouvelle incantation" << endl;
+			player->pose();
 			pushCallbackCommand(&ClientIa::);*/
+			player->incantation();
+		/*	pushCallbackCommand(&ClientIa::);*/
 		}
 		else
 		{
@@ -224,4 +224,6 @@ void	ClientIa::goToBroadcaster(int target)
 		player->droite();
 	if (target == 5)
 		player->droite();
+	if (target != 0)
+		pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 }

@@ -53,7 +53,7 @@ void	ClientIa::callbackCommandIgnore(string response)
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
-	printStack();
+	//printStack(KMAG);
 	if (stackCallbackCommand.size() > 0)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
@@ -83,7 +83,7 @@ void	ClientIa::pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string
 		stackCallbackCommand.push_front(callbackCommand);
 }
 
-void	ClientIa::printStack()
+void	ClientIa::printStack(string c)
 {
 	bool falg = false;
 	vector<pair<void (ClientIa::*)(string reponse), string> > tab;
@@ -101,7 +101,7 @@ void	ClientIa::printStack()
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationEnd, "callbackCommandLevelUpIncantationEnd"));
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpRepeatBroadcast, "callbackCommandLevelUpRepeatBroadcast"));
 
-	cout <<KMAG<< "stack callbackCommand:" << endl;
+	cout <<c<< getpid() <<" stack callbackCommand:" << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
 	{
 		falg = false;
@@ -110,7 +110,7 @@ void	ClientIa::printStack()
 			if (itTab->first == *it)
 			{
 				falg = true;
-				s << "\t" << itTab->second << endl;
+				s << "\t"<<getpid()<<" " << itTab->second << endl;
 			}
 		}
 		if (!falg)

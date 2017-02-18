@@ -72,21 +72,26 @@ void	ClientCommunication::manageRecv()
 		return ;
 	if (isAuthenticated)
 	{
+
 		string msg = bufferRecv.getFirstMsg();
 		if (msg.compare("mort\n") == 0)
 		{
-			//TODO ;)
+
 		}
 		else if (msg.compare("elevation en cours\n") == 0 && ia->flagIsIncantationCaller == false)
 		{
 			ia->pushFrontElevationEnd();
+			//ia->printStack(KMAG);
 		}
 		else
 		{
 			if (regex_match(msg, regex("message [0-8],.+\n")))
 				ia->receiveBroadcast(msg);
 			else
+			{
 				ia->receiveCallbackCommand(msg);
+				//ia->printStack(KMAG);
+			}
 		}
 	}
 	else
@@ -235,7 +240,8 @@ void	ClientCommunication::pushData()
 			break ;
 	}
 	replaceEnd(buffTmp = buffTmp.substr(0, retSend));
-	cout << KYEL << getpid()  << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << endl;
+	//cout << KYEL << getpid()  << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << endl;
+	ia->printStack(KYEL + to_string(getpid())  + " Sending to server: "+ KRESET +"["+buffTmp +"]\n" + KYEL);
 	if (retSend == -1)
 		throw (CustomException("send error"));
 	if (retSend > 0)
@@ -272,7 +278,8 @@ int		ClientCommunication::pullData()
 		bufferRecv.pushBuffer(buffRecv, retRecv);
 	string recvStr(buffRecv, retRecv);
 	replaceEnd(recvStr);
-	cout << KBLU << getpid() << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << endl;
+	//cout << KBLU << getpid() << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << endl;
+	ia->printStack(KCYN + to_string(getpid()) + " Receiving to server: "+ KRESET + "["+ recvStr + "] len: " + to_string(retRecv) + "\n" + KCYN );
 	delete[] buffRecv;
 	return (retRecv);
 }

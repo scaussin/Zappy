@@ -100,6 +100,11 @@ void	ClientIa::findItemMove()
 void	ClientIa::callbackCommandFindItemSee(string items)
 {
 	player->initItemsSeen(items);
+	if (items == "ok\n")
+	{
+		cout << "error voir" << endl;
+		exit(0);
+	}
 	//player->printItemsSeen();
 	findItemMove();
 }
