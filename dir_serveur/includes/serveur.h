@@ -68,7 +68,7 @@
 
 # define NB_RESSOURCES 7
 
-# define FOOD_LIFE_TIME 126		// default 126
+# define FOOD_LIFE_TIME 12600		// default 126
 # define EGG_HATCH_TIME 600		// default 600
 
 /*
@@ -81,7 +81,7 @@
 # define ITEM_CMD_TIME 7			// default 7
 # define EXPULSE_CMD_TIME 7			// default 7
 # define BROADCAST_CMD_TIME 7		// default 7
-# define INCANTATION_CMD_TIME 300	// default 300
+# define INCANTATION_CMD_TIME 50	// default 300
 # define FORK_CMD_TIME 42			// default 42 == egg laying time
 # define CONNECT_NBR_CMD_TIME 0		// default 0
 

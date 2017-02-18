@@ -73,7 +73,6 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 
 void	ClientIa::pushFrontElevationEnd()
 {
-
 	pushFrontCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationEnd);
 }
 
@@ -90,9 +89,7 @@ void	ClientIa::callbackContinueLevelUpCheck()
 {
 	if (player->getLevel() == 1)
 	{
-		player->incantation();
-		flagIsIncantationCaller = true;
-		pushCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationStart);
+		itemsPoseStart(player->getItemsLevelUp(), &ClientIa::callbackContinueLevelUpIncantation);
 	}
 	else
 	{
@@ -117,7 +114,11 @@ void	ClientIa::callbackCommandLevelUpRepeatBroadcast(string response)
 	callbackContinueLevelUpCheck();
 }
 
-
+void	ClientIa::callbackCommandLevelUpFork(string response)
+{
+	(void)response;
+	callbackContinueLevelUpFindItem();
+}
 
 void	ClientIa::callbackCommandLevelUpBroadcast(string response)
 {
@@ -140,6 +141,13 @@ void	ClientIa::callbackCommandLevelUpBroadcast(string response)
 	pushCallbackCommand(&ClientIa::callbackCommandLevelUpCheckBroadcastResponse);
 }
 
+void	ClientIa::callbackContinueLevelUpIncantation()
+{
+	player->incantation();
+	flagIsIncantationCaller = true;
+	pushCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationStart);
+}
+
 void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 {
 	cout << getpid() <<" startcoucou" << endl;
@@ -148,24 +156,32 @@ void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 	{
 		if (nPlayersReadyForIncantation == nPlayersBroadcastResponse)
 		{
+			itemsPoseStart(player->getItemsLevelUp(), &ClientIa::callbackContinueLevelUpIncantation);
 			/*cout << getpid() << "peut lancer nouvelle incantation" << endl;
-			player->pose();
-			pushCallbackCommand(&ClientIa::);*/
+			pushCallbackCommand(&ClientIa::);
 			player->incantation();
-		/*	pushCallbackCommand(&ClientIa::);*/
+			pushCallbackCommand(&ClientIa::);*/
 		}
 		else
 		{
 			callbackContinueLevelUpCheck();
 		}
 	}
+	else if (flagFork == false)
+	{
+		/*player->fork();
+		pushCallbackCommand(&ClientIa::callbackCommandLevelUpFork);*/
+		callbackContinueLevelUpFindItem();
+	}
+	else
+		callbackContinueLevelUpFindItem();
 }
 
 void	ClientIa::receiveBroadcast(string broadcast)
 {
 	smatch match;
 
-	if (regex_search(broadcast, match, regex("message ([0-8]),qui veut incanter niveau ([2-7]) ([0-9]+)\n")))
+	if (regex_search(broadcast, match, regex("message ([0-8]),qui veut incanter niveau ([2-8]) ([0-9]+)\n")))
 	{
 		if ((flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) != 0) || (flagWaitingForIncantation == true && pid > stoi(match[3])))
 		{
@@ -188,14 +204,14 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
 		}
 	}
-	else if (flagWaitingForIncantation && regex_search(broadcast, match, regex("message ([0-8]),j'arrive pour incantation level ([2-7])\n")))
+	else if (flagWaitingForIncantation && regex_search(broadcast, match, regex("message ([0-8]),j'arrive pour incantation level ([2-8])\n")))
 	{
 		if (player->getLevel() == stoi(match[2]) - 1)
 		{
 			nPlayersBroadcastResponse++;
 		}
 	}
-	else if (flagWaitingForIncantation && regex_search(broadcast, match, regex("message ([0-8]),je suis sur zone level ([2-7])\n")))
+	else if (flagWaitingForIncantation && regex_search(broadcast, match, regex("message ([0-8]),je suis sur zone level ([2-8])\n")))
 	{
 		if (player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) == 0)
 		{
@@ -203,7 +219,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			nPlayersReadyForIncantation++;
 		}
 	}
-	else if (flagGoToBroadcaster && regex_search(broadcast, match, regex("message ([0-8]),rejoignez moi pour incantation level ([2-7])\n")))
+	else if (flagGoToBroadcaster && regex_search(broadcast, match, regex("message ([0-8]),rejoignez moi pour incantation level ([2-8])\n")))
 	{
 		if (player->getLevel() == stoi(match[2]) - 1)
 			goToBroadcaster(stoi(match[1]));

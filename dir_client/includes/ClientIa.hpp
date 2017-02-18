@@ -50,9 +50,14 @@ class ClientIa
 		void								callbackCommandLevelUpIncantationEnd(string response);
 		void								callbackCommandLevelUpRepeatBroadcast(string response);
 		void								goToBroadcaster(int target);
+		void								callbackCommandLevelUpFork(string response);
+		void								itemsPoseStart(map<string, int> itemsToPose, void (ClientIa::*caller)());
+		void								callbackCommandItemsPoseEnd(string empty);
+		void								callbackContinueLevelUpIncantation();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;
+		bool								flagFork;
 		int									nCommandIgnore;
 		
 		pid_t								pid;

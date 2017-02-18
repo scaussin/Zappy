@@ -7,6 +7,7 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	flagGoToBroadcaster = false;
 	nCommandIgnore = 0;
 	flagIsIncantationCaller = false;
+	flagFork = false;
 	pid = getpid();
 }
 
@@ -100,6 +101,8 @@ void	ClientIa::printStack(string c)
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationStart, "callbackCommandLevelUpIncantationStart"));
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationEnd, "callbackCommandLevelUpIncantationEnd"));
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpRepeatBroadcast, "callbackCommandLevelUpRepeatBroadcast"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandItemsPoseEnd, "callbackCommandItemsPoseEnd"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpFork, "callbackCommandLevelUpFork"));
 
 	cout <<c<< getpid() <<" stack callbackCommand:" << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)

@@ -108,9 +108,20 @@ void	ClientPlayer::prend(string item)
 	bufferSend->pushMsg("prend " + item + "\n");
 }
 
+void	ClientPlayer::pose(string item)
+{
+	bufferSend->pushMsg("pose " + item + "\n");
+}
+
+
 void	ClientPlayer::broadcast(string broadcast)
 {
 	bufferSend->pushMsg("broadcast " + broadcast + "\n");
+}
+
+void	ClientPlayer::fork()
+{
+	bufferSend->pushMsg("fork\n");
 }
 
 map<string, int>	ClientPlayer::getItemsLevelUp()

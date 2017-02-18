@@ -72,25 +72,27 @@ void	ClientCommunication::manageRecv()
 		return ;
 	if (isAuthenticated)
 	{
+		string msg;
+		while ((msg = bufferRecv.getFirstMsg()).size() > 0)
+		{
+			if (msg.compare("mort\n") == 0)
+			{
 
-		string msg = bufferRecv.getFirstMsg();
-		if (msg.compare("mort\n") == 0)
-		{
-
-		}
-		else if (msg.compare("elevation en cours\n") == 0 && ia->flagIsIncantationCaller == false)
-		{
-			ia->pushFrontElevationEnd();
-			//ia->printStack(KMAG);
-		}
-		else
-		{
-			if (regex_match(msg, regex("message [0-8],.+\n")))
-				ia->receiveBroadcast(msg);
+			}
+			else if (msg.compare("elevation en cours\n") == 0 && ia->flagIsIncantationCaller == false)
+			{
+				ia->pushFrontElevationEnd();
+				//ia->printStack(KMAG);
+			}
 			else
 			{
-				ia->receiveCallbackCommand(msg);
-				//ia->printStack(KMAG);
+				if (regex_match(msg, regex("message [0-8],.+\n")))
+					ia->receiveBroadcast(msg);
+				else
+				{
+					ia->receiveCallbackCommand(msg);
+					//ia->printStack(KMAG);
+				}
 			}
 		}
 	}

@@ -23,10 +23,12 @@ class ClientPlayer
 		void						gauche();
 		void						droite();
 		void						prend(string item);
+		void						pose(string item);
 		void						connect_nbr();
 		void						broadcast(string broadcast);
 		int							move(int to);
 		void						incantation();
+		void						fork();
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
