@@ -9,6 +9,12 @@ void	ClientIa::newClientStart(void (ClientIa::*caller)())
 
 void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 {
+	if (connectNbr == "ko\n")
+	{
+		cout << "qwertyuiop " << getpid() <<endl;
+		stackCallbackCommand.push_front(&ClientIa::callbackCommandConnectNbr);
+		return ;
+	}
 	cout << "connect_nbr: " << connectNbr << endl;
 	int nb = stoi(connectNbr);
 

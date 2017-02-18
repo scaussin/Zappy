@@ -5,7 +5,6 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	nBroadcast = 0;
 	flagWaitingForIncantation = false;
 	flagGoToBroadcaster = false;
-	nCommandIgnore = 0;
 	flagIsIncantationCaller = false;
 	flagFork = false;
 	pid = getpid();
@@ -54,15 +53,12 @@ void	ClientIa::callbackCommandIgnore(string response)
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
-	//printStack(KMAG);
 	if (stackCallbackCommand.size() > 0)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
 		stackCallbackCommand.pop_front();
-		if (nCommandIgnore == 0)
+		if (func != NULL)
 			(this->*func)(response);
-		else
-			nCommandIgnore--;
 	}
 }
 
@@ -84,8 +80,17 @@ void	ClientIa::pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string
 		stackCallbackCommand.push_front(callbackCommand);
 }
 
+void	ClientIa::ignoreCallbackCommand()
+{
+	for (auto it = stackCallbackCommand.begin() ; it != stackCallbackCommand.end() ; ++it)
+	{
+		*it = NULL;
+	}
+}
+
 void	ClientIa::printStack(string c)
 {
+	
 	bool falg = false;
 	vector<pair<void (ClientIa::*)(string reponse), string> > tab;
 	ostringstream s;
@@ -107,17 +112,22 @@ void	ClientIa::printStack(string c)
 	cout <<c<< getpid() <<" stack callbackCommand:" << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
 	{
-		falg = false;
-		for (auto itTab = tab.begin() ; itTab != tab.end(); ++itTab)
+		if (*it == NULL)
+			s << "\t" <<getpid()<<" " "NULL" << endl;
+		else
 		{
-			if (itTab->first == *it)
+			falg = false;
+			for (auto itTab = tab.begin() ; itTab != tab.end(); ++itTab)
 			{
-				falg = true;
-				s << "\t"<<getpid()<<" " << itTab->second << endl;
+				if (itTab->first == *it)
+				{
+					falg = true;
+					s << "\t"<<getpid()<<" " << itTab->second << endl;
+				}
 			}
+			if (!falg)
+				s << "\t" << "ERROR" << endl;
 		}
-		if (!falg)
-			s << "\t" << "ERROR" << endl;
 	}
 	cout << s.str() << KRESET;
 }

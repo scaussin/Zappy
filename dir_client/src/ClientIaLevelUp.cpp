@@ -53,7 +53,6 @@ void	ClientIa::subItemsToFind(map<string, int> *newItemsToFind)
 					(*newItemsToFind)[it->first] = 0;
 			}
 		}
-
 	}
 }
 
@@ -67,7 +66,7 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 	cout << "incantation end: " << response << endl;
 	flagIsIncantationCaller = false;
 	player->setLevel(player->getLevel() + 1);
-	nCommandIgnore = stackCallbackCommand.size();
+	ignoreCallbackCommand();
 	levelUpStart(NULL);
 }
 
@@ -189,7 +188,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			flagGoToBroadcaster = true;
 			player->broadcast("j'arrive pour incantation level " + to_string(player->getLevel() + 1));
 			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-			nCommandIgnore = stackCallbackCommand.size();
+			ignoreCallbackCommand();
 			stackCallbackCallerContinue.clear();
 			itemsToFind.clear();
 			goToBroadcaster(stoi(match[1]));
@@ -197,7 +196,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 		else if (flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) == 0)
 		{
 			flagGoToBroadcaster = false;
-			nCommandIgnore = stackCallbackCommand.size();
+			ignoreCallbackCommand();
 			stackCallbackCallerContinue.clear();
 			itemsToFind.clear();
 			player->broadcast("je suis sur zone level " + to_string(player->getLevel() + 1));

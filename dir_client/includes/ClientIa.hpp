@@ -54,11 +54,12 @@ class ClientIa
 		void								itemsPoseStart(map<string, int> itemsToPose, void (ClientIa::*caller)());
 		void								callbackCommandItemsPoseEnd(string empty);
 		void								callbackContinueLevelUpIncantation();
+		void								ignoreCallbackCommand();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;
 		bool								flagFork;
-		int									nCommandIgnore;
+		//int									nCommandIgnore;
 		
 		pid_t								pid;
 		ClientPlayer						*player;
