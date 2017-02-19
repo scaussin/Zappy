@@ -50,11 +50,13 @@ class ClientIa
 		void								callbackCommandLevelUpIncantationEnd(string response);
 		void								callbackCommandLevelUpRepeatBroadcast(string response);
 		void								goToBroadcaster(int target);
-		void								callbackCommandLevelUpFork(string response);
 		void								itemsPoseStart(map<string, int> itemsToPose, void (ClientIa::*caller)());
 		void								callbackCommandItemsPoseEnd(string empty);
 		void								callbackContinueLevelUpIncantation();
 		void								ignoreCallbackCommand();
+		void								checkBeforeBroadcastStart(int minFood, int nToEat, void (ClientIa::*caller)());
+		void								callbackCommandCheckBeforeBroadcastInventory(string inventory);
+		void								callbackContinueCheckBeforeBroadcastEnd();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;

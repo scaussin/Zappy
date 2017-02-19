@@ -90,7 +90,6 @@ void	ClientIa::ignoreCallbackCommand()
 
 void	ClientIa::printStack(string c)
 {
-	
 	bool falg = false;
 	vector<pair<void (ClientIa::*)(string reponse), string> > tab;
 	ostringstream s;
@@ -106,8 +105,7 @@ void	ClientIa::printStack(string c)
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationStart, "callbackCommandLevelUpIncantationStart"));
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationEnd, "callbackCommandLevelUpIncantationEnd"));
 	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpRepeatBroadcast, "callbackCommandLevelUpRepeatBroadcast"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandItemsPoseEnd, "callbackCommandItemsPoseEnd"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpFork, "callbackCommandLevelUpFork"));
+	tab.push_back(make_pair(&ClientIa::callbackCommandItemsPoseEnd, "callbackCommandItemsPoseEnd"));	
 
 	cout <<c<< getpid() <<" stack callbackCommand:" << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
@@ -131,4 +129,3 @@ void	ClientIa::printStack(string c)
 	}
 	cout << s.str() << KRESET;
 }
-

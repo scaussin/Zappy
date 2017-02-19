@@ -16,6 +16,7 @@ SRC = 		src/main.cpp \
 			src/ClientIaLevelUp.cpp \
 			src/ClientIaNewClient.cpp \
 			src/ClientIaItemsPose.cpp \
+			src/ClientIaCheckBeforeBroadcast.cpp \
 			src/ClientController.cpp
 
 OBJ =		$(SRC:%.cpp=%.o)

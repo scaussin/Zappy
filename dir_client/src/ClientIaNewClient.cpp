@@ -9,7 +9,8 @@ void	ClientIa::newClientStart(void (ClientIa::*caller)())
 
 void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 {
-	if (connectNbr == "ko\n")
+	(string)connectNbr;
+	/*if (connectNbr == "ko\n")
 	{
 		cout << "qwertyuiop " << getpid() <<endl;
 		stackCallbackCommand.push_front(&ClientIa::callbackCommandConnectNbr);
@@ -26,7 +27,7 @@ void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 			// child
 			execve(player->argv[0], player->argv, NULL);
 		}
-	}
+	}*/
 	newClientEnd();
 }
 

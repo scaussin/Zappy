@@ -72,11 +72,13 @@ vector<string>	strSplit(string str, char c);
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
 
-# define MIN_FOOD_1  1200
-# define MIN_FOOD_2  1000
+# define MIN_FOOD_1 5000
+# define MIN_FOOD_2 5000
+//# define MIN_FOOD_BEFORE_INCANTATION 5000
 
-# define N_TO_EAT_1 4
-# define N_TO_EAT_2 6
+# define N_TO_EAT_1 50
+# define N_TO_EAT_2 50
+//# define N_TO_EAT_BEFORE_INCANTATION 50
 # define FOOD "nourriture"
 # define SUCCESS "ok\n"
 

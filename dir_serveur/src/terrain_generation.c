@@ -131,7 +131,7 @@ void	generate_ressources(t_world_hdl *world_hdl)
 
 void generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
 {
-	world_hdl->world_board[y][x].ressources[FOOD] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[FOOD] = (rand() % 10);
 	world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 10;
 	world_hdl->world_board[y][x].ressources[DERAUMERE] = rand() % 10;
 	world_hdl->world_board[y][x].ressources[SIBUR] = rand() % 10;
@@ -152,7 +152,7 @@ void generate_ressources_diced(t_world_hdl *world_hdl, int x, int y)
 
 	dice = rand() % 100; // d100 cast.
 	if (dice < 60) // 70% that case has food.
-		world_hdl->world_board[y][x].ressources[FOOD] = rand() % 6;
+		world_hdl->world_board[y][x].ressources[FOOD] = rand() % 30;
 	dice = rand() % 100;
 	if (dice < 60) // 60% that case has linemate.
 		world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 8;
