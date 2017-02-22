@@ -8,7 +8,9 @@ ClientBuffer::ClientBuffer()
 }
 
 ClientBuffer::~ClientBuffer()
-{}
+{
+	
+}
 
 /*
 **	return first cmd whithout end char ('\n').
