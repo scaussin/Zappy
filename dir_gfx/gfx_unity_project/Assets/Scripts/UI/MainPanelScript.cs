@@ -9,19 +9,28 @@ using UnityEngine.UI;
 /// </summary>
 public class MainPanelScript : MonoBehaviour {
 
+	[Header("Center panel inputs")]
 	public InputField   		HostnameInputField;
 	public InputField   		PortInputField;
 	public Text         		ResponseText;
-
-	private MainMenuController	MainMenuController;
 
 	// input field variable helper.
 	public bool        			isHostnameSet;
 	public bool        			isPortSet;
 	public bool        			CanEnterInput;
 
+	[Header("Control buttons")]
+	public Button				ExitBtn;
+	public Button				ExternalCreditsBtn;
+
+	// private vars
+	private MainMenuController	MainMenuController;
+	private Text				MainMenuHelpText;
+
 	// Use this for initialization
-	void Awake () {
+	void Awake ()
+	{
+		// get main references.
 		MainMenuController = transform.parent.GetComponent<MainMenuController> ();
 		HostnameInputField = transform
 			.Find("CenterAreaPanel").transform
@@ -38,18 +47,32 @@ public class MainPanelScript : MonoBehaviour {
 			.Find("CenterAreaContainer").transform
 			.Find("ServerInfosContainer").transform
 			.Find("ResponseText").GetComponent<Text>();
+		MainMenuHelpText = transform
+			.Find("CenterAreaPanel").transform
+			.Find("MainMenuHelpText").GetComponent<Text>();
 		isHostnameSet = false;
 		isPortSet = false;
+
+		// get btn refs
+		ExitBtn = transform.Find ("ExitGameBtn").GetComponent<Button> ();
+		ExternalCreditsBtn = transform
+			.Find ("FooterPanel").transform.Find ("ExternalCreditsBtn").GetComponent<Button> ();
 	}
 
 	void OnEnable()
 	{
 		HostnameInputField.onEndEdit.AddListener(OnEndEditHostname);
 		PortInputField.onEndEdit.AddListener(OnEndEditPort);
+		ExitBtn.onClick.AddListener (OnClickExitBtn);
+		ExternalCreditsBtn.onClick.AddListener (OnClickExternalCreditsBtn);
 	}
 
 	void OnDisable()
 	{
+		HostnameInputField.onEndEdit.RemoveListener(OnEndEditHostname);
+		PortInputField.onEndEdit.RemoveListener(OnEndEditPort);
+		ExitBtn.onClick.RemoveListener (OnClickExitBtn);
+		ExternalCreditsBtn.onClick.RemoveListener (OnClickExternalCreditsBtn);
 		isHostnameSet = false;
 		isPortSet = false;
 	}
@@ -68,15 +91,7 @@ public class MainPanelScript : MonoBehaviour {
 		{
 			GameManager.instance.Hostname = str;
 		}
-
-		if (isPortSet == true)
-		{
-			MainMenuController.OnServerInfoSelected.Invoke(); // lets go try connection!
-		}
-		else
-		{
-			PortInputField.Select();
-		}
+		PortInputField.Select();
 	}
 
 	/// <summary>
@@ -93,11 +108,6 @@ public class MainPanelScript : MonoBehaviour {
 		{
 			GameManager.instance.Port = str;
 		}
-
-		if (isHostnameSet == true)
-		{
-			MainMenuController.OnServerInfoSelected.Invoke(); // lets go try connection!
-		}
 	}
 
 	// Update is called once per frame
@@ -105,10 +115,9 @@ public class MainPanelScript : MonoBehaviour {
 	{
 		if (CanEnterInput)
 		{
-			// press enter when nothing is selected -> default settings.
-			if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)
-				|| Input.GetKeyDown(KeyCode.Space))
-				&& HostnameInputField.isFocused == false && PortInputField.isFocused == false)
+			// press enter when nothing is selected -> try connect.
+			if ((Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter)
+				|| Input.GetKeyUp(KeyCode.Space)))
 			{
 				if (!isHostnameSet)
 				{
@@ -118,16 +127,67 @@ public class MainPanelScript : MonoBehaviour {
 				{
 					GameManager.instance.Port = "4242";
 				}
-				MainMenuController.OnServerInfoSelected.Invoke();
+				//MainMenuController.OnServerInfoSelected.Invoke();
+				GameManager.instance.GameController.OnServerInfoEntered();
 			}
 			// Press tab when hostname modification ? select port field.
-			if (Input.GetKeyDown(KeyCode.Tab))
+			if (Input.GetKeyUp(KeyCode.Tab))
 			{
 				if (HostnameInputField.isFocused == true)
 				{
-					PortInputField.Select();
+					PortInputField.Select ();
+				}
+				else if (PortInputField.isFocused == true)
+				{
+					GameManager.instance.GameController.OnServerInfoEntered();
 				}
 			}
+		}
+	}
+
+	/// <summary>
+	/// Raises the button hover event. Changes the text of the help text.
+	/// </summary>
+	/// <param name="msg">Message.</param>
+	public void OnBtnHover(string msg)
+	{
+		MainMenuHelpText.text = msg;
+	}
+
+	public void DesactivateMainPanelHover()
+	{
+		HostnameInputField.GetComponent<UIMainMenuBtn> ().enabled =  false;
+		PortInputField.GetComponent<UIMainMenuBtn> ().enabled =  false;
+		MainMenuHelpText.text = "";
+	}
+
+	public void ActivateMainPanelHover()
+	{
+		HostnameInputField.GetComponent<UIMainMenuBtn> ().enabled =  true;
+		PortInputField.GetComponent<UIMainMenuBtn> ().enabled =  true;
+		MainMenuHelpText.text = "";
+	}
+
+	/// <summary>
+	/// Raises the click exit button event. Leaves the game.
+	/// </summary>
+	public void OnClickExitBtn()
+	{
+		if (GameManager.instance.GameController.InGame == false)
+		{
+			Debug.Log ("Exiting game!");
+			Application.Quit ();
+		}
+	}
+
+	public void OnClickExternalCreditsBtn()
+	{
+		if (GameManager.instance.GameController.InGame == false)
+		{
+			if (transform.parent.GetComponent<MainMenuController> ().CreditPanelController.CreditUp == false)
+				transform.parent.GetComponent<MainMenuController> ().CreditPanelController.ActivateCreditPanel ();
+			else
+				transform.parent.GetComponent<MainMenuController> ().CreditPanelController.CloseCreditPanel ();
 		}
 	}
 }

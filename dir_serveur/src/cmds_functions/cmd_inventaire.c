@@ -25,25 +25,10 @@ void	cmd_inventaire(struct s_serveur *serv, struct s_client_entity *client_cur, 
 	(void)				param;
 	t_player			*cur_player;
 	char				*msg;
-	long				nsec_left;
 	long				time_left;
-	struct timespec		timespec_life_left;
-	struct timespec		now;
 
 	cur_player = &(client_cur->player);
-	
-	// we set the time at food - 1 for the untouched food
-	time_left = (cur_player->inventory[FOOD] - 1) * FOOD_LIFE_TIME;
-
-	// now we want the status of the current food.
-	get_time(&now);
-	timespec_life_left = timespec_diff(&now, &cur_player->next_dinner_time);
-
-	// Time conversion to nanoseconds for precise time remaining.
-	nsec_left = convert_timespec_to_nsec(timespec_life_left);
-
-	// calculation to turn remaining time into (int)t_unit time.
-	time_left += (int)roundf((float)(nsec_left / (float)1000000000) / serv->world_hdl.t_unit);
+	time_left = get_food_as_time(serv, client_cur);
 	// player client response.
 	asprintf(&msg, "{nourriture %ld, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d}\n",  // nourriture ??
 		time_left,

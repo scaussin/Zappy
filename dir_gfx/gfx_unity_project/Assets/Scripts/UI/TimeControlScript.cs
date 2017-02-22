@@ -86,4 +86,12 @@ public class TimeControlScript : MonoBehaviour {
 		// TODO: boundary check ?
 		ChangeTimeValueTroughUI (timeDisplay.ToString ());
 	}
+
+	/// <summary>
+	/// Desactivates the time control panel. For animation call.
+	/// </summary>
+	public void DesactivateTimeControlPanel()
+	{
+		this.gameObject.SetActive (false);
+	}
 }

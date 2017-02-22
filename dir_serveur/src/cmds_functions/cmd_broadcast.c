@@ -4,14 +4,15 @@ int     on_start_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur, cha
 {
     char                    *msg;
 
-    if (!regex_match(param, "^[a-zA-Z0-9 ']+\n$"))
+    if (!regex_match(param, "^[a-zA-Z0-9 ]+\n$"))
     {
         printf(KMAG "Bad format to cmd [broadcast] "
                     "from sock %d\n" KRESET, client_cur->sock);
         return (-1);
     }
+
     // gfx msg
-    asprintf(&msg, "pbc #%d \n",client_cur->sock);
+    asprintf(&msg, "pbc #%d %.*s\n",client_cur->sock, (int)strlen(param) - 1, param);
     push_gfx_msg(serv, msg);
     free(msg);
     return (0);

@@ -30,32 +30,21 @@ void	check_players_events(t_serveur *serv)
 **	For current player, we check if he must die of hunger.
 **	At zero, the player dies at ~12.6 sec for 126 of food life time
 **	and t_unit 100.
+**	Exception : incanter cant die, or else the incantation will be lost in suspens.
+**	He will die at the end of his incantation and NOT get his level up.
 */
 
 void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 {
 	char				*gfx_msg;
-	if (cur_client->player.inventory[FOOD] == 0) // Works. 
+	
+	if (cur_client->player.is_incanter == 0 && cur_client->player.inventory[FOOD] <= 0)
 	{
 		cur_client->is_player_dead = 1;
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 
-		// TODO: team slot now available;
-		// if (serv->settings_hdl.are_teams_growing == B_TRUE)
-		// {
-		// 	if (cur_client->team->available_slots < serv->team_hdl.nb_teams_slots)
-		// 	{
-		// 		cur_client->team->available_slots += 1;
-		// 	}
-		// 	else
-		// 	{
-		// 		cur_client->team->available_slots -= 1;
-		// 	}
-		// }
-		// else
-		// {
-		// 	cur_client->team->available_slots += 1;
-		// }
+		// give back the slot.
+		cur_client->team->available_slots += 1;
 
 		// we do not disconnect him right away cause we want to send it "mort\n"
 		write_buffer(&cur_client->buff_send, "mort\n", 5);
@@ -69,6 +58,34 @@ void	check_player_life(t_serveur *serv, t_client_entity *cur_client)
 	{
 		cur_client->player.inventory[FOOD] -= 1;
 		assign_player_time_of_dinner(serv, &cur_client->player);
+	}
+}
+
+/*
+**	Refresh each player dinner time. Called when the server t unit is modified during runtime.
+*/
+
+void	refresh_player_dinner_time(t_serveur *serv, t_client_entity *client, float old_t_unit)
+{
+	long				time_left;
+	long				nsec_left;
+	struct timespec		now;
+	struct timespec		timespec_life_left;
+
+	if (client->player.inventory[FOOD] != 0)
+	{
+		// we want the status of the current food.
+		get_time(&now);
+		timespec_life_left = timespec_diff(&now, &client->player.next_dinner_time);
+
+		// Time conversion to nanoseconds for precise time remaining.
+		nsec_left = convert_timespec_to_nsec(timespec_life_left);
+		time_left = (long)roundf((float)(nsec_left / (float)1000000000) * (1 / old_t_unit));
+		
+		// reset dinner time.
+		get_time(&client->player.next_dinner_time);
+		add_nsec_to_timespec(&client->player.next_dinner_time,
+		time_left * 1000000000 * serv->world_hdl.t_unit);
 	}
 }
 

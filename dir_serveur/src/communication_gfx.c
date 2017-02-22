@@ -17,6 +17,7 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 {
 	char				*msg;
 	t_client_entity		*tmp_client;
+	t_egg				*eggs;
 	
 	// sending World size
 	gfx_cmd_msz(serv, gfx_client, "msz\n");
@@ -43,8 +44,21 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 				tmp_client->player.level,
 				tmp_client->team->name);
 			push_gfx_msg(serv, msg);
+			free(msg);
 		}
 		tmp_client = tmp_client->next;
+	}
+	// Sending Spawned Eggs
+	eggs = serv->world_hdl.eggs;
+	while (eggs)
+	{
+		asprintf(&msg, "enw #%d #%d %d %d\n",
+			eggs->egg_nb,
+			eggs->father_nb,
+			eggs->pos.x,
+			eggs->pos.y);
+		push_gfx_msg(serv, msg);
+		free(msg);
 	}
 }
 

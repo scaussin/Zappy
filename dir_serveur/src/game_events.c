@@ -40,7 +40,7 @@ void	check_world_events(t_serveur *serv)
 	}
 }
 
-void check_eggs(t_serveur *serv)
+void	check_eggs(t_serveur *serv)
 {
 	t_egg	*egg_tmp;
 	char	*gfx_msg;
@@ -121,27 +121,75 @@ void check_eggs(t_serveur *serv)
 **	- a player dies ([LV] -= 1)
 */
 
-void check_victory(t_serveur *serv)
+void	check_victory(t_serveur *serv)
 {
 	char	*gfx_msg;
 	int		i;
 
 	i = 0;
-	while (i < serv->team_hdl.nb_teams)
+	if (serv->victory_reached == 0)
 	{
-		if (serv->team_hdl.array_teams[i]
-			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] == 
-			VICTORY_CDT_PLAYER_NB)
+		while (i < serv->team_hdl.nb_teams)
 		{
-			printf(KGRN "Victory condition reached for team %s!\n"KRESET,
-				serv->team_hdl.array_teams[i].name);
-			// TODO: Victory code ?
-			sleep(10); //
-			// gfx send victory "seg N\n"
-			asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
+			if (serv->team_hdl.array_teams[i]
+				.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] >= 
+				VICTORY_CDT_PLAYER_NB)
+			{
+				serv->victory_reached = 1;
+				printf(KGRN "Victory condition reached for team %s!\n"KRESET,
+					serv->team_hdl.array_teams[i].name);
+				// gfx send victory "seg N\n"
+				asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
+				push_gfx_msg(serv, gfx_msg);
+				free(gfx_msg);
+			}
+			i++;
 		}
-		i++;
+	}
+}
+
+/*
+**	Refresh the time of every ongoing action to be coherent with
+**	server's time unit. Used when the time unit is modified during
+**	runtime.
+*/
+
+void	refresh_times(t_serveur *serv, float old_t_unit)
+{
+	t_client_entity			*p_client;
+	struct timespec			timespec_life_left;
+	struct timespec			now;
+	long					time_left;
+	long					nsec_left;
+
+	p_client = serv->client_hdl.list_clients;
+
+	// refresh all eggs on the serv.
+	refresh_eggs_hatching_time(serv, old_t_unit);
+	while (p_client)
+	{
+		refresh_player_dinner_time(serv, p_client, old_t_unit);
+		
+		// refresh cmd for each player
+		if (p_client->list_cmds && p_client->list_cmds->cmd_started == B_TRUE)
+		{
+			get_time(&now);
+			timespec_life_left = timespec_diff(&now, &p_client->list_cmds->end_time);
+
+			// Time conversion to nanoseconds for precise time remaining.
+			nsec_left = convert_timespec_to_nsec(timespec_life_left);
+			time_left = (long)roundf((float)(nsec_left / (float)1000000000) * (1 / old_t_unit));
+
+			get_time(&p_client->list_cmds->end_time);
+			add_nsec_to_timespec(&p_client->list_cmds->end_time,
+				time_left * 1000000000 * serv->world_hdl.t_unit);
+
+			// debug print checks.
+			// timespec_life_left = timespec_diff(&now, &p_client->list_cmds->end_time);
+			// printf("serveur: real sec left: %ld.%ld\n", timespec_life_left.tv_sec,
+			// 		timespec_life_left.tv_nsec);
+			// printf("serveur: t unit left: %ld.\n", time_left);
+		}
+		p_client = p_client->next;
 	}
 }

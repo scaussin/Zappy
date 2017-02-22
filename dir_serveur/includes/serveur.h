@@ -49,7 +49,7 @@
 **	Serveur communication defines.
 */
 
-# define BUFF_SIZE 40960
+# define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
 # define SIZE_GFX_CMD_MATCH_TABLE 9 // The number of client available cmds.
@@ -90,8 +90,8 @@
 */
 
 # define MAX_LV 8
-# define VICTORY_CDT_PLAYER_NB 6
-# define VICTORY_CDT_PLAYER_LV 8
+# define VICTORY_CDT_PLAYER_NB 2
+# define VICTORY_CDT_PLAYER_LV 2
 
 /*
 **	Server structures.
@@ -301,6 +301,7 @@ typedef	struct				s_event_client
 typedef struct				s_egg
 {
 	int						egg_nb;
+	int						father_nb;
 	t_team_entity			*team;
 	t_pos					pos;
 
@@ -359,6 +360,9 @@ typedef struct				s_serveur
 	t_client_hdl			client_hdl;
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
+
+	int						victory_reached;
+	unsigned int			loop_nb;
 
 	t_game_settings			settings_hdl;
 }							t_serveur;
@@ -474,6 +478,7 @@ void						client_authenticate_player(t_serveur *serv, t_client_entity *client, c
 
 void						assign_random_player_position(t_serveur *serv, t_player *player);
 void						assign_player_time_of_dinner(t_serveur *serv, t_player *player);
+long						get_food_as_time(t_serveur *serv, t_client_entity *client);
 
 /*
 ** team_hdl.c
@@ -490,9 +495,12 @@ void						check_world_events(t_serveur *serv);
 void						check_players_events(t_serveur *serv);
 void						check_eggs(t_serveur *serv);
 void						check_player_life(t_serveur *serv, t_client_entity *cur_client);
+void						refresh_player_dinner_time(t_serveur *serv, t_client_entity *client, float old_t_unit);
+
 //void						check_player_incantation_end(t_serveur	*serv, t_client_entity	*cur_client);
 //void						check_player_laying_egg_end(t_serveur	*serv, t_client_entity	*cur_client);
 void						check_victory(t_serveur *serv);
+void						refresh_times(t_serveur *serv, float old_t_unit);
 
 /*
 ** cmd_clients_manager.c
@@ -509,6 +517,8 @@ int							compare_cmd(char *s1, char *s2);
 void						clean_clients_first_cmd(t_client_entity *p_client);
 
 struct timespec				*exec_cmd_client(t_serveur *serv);
+
+
 
 /*
 **	Gfx client cmds
@@ -619,6 +629,6 @@ void						gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 void						add_new_egg(t_serveur *serv, t_client_entity *client);
 t_egg						*egg_available(t_serveur *serv, t_client_entity *client);
 void						clear_egg(t_serveur *serv, t_egg *egg);
-
+void						refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit);
 
 #endif

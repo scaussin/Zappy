@@ -43,6 +43,7 @@ void	main_loop(t_serveur *serv)
 	printf(KCYN "- Server awaiting datas... -\n" KRESET);
 	while (42)
 	{
+		serv->loop_nb += 1;
 		// Before executing clients cmds, we shall check for
 		// game modifiying events.
 		check_game_events(serv);
