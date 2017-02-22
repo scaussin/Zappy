@@ -60,9 +60,9 @@ ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName)
 ClientPlayer::~ClientPlayer()
 {}
 
-void	ClientPlayer::init(deque<void (ClientIa::*)(string)> *stackCallbackCommand)
+void	ClientPlayer::init(void (ClientIa::**nextCallbackCommand)(string))
 {
-	iaStackCallbackCommand = stackCallbackCommand;
+	this->nextCallbackCommand = nextCallbackCommand;
 }
 
 void	ClientPlayer::printStat()
@@ -110,6 +110,7 @@ void	ClientPlayer::connect_nbr()
 
 void	ClientPlayer::prend(string item)
 {
+
 	bufferSend->pushMsg("prend " + item + "\n");
 }
 
@@ -142,8 +143,9 @@ int		ClientPlayer::getNPlayerLevelUp()
 	return (nPlayersLevelUp[level - 1]);
 }
 
-int		ClientPlayer::move(int to)
+int		ClientPlayer::move(string pos)
 {
+	int to = stoi(pos);
 	int nMove = 0;
 	int posxdebut = poshorizontale(position);
 	int posydebut = posverticale(position);

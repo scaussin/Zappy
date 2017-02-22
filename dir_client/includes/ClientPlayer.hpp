@@ -17,18 +17,18 @@ class ClientPlayer
 		int							teamSlots;
 		char						**argv;
 
-		void						inventaire();
-		void						avance();
-		void						voir();
-		void						gauche();
-		void						droite();
+		void						inventaire(string noArg);
+		void						avance(string noArg);
+		void						voir(string noArg);
+		void						gauche(string noArg);
+		void						droite(string noArg);
 		void						prend(string item);
 		void						pose(string item);
-		void						connect_nbr();
+		void						connect_nbr(string noArg);
 		void						broadcast(string broadcast);
-		int							move(int to);
-		void						incantation();
-		void						fork();
+		int							move(string pos);
+		void						incantation(string noArg);
+		void						fork(string noArg);
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
@@ -45,7 +45,7 @@ class ClientPlayer
 		int							getNPlayerLevelUp();
 		int							getLevel();
 		void						setLevel(int _level);
-		void						init(deque<void (ClientIa::*)(string)> *stackCallbackCommand);
+		void						init(void (ClientIa::**nextCallbackCommand)(string));
 
 	private:
 		int							level;
@@ -57,6 +57,7 @@ class ClientPlayer
 		vector<map<string, int> >	itemsSeen;
 		vector<map<string, int> >	levelUpItems;
 		vector<int>					nPlayersLevelUp;
+		void 						(ClientIa::**nextCallbackCommand)(string);
 		deque<void (ClientIa::*)(string)>	*iaStackCallbackCommand;
 
 		int							poshorizontale(int pos);

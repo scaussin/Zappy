@@ -8,7 +8,8 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	flagIsIncantationCaller = false;
 	flagFork = false;
 	pid = getpid();
-	player->init(&stackCallbackCommand);
+	//player->init(&nextCallbackCommand);
+	bzero(curCallbackCommand, sizeof(t_callbackCommand));
 }
 
 ClientIa::~ClientIa()
@@ -54,12 +55,35 @@ void	ClientIa::callbackCommandIgnore(string response)
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
+	if (curCallbackCommand.callback)
+	{
+		(this->*curCallbackCommand.callback)(response);
+		bzero(curCallbackCommand, sizeof(t_callbackCommand));
+	}
+	else
+		cout << KRED << "[ERROR] curCallbackCommand is null" <<endl;
+	sendNextCommand();
+/*
 	if (stackCallbackCommand.size() > 0)
 	{
 		void (ClientIa::*func)(string) = stackCallbackCommand.front();
 		stackCallbackCommand.pop_front();
 		if (func != NULL)
 			(this->*func)(response);
+	}*/
+}
+
+void	ClientIa::sendNextCommand()
+{
+	if (stackCallbackCommand.size() > 0)
+	{
+		t_callbackCommand nextCommand = stackCallbackCommand.front();
+		if (nextCommand.command)
+			(player->*nextCommand.command)(nextCommand.arg);
+		else
+			cout << KRED << "[ERROR] nextCommand.command is null" <<endl;
+		curCallbackCommand = nextCommand;
+		stackCallbackCommand.pop();
 	}
 }
 

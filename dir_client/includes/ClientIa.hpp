@@ -3,6 +3,14 @@
 
 # include "client.hpp"
 
+	typedef struct				s_callbackCommand
+	{
+		void					(ClientPlayer::*command)(string);
+		void					(ClientIa::*callback)(string);
+		string					arg;
+		string					toString;
+	}							t_callbackCommand;
+
 class ClientIa
 {
 	public:
@@ -74,9 +82,10 @@ class ClientIa
 		pair<string, int>					itemTryToTake;
 		int									nRotate;
 		int									nBroadcast;
-		deque<void (ClientIa::*)(string)>	stackCallbackCommand;
+		//deque<void (ClientIa::*)(string)>	stackCallbackCommand;
+		t_callbackCommand					curCallbackCommand;
+		deque<t_callbackCommand>			stackCallbackCommand;
 		deque<void (ClientIa::*)()>			stackCallbackCallerContinue;
-		
 };
 
 #endif
