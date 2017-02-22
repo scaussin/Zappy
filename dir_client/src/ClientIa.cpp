@@ -9,7 +9,7 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	flagFork = false;
 	pid = getpid();
 	//player->init(&nextCallbackCommand);
-	bzero(curCallbackCommand, sizeof(t_callbackCommand));
+	curCallbackCommand = NULL;
 }
 
 ClientIa::~ClientIa()
@@ -18,19 +18,7 @@ ClientIa::~ClientIa()
 
 void	ClientIa::startPlay()
 {
-	/*map<string, int> itemsToFind;
-
-	itemsToFind["linemate"] = 5;
-	itemsToFind["phiras"] = 5;
-	itemsToFind["nourriture"] = 5;
-	itemsToFind["sibur"] = 5;
-	itemsToFind["mendiane"] = 5;
-	itemsToFind["deraumere"] = 5;
-	itemsToFind["thystame"] = 5;*/
-
 	levelUpStart(&ClientIa::endPlay);
-	//newClientStart(&ClientIa::newClientEnd);
-	//findItemStart(&itemsToFind, &ClientIa::endPlay);
 }
 
 void	ClientIa::endPlay()
@@ -55,35 +43,26 @@ void	ClientIa::callbackCommandIgnore(string response)
 
 void	ClientIa::receiveCallbackCommand(string response)
 {
-	if (curCallbackCommand.callback)
+	if (curCallbackCommand)
 	{
-		(this->*curCallbackCommand.callback)(response);
-		bzero(curCallbackCommand, sizeof(t_callbackCommand));
+		(this->*(curCallbackCommand->callback))(response);
+		delete curCallbackCommand;
+		curCallbackCommand = NULL;
 	}
 	else
-		cout << KRED << "[ERROR] curCallbackCommand is null" <<endl;
+		cout << KRED << "[ERROR] receive command not expected [" << response << "]" << KRESET << endl;
 	sendNextCommand();
-/*
-	if (stackCallbackCommand.size() > 0)
-	{
-		void (ClientIa::*func)(string) = stackCallbackCommand.front();
-		stackCallbackCommand.pop_front();
-		if (func != NULL)
-			(this->*func)(response);
-	}*/
 }
 
 void	ClientIa::sendNextCommand()
 {
-	if (stackCallbackCommand.size() > 0)
+	if (stackCallbackCommand.size() > 0 && curCallbackCommand == NULL)
 	{
-		t_callbackCommand nextCommand = stackCallbackCommand.front();
-		if (nextCommand.command)
-			(player->*nextCommand.command)(nextCommand.arg);
-		else
-			cout << KRED << "[ERROR] nextCommand.command is null" <<endl;
-		curCallbackCommand = nextCommand;
+		CallbackCommand *nextCommand = stackCallbackCommand.front();
 		stackCallbackCommand.pop();
+		if (nextCommand->command)
+			(player->*(nextCommand->command))(nextCommand->arg);
+		curCallbackCommand = nextCommand;
 	}
 }
 
@@ -93,64 +72,41 @@ void	ClientIa::pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinu
 		stackCallbackCallerContinue.push_front(callbackCallerContinue);
 }
 
-void	ClientIa::pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse))
+void	ClientIa::pushBackCallbackCommand(CallbackCommand *callbackCommand)
 {
-	if (callbackCommand != NULL)
-		stackCallbackCommand.push_back(callbackCommand);
+	stackCallbackCommand.push_back(callbackCommand);
+	sendNextCommand();
 }
 
-void	ClientIa::pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string reponse))
+
+void	ClientIa::pushBackCallbackCommand(void (ClientPlayer::*command)(string), void (ClientIa::*callback)(string), string debug)
 {
-	if (callbackCommand != NULL)
-		stackCallbackCommand.push_front(callbackCommand);
+	stackCallbackCommand.push_back(new CallbackCommand(command, callback, debug));
+	sendNextCommand();
 }
 
-void	ClientIa::ignoreCallbackCommand()
+void	ClientIa::pushFrontCallbackCommand(CallbackCommand *callbackCommand)
+{
+	stackCallbackCommand.push_front(callbackCommand);
+	sendNextCommand();
+}
+
+/*void	ClientIa::ignoreCallbackCommand()
 {
 	for (auto it = stackCallbackCommand.begin() ; it != stackCallbackCommand.end() ; ++it)
 	{
 		*it = NULL;
 	}
-}
+}*/
 
 void	ClientIa::printStack(string c)
 {
-	bool falg = false;
-	vector<pair<void (ClientIa::*)(string reponse), string> > tab;
 	ostringstream s;
 
-	tab.push_back(make_pair(&ClientIa::callbackCommandCheckInventory, "callbackCommandCheckInventory"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandFindItemTake, "callbackCommandFindItemTake"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandFindItemSee, "callbackCommandFindItemSee"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandIgnore, "callbackCommandIgnore"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpBroadcast, "callbackCommandLevelUpBroadcast"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandConnectNbr, "callbackCommandConnectNbr"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpInventory, "callbackCommandLevelUpInventory"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpCheckBroadcastResponse, "callbackCommandLevelUpCheckBroadcastResponse"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationStart, "callbackCommandLevelUpIncantationStart"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpIncantationEnd, "callbackCommandLevelUpIncantationEnd"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandLevelUpRepeatBroadcast, "callbackCommandLevelUpRepeatBroadcast"));
-	tab.push_back(make_pair(&ClientIa::callbackCommandItemsPoseEnd, "callbackCommandItemsPoseEnd"));	
-
-	cout <<c<< getpid() <<" stack callbackCommand:" << endl;
+	s << c << getpid() <<" stack callbackCommand:" << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
 	{
-		if (*it == NULL)
-			s << "\t" <<getpid()<<" " "NULL" << endl;
-		else
-		{
-			falg = false;
-			for (auto itTab = tab.begin() ; itTab != tab.end(); ++itTab)
-			{
-				if (itTab->first == *it)
-				{
-					falg = true;
-					s << "\t"<<getpid()<<" " << itTab->second << endl;
-				}
-			}
-			if (!falg)
-				s << "\t" << "ERROR" << endl;
-		}
+		s << "\t" << getpid() << " " << it->debug << endl;
 	}
 	cout << s.str() << KRESET;
 }

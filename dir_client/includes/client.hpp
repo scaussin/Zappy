@@ -48,6 +48,7 @@ class ClientCommunication; // communicate with the server.
 class ClientPlayer; // the actual game player.
 class ClientController; // main controller.
 class ClientIa;
+class CallbackCommand;
 
 
 // Class files includes.

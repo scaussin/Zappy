@@ -26,9 +26,10 @@ class ClientPlayer
 		void						pose(string item);
 		void						connect_nbr(string noArg);
 		void						broadcast(string broadcast);
-		int							move(string pos);
 		void						incantation(string noArg);
 		void						fork(string noArg);
+
+		vector<void (ClientPlayer::*)(string)>	move(int to);
 
 		void						setBufferSend(ClientBuffer *buffer);
 		void						setInventory(string inventory);
@@ -45,7 +46,7 @@ class ClientPlayer
 		int							getNPlayerLevelUp();
 		int							getLevel();
 		void						setLevel(int _level);
-		void						init(void (ClientIa::**nextCallbackCommand)(string));
+		//void						init(void (ClientIa::**nextCallbackCommand)(string));
 
 	private:
 		int							level;
@@ -57,14 +58,14 @@ class ClientPlayer
 		vector<map<string, int> >	itemsSeen;
 		vector<map<string, int> >	levelUpItems;
 		vector<int>					nPlayersLevelUp;
-		void 						(ClientIa::**nextCallbackCommand)(string);
-		deque<void (ClientIa::*)(string)>	*iaStackCallbackCommand;
+		/*void 						(ClientIa::**nextCallbackCommand)(string);
+		deque<void (ClientIa::*)(string)>	*iaStackCallbackCommand;*/
 
 		int							poshorizontale(int pos);
 		int							posverticale(int pos);
-		int							memeligne(int debut, int fin);
-		int							monter(int debuty, int finy, int debutx, int finx);
-		int							descendre(int debuty, int finy, int debutx, int finx);
+		void						memeligne(int debut, int fin, vector<void (ClientPlayer::*)(string)> *cmdMove);
+		void						monter(int debuty, int finy, int debutx, int finx, vector<void (ClientPlayer::*)(string)> *cmdMove);
+		void						descendre(int debuty, int finy, int debutx, int finx, vector<void (ClientPlayer::*)(string)> *cmdMove);
 		
 };
 

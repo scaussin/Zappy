@@ -11,15 +11,12 @@ void	ClientIa::levelUpStart(void (ClientIa::*caller)())
 
 void	ClientIa::callbackContinueLevelUpNewClient()
 {
-	
-
 	if (player->getLevel() == LEVEL_MAX)
 	{
 		execCallbackCallerContinue();
 		return ;
 	}
-	player->inventaire();	
-	pushCallbackCommand(&ClientIa::callbackCommandLevelUpInventory);
+	pushBackCallbackCommand(&clientPlayer::inventaire, &ClientIa::callbackCommandLevelUpInventory, "levelUp inventaire()");
 }
 
 void	ClientIa::callbackCommandLevelUpInventory(string inventory)

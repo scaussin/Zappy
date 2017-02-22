@@ -3,14 +3,6 @@
 
 # include "client.hpp"
 
-	typedef struct				s_callbackCommand
-	{
-		void					(ClientPlayer::*command)(string);
-		void					(ClientIa::*callback)(string);
-		string					arg;
-		string					toString;
-	}							t_callbackCommand;
-
 class ClientIa
 {
 	public:
@@ -24,7 +16,6 @@ class ClientIa
 		void								printStack(string);
 		
 	private:
-		void								pushFrontCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
 		void								findItemStart(map<string, int> *newItemsToFind, void (ClientIa::*caller)());
 		void								checkStart(int minFood, int nToEat, void (ClientIa::*caller)());
 		void								newClientStart(void (ClientIa::*caller)());
@@ -38,7 +29,6 @@ class ClientIa
 		void								concatItemsToFind(map<string, int> *newItemsToFind);
 		void								callbackCommandCheckInventory(string inventory);
 		void								pushCallbackCallerContinue(void (ClientIa::*callbackCallerContinue)());
-		void								pushCallbackCommand(void (ClientIa::*callbackCommand)(string reponse));
 		bool								itemsToFindIsEmpty();
 		void								callbackCommandFindItemTake(string response);
 		void								callbackCommandFindItemSee(string items);
@@ -61,10 +51,13 @@ class ClientIa
 		void								itemsPoseStart(map<string, int> itemsToPose, void (ClientIa::*caller)());
 		void								callbackCommandItemsPoseEnd(string empty);
 		void								callbackContinueLevelUpIncantation();
-		void								ignoreCallbackCommand();
+		//void								ignoreCallbackCommand();
 		void								checkBeforeBroadcastStart(int minFood, int nToEat, void (ClientIa::*caller)());
 		void								callbackCommandCheckBeforeBroadcastInventory(string inventory);
 		void								callbackContinueCheckBeforeBroadcastEnd();
+		void								pushBackCallbackCommand(CallbackCommand *callbackCommand);
+		void								pushFrontCallbackCommand(CallbackCommand *callbackCommand);
+		void								pushBackCallbackCommand(void (ClientPlayer::*command)(string), void (ClientIa::*callback)(string), string debug);
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;
@@ -83,8 +76,8 @@ class ClientIa
 		int									nRotate;
 		int									nBroadcast;
 		//deque<void (ClientIa::*)(string)>	stackCallbackCommand;
-		t_callbackCommand					curCallbackCommand;
-		deque<t_callbackCommand>			stackCallbackCommand;
+		CallbackCommand				*curCallbackCommand;
+		deque<CallbackCommand*>		stackCallbackCommand;
 		deque<void (ClientIa::*)()>			stackCallbackCallerContinue;
 };
 

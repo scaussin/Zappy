@@ -10,8 +10,7 @@ void	ClientIa::checkStart(int minFood, int nToEat, void (ClientIa::*caller)())
 
 void	ClientIa::callbackContinueCheckInventory()
 {
-	player->inventaire();
-	stackCallbackCommand.push_back(&ClientIa::callbackCommandCheckInventory);
+	pushBackCallbackCommand(&clientPlayer::inventaire, &ClientIa::callbackCommandCheckInventory, "check inventaire()");
 }
 
 void	ClientIa::checkEnd()

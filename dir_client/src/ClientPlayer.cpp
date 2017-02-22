@@ -60,10 +60,11 @@ ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName)
 ClientPlayer::~ClientPlayer()
 {}
 
+/*
 void	ClientPlayer::init(void (ClientIa::**nextCallbackCommand)(string))
 {
 	this->nextCallbackCommand = nextCallbackCommand;
-}
+}*/
 
 void	ClientPlayer::printStat()
 {
@@ -143,10 +144,9 @@ int		ClientPlayer::getNPlayerLevelUp()
 	return (nPlayersLevelUp[level - 1]);
 }
 
-int		ClientPlayer::move(string pos)
+vector<void (ClientPlayer::*)(string)>	ClientPlayer::move(int to)
 {
-	int to = stoi(pos);
-	int nMove = 0;
+	vector<void (ClientPlayer::*)(string)> cmdMove;
 	int posxdebut = poshorizontale(position);
 	int posydebut = posverticale(position);
 	int posxfin = poshorizontale(to);
@@ -154,13 +154,13 @@ int		ClientPlayer::move(string pos)
 	int monte = posyfin - posydebut;
 
 	if (monte == 0)
-		nMove += memeligne(posxdebut, posxfin);
+		memeligne(posxdebut, posxfin, &cmdMove);
 	if (monte > 0)
-		nMove += monter(posydebut, posyfin, posxdebut, posxfin);
+		monter(posydebut, posyfin, posxdebut, posxfin, &cmdMove);
 	if (monte < 0)
-		nMove += descendre(posydebut, posyfin, posxdebut, posxfin);
+		descendre(posydebut, posyfin, posxdebut, posxfin, &cmdMove);
 	position = to;
-	return (nMove);
+	return (cmdMove);
 }
 
 int		ClientPlayer::getLevel()
@@ -203,66 +203,54 @@ int		ClientPlayer::posverticale(int pos)	//return ligne
 	return (carre);
 }
 
-int		ClientPlayer::memeligne(int debut, int fin)
+void		ClientPlayer::memeligne(int debut, int fin, vector<void (ClientPlayer::*)(string)> *cmdMove)
 {
-	int nMove = 0;
-
 	if (debut == fin)
-		return (nMove);
+		return ;
 	if (debut < fin)
 	{
-		droite();
+		cmdMove->push_back(&ClientPlayer::droite);
 		while (debut != fin)
 		{
-			nMove++;
 			debut++;
-			avance();
+			cmdMove->push_back(&ClientPlayer::avance);
 		}
-		gauche();
+		cmdMove->push_back(&ClientPlayer::gauche);
 	}
 	else if (debut > fin)
 	{
-		gauche();
+		cmdMove->push_back(&ClientPlayer::gauche);
 		while (debut != fin)
 		{
 			debut--;
-			nMove++;
-			avance();
+			cmdMove->push_back(&ClientPlayer::avance);
 		}
-		droite();
+		cmdMove->push_back(&ClientPlayer::droite);
 	}
-	return (nMove + 2);
 }
 
-int		ClientPlayer::monter(int debuty, int finy, int debutx, int finx)
+void		ClientPlayer::monter(int debuty, int finy, int debutx, int finx, vector<void (ClientPlayer::*)(string)> *cmdMove)
 {
-	int nMove = 0;
-
 	while (debuty < finy)
 	{
 		debuty++;
-		nMove++;
-		avance();
+		cmdMove->push_back(&ClientPlayer::avance);
 	}
-	return (memeligne(debutx, finx) + nMove);
+	memeligne(debutx, finx, cmdMove);
 }
 
-int		ClientPlayer::descendre(int debuty, int finy, int debutx, int finx)
+void		ClientPlayer::descendre(int debuty, int finy, int debutx, int finx, vector<void (ClientPlayer::*)(string)> *cmdMove)
 {
-	int nMove = 0;
-
-	nMove = memeligne(debutx, finx);
-	droite();
-	droite();
+	memeligne(debutx, finx, cmdMove);
+	cmdMove->push_back(&ClientPlayer::droite);
+	cmdMove->push_back(&ClientPlayer::droite);
 	while (debuty > finy)
 	{
 		debuty--;
-		nMove++;
-		avance();
+		cmdMove->push_back(&ClientPlayer::avance);
 	}
-	droite();
-	droite();
-	return(nMove + 4);
+	cmdMove->push_back(&ClientPlayer::droite);
+	cmdMove->push_back(&ClientPlayer::droite);
 }
 
 void	ClientPlayer::setInventory(string inventory)

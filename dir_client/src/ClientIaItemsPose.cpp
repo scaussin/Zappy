@@ -8,16 +8,14 @@ void	ClientIa::itemsPoseStart(map<string, int> itemsToPose, void (ClientIa::*cal
 	{
 		while (it->second > 0)
 		{
-			player->pose(it->first);
-			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
+			pushBackCallbackCommand(new CallbackCommand(&clientPlayer::pose, &ClientIa::callbackCommandIgnore, it->first, "itemPose pose item");
 			countPush++;
 			it->second--;
 		}
 	}
 	if (countPush > 0)
 	{
-		stackCallbackCommand.pop_back();
-		pushCallbackCommand(&ClientIa::callbackCommandItemsPoseEnd);
+		stackCallbackCommand.back()->command = &ClientIa::callbackCommandItemsPoseEnd;
 	}
 }
 
