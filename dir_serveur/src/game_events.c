@@ -132,7 +132,7 @@ void	check_victory(t_serveur *serv)
 		while (i < serv->team_hdl.nb_teams)
 		{
 			if (serv->team_hdl.array_teams[i]
-				.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] == 
+				.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] >= 
 				VICTORY_CDT_PLAYER_NB)
 			{
 				serv->victory_reached = 1;
