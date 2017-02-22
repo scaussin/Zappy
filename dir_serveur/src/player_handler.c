@@ -10,7 +10,7 @@
 
 void		assign_random_player_position(t_serveur *serv, t_player *player)
 {
-	srand(time(NULL));
+	srand(time(NULL) + serv->loop_nb);
 	player->pos.x = rand() % serv->world_hdl.map_x;
 	player->pos.y = rand() % serv->world_hdl.map_y;
 	player->dir = rand() % 3;

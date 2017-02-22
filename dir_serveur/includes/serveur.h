@@ -362,6 +362,7 @@ typedef struct				s_serveur
 	t_world_hdl				world_hdl;
 
 	int						victory_reached;
+	unsigned int			loop_nb;
 
 	t_game_settings			settings_hdl;
 }							t_serveur;
