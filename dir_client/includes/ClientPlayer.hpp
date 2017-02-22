@@ -45,6 +45,7 @@ class ClientPlayer
 		int							getNPlayerLevelUp();
 		int							getLevel();
 		void						setLevel(int _level);
+		void						init(deque<void (ClientIa::*)(string)> *stackCallbackCommand);
 
 	private:
 		int							level;
@@ -56,12 +57,14 @@ class ClientPlayer
 		vector<map<string, int> >	itemsSeen;
 		vector<map<string, int> >	levelUpItems;
 		vector<int>					nPlayersLevelUp;
+		deque<void (ClientIa::*)(string)>	*iaStackCallbackCommand;
 
 		int							poshorizontale(int pos);
 		int							posverticale(int pos);
 		int							memeligne(int debut, int fin);
 		int							monter(int debuty, int finy, int debutx, int finx);
 		int							descendre(int debuty, int finy, int debutx, int finx);
+		
 };
 
 #endif

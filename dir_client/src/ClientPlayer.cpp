@@ -60,6 +60,11 @@ ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName)
 ClientPlayer::~ClientPlayer()
 {}
 
+void	ClientPlayer::init(deque<void (ClientIa::*)(string)> *stackCallbackCommand)
+{
+	iaStackCallbackCommand = stackCallbackCommand;
+}
+
 void	ClientPlayer::printStat()
 {
 	/*cout << KGRN << "Player Game datas:" << KRESET << endl;

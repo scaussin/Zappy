@@ -186,7 +186,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 
 	if (regex_search(broadcast, match, regex("message ([0-8]),qui veut incanter niveau ([2-8]) ([0-9]+)\n")))
 	{
-		if ((flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) != 0) || (flagWaitingForIncantation == true && pid > stoi(match[3]) && player->getLevel() == stoi(match[2]) - 1 ))
+		if ((flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) != 0) || (flagWaitingForIncantation == true && pid > stoi(match[3]) && player->getLevel() == stoi(match[2]) - 1))
 		{
 			if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] == 0)
 			{

@@ -8,6 +8,7 @@ ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 	flagIsIncantationCaller = false;
 	flagFork = false;
 	pid = getpid();
+	player->init(&stackCallbackCommand);
 }
 
 ClientIa::~ClientIa()
