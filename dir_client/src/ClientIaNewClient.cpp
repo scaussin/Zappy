@@ -3,7 +3,7 @@
 void	ClientIa::newClientStart(void (ClientIa::*caller)())
 {
 	pushCallbackCallerContinue(caller);
-	pushBackCallbackCommand(&clientPlayer::connect_nbr, &ClientIa::callbackCommandConnectNbr, "newClient connect_nbr()");
+	pushBackCallbackCommand(&ClientPlayer::connect_nbr, &ClientIa::callbackCommandConnectNbr, "[newClient] connect_nbr()");
 }
 
 void	ClientIa::callbackCommandConnectNbr(string connectNbr)

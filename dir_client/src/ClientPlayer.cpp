@@ -75,37 +75,44 @@ void	ClientPlayer::printStat()
 	cout << "  Inventory size: " << inventory.size() << endl;*/
 }
 
-void	ClientPlayer::inventaire()
+void	ClientPlayer::inventaire(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("inventaire\n");
 }
 
-void	ClientPlayer::voir()
+void	ClientPlayer::voir(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("voir\n");
 }
-void	ClientPlayer::incantation()
+void	ClientPlayer::incantation(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("incantation\n");
 }
 
-void	ClientPlayer::avance()
+void	ClientPlayer::avance(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("avance\n");
 }
 
-void	ClientPlayer::droite()
+void	ClientPlayer::droite(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("droite\n");
 }
 
-void	ClientPlayer::gauche()
+void	ClientPlayer::gauche(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("gauche\n");
 }
 
-void	ClientPlayer::connect_nbr()
+void	ClientPlayer::connect_nbr(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("connect_nbr\n");
 }
 
@@ -126,8 +133,9 @@ void	ClientPlayer::broadcast(string broadcast)
 	bufferSend->pushMsg("broadcast " + broadcast + "\n");
 }
 
-void	ClientPlayer::fork()
+void	ClientPlayer::fork(string noArg)
 {
+	(void)noArg;
 	bufferSend->pushMsg("fork\n");
 }
 

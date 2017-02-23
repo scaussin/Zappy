@@ -45,10 +45,10 @@ typedef struct			s_CommunicationSettings
 class ClientInputHandler; // handle and check args.
 class ClientBuffer;
 class ClientCommunication; // communicate with the server.
+class CallbackCommand;
 class ClientPlayer; // the actual game player.
 class ClientController; // main controller.
 class ClientIa;
-class CallbackCommand;
 
 
 // Class files includes.
@@ -58,6 +58,7 @@ class CallbackCommand;
 # include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
 # include "ClientController.hpp"
+# include "CallbackCommand.hpp"
 # include "ClientIa.hpp"
 
 vector<string>	strSplit(string str, char c);

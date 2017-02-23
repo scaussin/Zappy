@@ -58,6 +58,7 @@ class ClientIa
 		void								pushBackCallbackCommand(CallbackCommand *callbackCommand);
 		void								pushFrontCallbackCommand(CallbackCommand *callbackCommand);
 		void								pushBackCallbackCommand(void (ClientPlayer::*command)(string), void (ClientIa::*callback)(string), string debug);
+		void								sendNextCommand();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;
@@ -76,8 +77,10 @@ class ClientIa
 		int									nRotate;
 		int									nBroadcast;
 		//deque<void (ClientIa::*)(string)>	stackCallbackCommand;
-		CallbackCommand				*curCallbackCommand;
-		deque<CallbackCommand*>		stackCallbackCommand;
+
+		CallbackCommand						*curCallbackCommand;
+		deque<CallbackCommand*>				stackCallbackCommand;
+
 		deque<void (ClientIa::*)()>			stackCallbackCallerContinue;
 };
 

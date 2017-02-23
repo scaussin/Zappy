@@ -45,7 +45,8 @@ void	ClientIa::receiveCallbackCommand(string response)
 {
 	if (curCallbackCommand)
 	{
-		(this->*(curCallbackCommand->callback))(response);
+		//void (ClientIa::*callback)(string) = curCallbackCommand->callback;
+		(this->*curCallbackCommand->callback)(response);
 		delete curCallbackCommand;
 		curCallbackCommand = NULL;
 	}
@@ -59,7 +60,7 @@ void	ClientIa::sendNextCommand()
 	if (stackCallbackCommand.size() > 0 && curCallbackCommand == NULL)
 	{
 		CallbackCommand *nextCommand = stackCallbackCommand.front();
-		stackCallbackCommand.pop();
+		stackCallbackCommand.pop_front();
 		if (nextCommand->command)
 			(player->*(nextCommand->command))(nextCommand->arg);
 		curCallbackCommand = nextCommand;
@@ -104,9 +105,11 @@ void	ClientIa::printStack(string c)
 	ostringstream s;
 
 	s << c << getpid() <<" stack callbackCommand:" << endl;
+	if (curCallbackCommand)
+		s << "\t-> " << getpid() << " " << curCallbackCommand->debug << endl;
 	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
 	{
-		s << "\t" << getpid() << " " << it->debug << endl;
+		s << "\t   " << getpid() << " " << (*it)->debug << endl;
 	}
 	cout << s.str() << KRESET;
 }

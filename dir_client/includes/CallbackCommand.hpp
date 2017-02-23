@@ -3,7 +3,6 @@
 
 # include "client.hpp"
 
-
 class CallbackCommand
 {
 	public:

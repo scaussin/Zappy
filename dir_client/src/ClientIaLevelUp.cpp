@@ -16,7 +16,7 @@ void	ClientIa::callbackContinueLevelUpNewClient()
 		execCallbackCallerContinue();
 		return ;
 	}
-	pushBackCallbackCommand(&clientPlayer::inventaire, &ClientIa::callbackCommandLevelUpInventory, "levelUp inventaire()");
+	pushBackCallbackCommand(&ClientPlayer::inventaire, &ClientIa::callbackCommandLevelUpInventory, "[levelUp] inventaire()");
 }
 
 void	ClientIa::callbackCommandLevelUpInventory(string inventory)
@@ -63,13 +63,13 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 	cout << "incantation end: " << response << endl;
 	flagIsIncantationCaller = false;
 	player->setLevel(player->getLevel() + 1);
-	ignoreCallbackCommand();
+	stackCallbackCommand.clear();
 	levelUpStart(NULL);
 }
 
 void	ClientIa::pushFrontElevationEnd()
 {
-	pushFrontCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationEnd);
+	pushFrontCallbackCommand(new CallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] end incantation"));
 }
 
 void	ClientIa::callbackCommandLevelUpIncantationStart(string response)
@@ -78,7 +78,7 @@ void	ClientIa::callbackCommandLevelUpIncantationStart(string response)
 	if (response == "ko\n")
 		levelUpStart(NULL);
 	else
-		pushCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationEnd);
+		pushBackCallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] inventaire()");
 }
 
 void	ClientIa::callbackContinueLevelUpCheck()
@@ -92,13 +92,13 @@ void	ClientIa::callbackContinueLevelUpCheck()
 		if (nBroadcast % MODULO_BROADCAST == 0)
 		{
 			flagWaitingForIncantation = true;
-			player->broadcast("qui veut incanter niveau " + to_string(player->getLevel() + 1) + " " + to_string(pid));
-			pushCallbackCommand(&ClientIa::callbackCommandLevelUpBroadcast);
+			pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandLevelUpBroadcast, 
+			"qui veut incanter niveau " + to_string(player->getLevel() + 1) + " " + to_string(pid), "[levelUp] broadcast(qui veut incanter ?)"));
 		}
 		else
 		{
-			player->broadcast("rejoignez moi pour incantation level " + to_string(player->getLevel() + 1));
-			pushCallbackCommand(&ClientIa::callbackCommandLevelUpRepeatBroadcast);
+			pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandLevelUpRepeatBroadcast, 
+			"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 		}
 		nBroadcast++;
 	}
@@ -115,27 +115,19 @@ void	ClientIa::callbackCommandLevelUpBroadcast(string response)
 	(void)response;
 	nPlayersBroadcastResponse = 0;
 	nPlayersReadyForIncantation = 0;
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-	player->gauche();
-	pushCallbackCommand(&ClientIa::callbackCommandLevelUpCheckBroadcastResponse);
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() waiting responses incantation");
+	pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandLevelUpCheckBroadcastResponse, "[levelUp] gauche() check if incantation is possible");
 }
 
 void	ClientIa::callbackContinueLevelUpIncantation()
 {
-	player->incantation();
 	flagIsIncantationCaller = true;
-	pushCallbackCommand(&ClientIa::callbackCommandLevelUpIncantationStart);
+	pushBackCallbackCommand(&ClientPlayer::incantation, &ClientIa::callbackCommandLevelUpIncantationStart, "[levelUp] incantation()");
 }
 
 void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
@@ -160,8 +152,8 @@ void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 	{
 		nBroadcast = 0;
 		flagWaitingForIncantation = false;
-		player->broadcast("abandon de l'incantation level " + to_string(player->getLevel() + 1));
-		pushCallbackCommand(&ClientIa::callbackCommandIgnore);
+		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+				"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon)"));
 		if (flagFork == false)
 		{
 			/*player->fork();
@@ -189,9 +181,9 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			{
 				flagWaitingForIncantation = false;
 				flagGoToBroadcaster = true;
-				player->broadcast("j'arrive pour incantation level " + to_string(player->getLevel() + 1));
-				pushCallbackCommand(&ClientIa::callbackCommandIgnore);
-				ignoreCallbackCommand();
+				stackCallbackCommand.clear();
+				pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+				"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive)"));
 				stackCallbackCallerContinue.clear();
 				itemsToFind.clear();
 				//goToBroadcaster(stoi(match[1]));
@@ -200,17 +192,17 @@ void	ClientIa::receiveBroadcast(string broadcast)
 		else if (flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) == 0)
 		{
 			flagGoToBroadcaster = false;
-			ignoreCallbackCommand();
+			stackCallbackCommand.clear();
 			stackCallbackCallerContinue.clear();
 			itemsToFind.clear();
-			player->broadcast("je suis sur zone level " + to_string(player->getLevel() + 1));
-			pushCallbackCommand(&ClientIa::callbackCommandIgnore);
+			pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+				"je suis sur zone level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(je suis sur zone)"));
 		}
 	}
 	else if (flagWaitingForIncantation == false && regex_search(broadcast, match, regex("message ([0-8]),abandon de l'incantation level ([2-8])\n")) && player->getLevel() == stoi(match[2]) - 1)
 	{
 		flagGoToBroadcaster = false;
-		ignoreCallbackCommand();
+		stackCallbackCommand.clear();
 		stackCallbackCallerContinue.clear();
 		itemsToFind.clear();
 		levelUpStart(NULL);
@@ -240,17 +232,9 @@ void	ClientIa::receiveBroadcast(string broadcast)
 void	ClientIa::goToBroadcaster(int target)
 {
 	if (target == 1 || target == 2 || target == 8)
-		player->avance();
-	if (target == 3)
-		player->gauche();
-	if (target == 7)
-		player->droite();
-	if (target == 4)
-		player->gauche();
-	if (target == 6)
-		player->droite();
-	if (target == 5)
-		player->droite();
-	if (target != 0)
-		pushCallbackCommand(&ClientIa::callbackCommandIgnore);
+		pushBackCallbackCommand(&ClientPlayer::avance, &ClientIa::callbackCommandIgnore, "[levelUp] avance() go to master");
+	if (target == 3 || target == 4)
+		pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[levelUp] gauche() go to master");
+	if (target == 7 || target == 6 || target == 5)
+		pushBackCallbackCommand(&ClientPlayer::droite, &ClientIa::callbackCommandIgnore, "[levelUp] droite() go to master");
 }

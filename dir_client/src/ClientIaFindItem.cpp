@@ -27,7 +27,7 @@ void	ClientIa::concatItemsToFind(map<string, int> *newItemsToFind)
 
 void	ClientIa::callbackContinueFindItemSee()
 {
-	pushBackCallbackCommand(&clientPlayer::voir, &ClientIa::callbackCommandFindItemSee, "findItem voir()");
+	pushBackCallbackCommand(&ClientPlayer::voir, &ClientIa::callbackCommandFindItemSee, "[findItem] voir()");
 }
 
 void	ClientIa::callbackCommandFindItemTake(string response)
@@ -58,13 +58,13 @@ void	ClientIa::findItemMove()
 		vector<void (ClientPlayer::*)(string)> cmdMove = player->move(itemAvailable.second);
 		for (auto it = cmdMove.begin() ; it != cmdMove.end(); ++it)
 		{
-			pushBackCallbackCommand(*it, &ClientIa::callbackCommandIgnore, "findItem move to item");
+			pushBackCallbackCommand(*it, &ClientIa::callbackCommandIgnore, "[findItem] move to item");
 		}
-		pushBackCallbackCommand(new CallbackCommand(&clientPlayer::prend, &ClientIa::callbackCommandFindItemTake, itemAvailable.first, "findItem take item");
+		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::prend, &ClientIa::callbackCommandFindItemTake, itemAvailable.first, "[findItem] take item"));
 	}
 	else if (nRotate < 3)
 	{
-		pushBackCallbackCommand(&clientPlayer::droite, &ClientIa::callbackCommandIgnore, "findItem droite (rotate)");
+		pushBackCallbackCommand(&ClientPlayer::droite, &ClientIa::callbackCommandIgnore, "[findItem] droite (rotate)");
 		nRotate++;
 		callbackContinueFindItemSee();
 	}
@@ -72,13 +72,13 @@ void	ClientIa::findItemMove()
 	{
 		int nRand = rand() % 3;
 		if (nRand == 0)
-			pushBackCallbackCommand(&clientPlayer::droite, &ClientIa::callbackCommandIgnore, "findItem droite (rand)");
+			pushBackCallbackCommand(&ClientPlayer::droite, &ClientIa::callbackCommandIgnore, "[findItem] droite (rand)");
 		else if (nRand == 1)
-			pushBackCallbackCommand(&clientPlayer::gauche, &ClientIa::callbackCommandIgnore, "findItem gauche (rand)");
+			pushBackCallbackCommand(&ClientPlayer::gauche, &ClientIa::callbackCommandIgnore, "[findItem] gauche (rand)");
 		int nAvance = (player->getHeightVision() * 2) - 1;
 		while (nAvance > 0)
 		{
-			pushBackCallbackCommand(&clientPlayer::avance, &ClientIa::callbackCommandIgnore, "findItem avance (to another spot)");
+			pushBackCallbackCommand(&ClientPlayer::avance, &ClientIa::callbackCommandIgnore, "[findItem] avance (to another spot)");
 			nAvance--;
 		}
 		findItemStart(NULL, NULL);
