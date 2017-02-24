@@ -59,6 +59,7 @@ class ClientIa
 		void								pushFrontCallbackCommand(CallbackCommand *callbackCommand);
 		void								pushBackCallbackCommand(void (ClientPlayer::*command)(string), void (ClientIa::*callback)(string), string debug);
 		void								sendNextCommand();
+		void								callbackContinueLevelUpComming();
 
 		bool								flagWaitingForIncantation;
 		bool								flagGoToBroadcaster;

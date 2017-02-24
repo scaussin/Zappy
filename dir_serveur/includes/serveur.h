@@ -90,8 +90,8 @@
 */
 
 # define MAX_LV 8
-# define VICTORY_CDT_PLAYER_NB 2
-# define VICTORY_CDT_PLAYER_LV 2
+# define VICTORY_CDT_PLAYER_NB 6
+# define VICTORY_CDT_PLAYER_LV 8
 
 /*
 **	Server structures.
