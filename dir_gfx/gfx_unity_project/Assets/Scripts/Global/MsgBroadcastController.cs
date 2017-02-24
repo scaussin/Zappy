@@ -409,7 +409,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchPlayerBroadcast(string msg)
 	{
-		rgx = new Regex("^pbc #\\d+ \\w+$");
+		rgx = new Regex("^pbc #\\d+ [\\w ']+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
