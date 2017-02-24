@@ -14,13 +14,6 @@ public class BlockObject : MonoBehaviour
 	public int					x;
 	public int					y;
 
-<<<<<<< HEAD
-	/*[Header("Block datas")]
-	public int					x;
-	public int					y;*/
-
-=======
->>>>>>> a66b4d8ee7688ec80a46e663d5052d48f6ddf630
 	[Header("Ressources on the case(modified by server)")]
 	public int					FoodUnits = 0;
 	public int					LinemateUnits  = 0;

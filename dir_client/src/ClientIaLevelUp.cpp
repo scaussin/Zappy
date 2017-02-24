@@ -78,7 +78,7 @@ void	ClientIa::callbackCommandLevelUpIncantationStart(string response)
 	if (response == "ko\n")
 		levelUpStart(NULL);
 	else
-		pushBackCallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] inventaire()");
+		pushBackCallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] incantationEnd()");
 }
 
 void	ClientIa::callbackContinueLevelUpCheck()
@@ -127,7 +127,7 @@ void	ClientIa::callbackCommandLevelUpBroadcast(string response)
 void	ClientIa::callbackContinueLevelUpIncantation()
 {
 	flagIsIncantationCaller = true;
-	pushBackCallbackCommand(&ClientPlayer::incantation, &ClientIa::callbackCommandLevelUpIncantationStart, "[levelUp] incantation()");
+	pushBackCallbackCommand(&ClientPlayer::incantation, &ClientIa::callbackCommandLevelUpIncantationStart, "[levelUp] incantationStart()");
 }
 
 void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
@@ -198,6 +198,15 @@ void	ClientIa::receiveBroadcast(string broadcast)
 		}
 		else if (flagWaitingForIncantation == false && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) == 0)
 		{
+			/*if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] == 0) // pas faim
+			{
+				stackCallbackCommand.clear();
+				stackCallbackCallerContinue.clear();
+				itemsToFind.clear();
+				pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+					"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive)"));
+				checkStart(MIN_FOOD_2, N_TO_EAT_2, &ClientIa::callbackContinueLevelUpComming);
+			}*/
 			flagGoToBroadcaster = false;
 			stackCallbackCommand.clear();
 			stackCallbackCallerContinue.clear();
