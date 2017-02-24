@@ -36,7 +36,7 @@ public class ConnectionManager : MonoBehaviour
 	public bool							IsAuthMsgSend = false;
 
 	// private
-	public int							msg_size = 2048;
+	public int							msg_size = 1024;
 	public CircularBuffer				buffer_recv = new CircularBuffer();
 	public CircularBuffer				buffer_send = new CircularBuffer();
 
