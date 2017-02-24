@@ -121,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
 
 		// adding personal offset for visual appreciation.
 		TargetPos.x += Offset_x;
-		TargetPos.x += Offset_z;
+		TargetPos.z += Offset_z;
 
 		// apply final value.
 		transform.position = TargetPos;
@@ -160,26 +160,36 @@ public class PlayerMovement : MonoBehaviour
 	/// Sets the target world position. From the server's XY map position, set a XYZ unity 3d position.
 	/// Remember: Y server == Z unity.
 	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
+	/// <param name="x">The x server map coordinate.</param>
+	/// <param name="y">The y server map coordinate.</param>
 	/// <param name="dir">Dir.</param>
 	private void SetTargetWorldPos(int x, int y, int dir)
 	{
-		// TargetPos = transform.forward + new Vector3(AdvanceDistance, 0.0f, AdvanceDistance);
-		TargetPos = transform.position;
+//		// TargetPos = transform.forward + new Vector3(AdvanceDistance, 0.0f, AdvanceDistance);
+//		TargetPos = transform.position;
+//
+//		// If new val == old val, ne rien faire.
+//		// Set x target position;
+//		if (x > playerObjInstance.X)
+//			TargetPos.x += AdvanceDistance;
+//		else if (x < playerObjInstance.X)
+//			TargetPos.x -= AdvanceDistance;
+//
+//		// Set y target position;
+//		if (y > playerObjInstance.Y)
+//			TargetPos.z += AdvanceDistance;
+//		else if (y < playerObjInstance.Y)
+//			TargetPos.z -= AdvanceDistance;
 
-		// If new val == old val, ne rien faire.
-		// Set x target position;
-		if (x > playerObjInstance.X)
-			TargetPos.x += AdvanceDistance;
-		else if (x < playerObjInstance.X)
-			TargetPos.x -= AdvanceDistance;
+		TargetPos = boardZeroPoint;
+		TargetPos.x += (GameManager.instance.WorldSettings.BlockSize +
+			GameManager.instance.WorldSettings.BlockSpacing) * x;
+		TargetPos.z += (GameManager.instance.WorldSettings.BlockSize +
+			GameManager.instance.WorldSettings.BlockSpacing) * y;
 
-		// Set y target position;
-		if (y > playerObjInstance.Y)
-			TargetPos.z += AdvanceDistance;
-		else if (y < playerObjInstance.Y)
-			TargetPos.z -= AdvanceDistance;
+		// adding personal offset for visual appreciation.
+		TargetPos.x += Offset_x;
+		TargetPos.z += Offset_z;
 	}
 
 	/// <summary>

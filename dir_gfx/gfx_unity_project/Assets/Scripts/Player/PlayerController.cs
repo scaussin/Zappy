@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void PlayerBroadcast(string msg)
 	{
-		rgx = new Regex ("^pbc #(\\d+) (\\w+)$");
+		rgx = new Regex ("^pbc #(\\d+) ([\\w ']+)$");
 		match = rgx.Match (msg);
 		if (match.Success)
 		{
@@ -219,8 +219,17 @@ public class PlayerController : MonoBehaviour {
 				if (player.AssignedNumber == player_nb)
 				{
 					player.GetComponent<Animator> ().SetTrigger ("Broadcasting");
-					player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive(false);
-					player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive(true);
+					// Red broadcast exception for leader call. 
+					if ((groups [2].Value.IndexOf ("qui veut incanter")) != -1 || (groups [2].Value.IndexOf ("rejoignez moi")) != -1) 
+					{
+						player.gameObject.transform.Find ("Effects").transform.Find ("RedBroadcastEffect").gameObject.SetActive (false);
+						player.gameObject.transform.Find ("Effects").transform.Find ("RedBroadcastEffect").gameObject.SetActive (true);
+					}
+					else
+					{
+						player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive (false);
+						player.gameObject.transform.Find ("Effects").transform.Find ("BroadcastEffect").gameObject.SetActive (true);
+					}
 				}
 			}
 		}
@@ -334,10 +343,8 @@ public class PlayerController : MonoBehaviour {
 				// we want the first launched incantation, because they finish in a chronological order(first in, first out);
 				int cur_incantation = incantation_block_obj.GetComponent<BlockObject> ().Incantations_id [0];
 
-				foreach (PlayerObject player in Players)
-				{
-					if (player.IsIncanting == true && player.IncantationId == cur_incantation)
-					{
+				foreach (PlayerObject player in Players) {
+					if (player.IsIncanting == true && player.IncantationId == cur_incantation) {
 						player.IsIncanting = false;
 						player.IncantationId = -1;
 						player.GetComponent<Animator> ().SetBool ("IsIncanting", false);
@@ -349,6 +356,7 @@ public class PlayerController : MonoBehaviour {
 					}
 				}
 				// set the ground particle effect OFF.
+				incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.RemoveAt (0);
 				incantation_block_obj.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
 					gameObject.SetActive (false);
 			}

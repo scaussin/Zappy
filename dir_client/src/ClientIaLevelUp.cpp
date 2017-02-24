@@ -182,7 +182,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 				stackCallbackCommand.clear();
 				stackCallbackCallerContinue.clear();
 				itemsToFind.clear();
-				pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+				pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
 					"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive)"));
 				checkStart(MIN_FOOD_2, N_TO_EAT_2, &ClientIa::callbackContinueLevelUpComming);
 				//goToBroadcaster(stoi(match[1]));
