@@ -64,7 +64,7 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 	flagIsIncantationCaller = false;
 	player->setLevel(player->getLevel() + 1);
 	stackCallbackCommand.clear();
-	levelUpStart(NULL);
+	levelUpStart(&ClientIa::endPlay);
 }
 
 void	ClientIa::pushFrontElevationEnd()
