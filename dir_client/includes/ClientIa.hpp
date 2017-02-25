@@ -3,6 +3,13 @@
 
 # include "client.hpp"
 
+enum incantationState 
+{
+	none,
+	master,
+	slave
+};
+
 class ClientIa
 {
 	public:
@@ -12,7 +19,8 @@ class ClientIa
 		void								receiveCallbackCommand(string response);
 		void								receiveBroadcast(string broadcast);
 		void								pushFrontElevationEnd();
-		bool								flagIsIncantationCaller;
+		incantationState					state;
+		//bool								flagIsIncantationCaller;
 		void								printStack(string);
 		
 	private:
@@ -36,7 +44,7 @@ class ClientIa
 		void								callbackCommandIgnore(string response);
 		void								printItemsToFind();
 		void								subItemsToFind(map<string, int> *newItemsToFind);
-		void								callbackCommandLevelUpBroadcast(string response);
+		void								callbackCommandLevelUpMasterWaitingResponses(string response);
 		void								callbackCommandConnectNbr(string connectNbr);
 		void								callbackContinueCheckInventory();
 		void								callbackCommandLevelUpInventory(string inventory);
@@ -60,8 +68,12 @@ class ClientIa
 		void								pushBackCallbackCommand(void (ClientPlayer::*command)(string), void (ClientIa::*callback)(string), string debug);
 		void								sendNextCommand();
 		void								callbackContinueLevelUpComming();
+		void								callbackContinueLevelUpJoin();
+		void								checkNeedFoodStart(int minFood, int nToEat, void (ClientIa::*no)());
+		void								callbackCommandcheckNeedFoodInventory(string inventory);
+		void								loopCheckFood();
 
-		bool								flagWaitingForIncantation;
+		//bool								flagIsSlave;
 		bool								flagGoToBroadcaster;
 		bool								flagFork;
 		//int									nCommandIgnore;
@@ -76,13 +88,14 @@ class ClientIa
 		int									nPlayersReadyForIncantation;
 		pair<string, int>					itemTryToTake;
 		int									nRotate;
-		int									nBroadcast;
 		//deque<void (ClientIa::*)(string)>	stackCallbackCommand;
 
 		CallbackCommand						*curCallbackCommand;
 		deque<CallbackCommand*>				stackCallbackCommand;
 
 		deque<void (ClientIa::*)()>			stackCallbackCallerContinue;
+
+		
 };
 
 #endif

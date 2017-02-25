@@ -3,7 +3,7 @@
 ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 {
 	nBroadcast = 0;
-	flagWaitingForIncantation = false;
+	flagIsMaster = false;
 	flagGoToBroadcaster = false;
 	flagIsIncantationCaller = false;
 	flagFork = false;

@@ -79,7 +79,7 @@ void	ClientCommunication::manageRecv()
 			{
 
 			}
-			else if (msg.compare("elevation en cours\n") == 0 && ia->flagIsIncantationCaller == false)
+			else if (msg.compare("elevation en cours\n") == 0 && (ia->state == slave || ia->state == none))
 			{
 				ia->pushFrontElevationEnd();
 				//ia->printStack(KMAG);

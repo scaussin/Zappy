@@ -16,7 +16,7 @@ SRC = 		src/main.cpp \
 			src/ClientIaLevelUp.cpp \
 			src/ClientIaNewClient.cpp \
 			src/ClientIaItemsPose.cpp \
-			src/ClientIaCheckBeforeBroadcast.cpp \
+			src/ClientIaCheckNeedFood.cpp \
 			src/CallbackCommand.cpp \
 			src/ClientController.cpp
 
