@@ -3,6 +3,7 @@
 void	ClientIa::levelUpStart(void (ClientIa::*caller)())
 {
 	state = none;
+	flagFork = false;
 	flagGoToBroadcaster = false;
 	pushCallbackCallerContinue(caller);
 	newClientStart(&ClientIa::callbackContinueLevelUpNewClient);
