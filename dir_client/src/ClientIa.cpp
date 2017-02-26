@@ -2,10 +2,6 @@
 
 ClientIa::ClientIa(ClientPlayer *_player) : player(_player)
 {
-	nBroadcast = 0;
-	flagIsMaster = false;
-	flagGoToBroadcaster = false;
-	flagIsIncantationCaller = false;
 	flagFork = false;
 	pid = getpid();
 	//player->init(&nextCallbackCommand);
@@ -45,8 +41,8 @@ void	ClientIa::receiveCallbackCommand(string response)
 {
 	if (curCallbackCommand)
 	{
-		//void (ClientIa::*callback)(string) = curCallbackCommand->callback;
-		(this->*curCallbackCommand->callback)(response);
+		if (curCallbackCommand->callback)
+			(this->*curCallbackCommand->callback)(response);
 		delete curCallbackCommand;
 		curCallbackCommand = NULL;
 	}
@@ -90,6 +86,13 @@ void	ClientIa::pushFrontCallbackCommand(CallbackCommand *callbackCommand)
 {
 	stackCallbackCommand.push_front(callbackCommand);
 	sendNextCommand();
+}
+
+void	ClientIa::callbackCommandClear()
+{
+	stackCallbackCommand.clear();
+	if (curCallbackCommand)
+		curCallbackCommand->callback = NULL;
 }
 
 /*void	ClientIa::ignoreCallbackCommand()

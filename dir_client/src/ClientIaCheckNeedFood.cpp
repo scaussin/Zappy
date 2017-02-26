@@ -15,17 +15,18 @@ void	ClientIa::callbackCommandcheckNeedFoodInventory(string inventory)
 	if (player->getInventory()[FOOD] < minFood) //faim
 	{
 		itemsToFind[FOOD] = nToEat;
+		stackCallbackCallerContinue.pop_front();
 		execCallbackCallerContinue();
 		findItemStart(NULL, &ClientIa::loopCheckFood);
 	}
 	else
 	{
-		stackCallbackCallerContinue.pop_front();
 		execCallbackCallerContinue();
+		stackCallbackCallerContinue.pop_front();
 	}
 }
 
 void	ClientIa::loopCheckFood()
 {
-	checkFood(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::loopCheckFood);
+	checkStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::loopCheckFood);
 }
