@@ -149,30 +149,30 @@ void	ClientIa::callbackContinueLevelUpIncantation()
 	pushBackCallbackCommand(&ClientPlayer::incantation, &ClientIa::callbackCommandLevelUpIncantationStart, "[levelUp] incantationStart()");
 }
 
-void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
+void	ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodYes()
 {
-	(void)response;
+	pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
+		"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon faim)"));
+}
+
+void	ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo()
+{
 	if (nPlayersBroadcastResponse >= player->getNPlayerLevelUp() - 1) //assez de personne pour faire une incantation
 	{
 		if (nPlayersReadyForIncantation == nPlayersBroadcastResponse) //tous sur zone
 		{
 			itemsPoseStart(player->getItemsLevelUp(), &ClientIa::callbackContinueLevelUpIncantation);
-			/*cout << getpid() << "peut lancer nouvelle incantation" << endl;
-			pushCallbackCommand(&ClientIa::);
-			player->incantation();
-			pushCallbackCommand(&ClientIa::);*/
 		}
 		else //assez de personne mais pas tous sur zone
 		{
 			callbackContinueLevelUpJoin();
-			//callbackContinueLevelUpCheck();
 		}
 	}
 	else //pas assez de personne
 	{
 		state = none;
 		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-				"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon pas assez de monde)"));
+			"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon pas assez de monde)"));
 		if (flagFork == false)
 		{
 			pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg");
@@ -180,6 +180,13 @@ void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 		}
 		callbackContinueLevelUpFindItem();
 	}
+}
+
+void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
+{
+	(void)response;
+	checkNeedFoodStart(MIN_FOOD_2, N_TO_EAT_2, &ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodYes, 
+		&ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo, &ClientIa::callbackContinueLevelUpCheck);
 }
 
 void	ClientIa::callbackContinueLevelUpComming()
@@ -209,7 +216,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			|| (state == master && pid > stoi(match[3]) && player->getLevel() == stoi(match[2]) - 1))
 		{
 			state = slave;
-			if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] == 0) // cherche pas de food
+			if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] <= 0) // cherche pas de food
 			{
 				callbackCommandClear();
 				stackCallbackCallerContinue.clear();
@@ -220,6 +227,8 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			}
 			else // faim -> double_egg_burger(2)
 			{
+				if (itemsToFind.find(FOOD) != itemsToFind.end())
+					cout << getpid() << " nfood : " << itemsToFind[FOOD] << endl;
 				flagGoToBroadcaster = false;
 				int food = itemsToFind[FOOD];
 				itemsToFind.clear();
@@ -232,13 +241,13 @@ void	ClientIa::receiveBroadcast(string broadcast)
 		{
 			flagGoToBroadcaster = false;
 			state = slave;
-			if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] == 0) // cherche pas de food
+			if (itemsToFind.find(FOOD) == itemsToFind.end() || itemsToFind[FOOD] <= 0) // cherche pas de food
 			{
 				callbackCommandClear();
 				stackCallbackCallerContinue.clear();
 				itemsToFind.clear();
 				checkNeedFoodStart(MIN_FOOD_2, N_TO_EAT_2, &ClientIa::callbackContinueLevelUpCheckNeedFoodYes, 
-					&ClientIa::callbackContinueLevelUpCheckNeedFoodNo);
+					&ClientIa::callbackContinueLevelUpCheckNeedFoodNo, &ClientIa::loopCheckFood);
 			}
 			else
 			{
@@ -252,12 +261,9 @@ void	ClientIa::receiveBroadcast(string broadcast)
 	}
 	else if (regex_search(broadcast, match, regex("message ([0-8]),abandon de l'incantation level ([2-8])\n")) && player->getLevel() == stoi(match[2]) - 1)
 	{
-		state = none;
+		if (!isInLoopCheckFood())
+			loopCheckFood();
 		flagGoToBroadcaster = false;
-		callbackCommandClear();
-		stackCallbackCallerContinue.clear();
-		itemsToFind.clear();
-		levelUpStart(NULL);
 	}
 	else if (state == master && regex_search(broadcast, match, regex("message ([0-8]),j'arrive pour incantation level ([2-8])\n")))
 	{
@@ -279,6 +285,16 @@ void	ClientIa::receiveBroadcast(string broadcast)
 		if (player->getLevel() == stoi(match[2]) - 1)
 			goToBroadcaster(stoi(match[1]));
 	}
+}
+
+bool	ClientIa::isInLoopCheckFood()
+{
+	for (auto it = stackCallbackCallerContinue.begin() ; it != stackCallbackCallerContinue.end(); ++it)
+	{
+		if (*it == &ClientIa::loopCheckFood)
+			return true;
+	}
+	return false;
 }
 
 void	ClientIa::goToBroadcaster(int target)

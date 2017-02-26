@@ -52,7 +52,7 @@ void	ClientIa::findItemMove()
 		return ;
 	}
 	pair<string, int> itemAvailable = checkItemAvailable();
-	if (itemAvailable.second != -1) //move
+	if (itemAvailable.second != -45) //move
 	{
 		itemTryToTake = itemAvailable;
 		vector<void (ClientPlayer::*)(string)> cmdMove = player->move(itemAvailable.second);
@@ -132,5 +132,5 @@ pair<string, int>	ClientIa::checkItemAvailable()
 		}
 		i++;
 	}
-	return make_pair("", -1);
+	return make_pair("", -45);
 }

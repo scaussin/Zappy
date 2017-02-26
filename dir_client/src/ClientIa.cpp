@@ -22,6 +22,11 @@ void	ClientIa::endPlay()
 	cout << "End" << endl;
 }
 
+void	ClientIa::loopCheckFood()
+{
+	checkStart(MIN_FOOD_1, N_TO_EAT_1, &ClientIa::loopCheckFood);
+}
+
 void	ClientIa::execCallbackCallerContinue()
 {
 	if (stackCallbackCallerContinue.size() > 0)

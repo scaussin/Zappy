@@ -74,7 +74,10 @@ class ClientIa
 		void								callbackCommandClear();
 		void								callbackContinueLevelUpCheckNeedFoodYes();
 		void								callbackContinueLevelUpCheckNeedFoodNo();
-		void								checkNeedFoodStart(int minFood, int nToEat, void (ClientIa::*yes)(), void (ClientIa::*no)());
+		void								checkNeedFoodStart(int minFood, int nToEat, void (ClientIa::*yes)(), void (ClientIa::*no)(), void (ClientIa::*end)());
+		void								callbackCommandLevelUpBroadcastResponseCheckNeedFoodYes();
+		void								callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo();
+		bool								isInLoopCheckFood();
 
 		//bool								flagIsSlave;
 		bool								flagGoToBroadcaster;
