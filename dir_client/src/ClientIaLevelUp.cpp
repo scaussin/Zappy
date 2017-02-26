@@ -63,16 +63,21 @@ void	ClientIa::callbackCommandLevelUpIncantationEnd(string response)
 	cout << "incantation end: " << response << endl;
 	//flagIsIncantationCaller = false;
 	player->setLevel(player->getLevel() + 1);
-	callbackCommandClear();
+	//callbackCommandClear();
 	levelUpStart(&ClientIa::endPlay);
 }
 
 void	ClientIa::pushFrontElevationEnd()
 {
-	CallbackCommand *tmp = curCallbackCommand;
+	callbackCommandClear();
+	stackCallbackCallerContinue.clear();
+	if (curCallbackCommand)
+	{
+		CallbackCommand *tmp = curCallbackCommand;
+		tmp->command = NULL;
+		pushFrontCallbackCommand(tmp);
+	}
 	curCallbackCommand = new CallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] incantation() End");
-	tmp->command = NULL;
-	pushFrontCallbackCommand(tmp);
 }
 
 void	ClientIa::callbackCommandLevelUpIncantationStart(string response)
@@ -92,6 +97,7 @@ void	ClientIa::callbackContinueLevelUpCheck()
 {
 	if (player->getLevel() == 1)
 	{
+		state = master;
 		itemsPoseStart(player->getItemsLevelUp(), &ClientIa::callbackContinueLevelUpIncantation);
 	}
 	else if (state == none || state == master)
@@ -169,7 +175,7 @@ void	ClientIa::callbackCommandLevelUpCheckBroadcastResponse(string response)
 				"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon pas assez de monde)"));
 		if (flagFork == false)
 		{
-			//pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg");
+			pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg");
 			flagFork = true;
 		}
 		callbackContinueLevelUpFindItem();
