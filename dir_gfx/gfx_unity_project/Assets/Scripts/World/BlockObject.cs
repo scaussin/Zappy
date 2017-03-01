@@ -38,6 +38,7 @@ public class BlockObject : MonoBehaviour
 	private Animator			BlockAnimator;
 
 	private GameObject			GroundSelectedModel;
+	private Vector3				BlockRootScale;
 
 	// Use this for initialization
 	void Awake ()
@@ -57,6 +58,9 @@ public class BlockObject : MonoBehaviour
 
 		GroundSelectedModel = transform.Find ("Effects").transform.Find ("GroundSelected").gameObject;
 		ToggleSelection (false);
+		BlockRootScale.x = 1.0f;
+		BlockRootScale.y = 1.0f;
+		BlockRootScale.z = 1.0f;
 	}
 
 	/// <summary>
@@ -110,6 +114,7 @@ public class BlockObject : MonoBehaviour
 	/// </summary>
 	public void DesactivateAnimator()
 	{
+		transform.Find ("Model").transform.Find ("Root").transform.localScale = BlockRootScale;
 		BlockAnimator.enabled = false;
 	}
 }

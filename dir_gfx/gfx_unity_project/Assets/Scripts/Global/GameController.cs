@@ -187,6 +187,7 @@ public class GameController : MonoBehaviour {
 		InGame = false;
 		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
+		GameManager.instance.WorldManager.PlayerController.CleanMapOfEggs ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
 

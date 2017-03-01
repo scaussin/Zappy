@@ -150,7 +150,7 @@ public class CircularBuffer
 			i = 0;
 			if (len + size > buff_size)
 			{
-				Debug.Log ("Buffer full");
+				Debug.LogWarning ("Buffer full");
 				return ;
 			}
 			while (i < size)

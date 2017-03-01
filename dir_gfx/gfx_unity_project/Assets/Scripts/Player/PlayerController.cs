@@ -480,4 +480,13 @@ public class PlayerController : MonoBehaviour {
 		}
 		Players.Clear ();
 	}
+
+	public void CleanMapOfEggs()
+	{
+		foreach (EggObject egg in GameManager.instance.PlayerManager.EggList)
+		{
+			Destroy (egg.gameObject);
+		}
+		GameManager.instance.PlayerManager.EggList.Clear ();
+	}
 }
