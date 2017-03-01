@@ -13,7 +13,12 @@ void	ClientIa::callbackContinueLevelUpNewClient()
 {
 	if (player->getLevel() == LEVEL_MAX)
 	{
-		execCallbackCallerContinue();
+		callbackCommandClear();
+		stackCallbackCallerContinue.clear();
+		pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] end fork and food loop");
+		loopCheckFood();
+		/*execCallbackCallerContinue();
+		*/
 		return ;
 	}
 	pushBackCallbackCommand(&ClientPlayer::inventaire, &ClientIa::callbackCommandLevelUpInventory, "[levelUp] inventaire()");
