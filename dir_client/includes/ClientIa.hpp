@@ -21,7 +21,7 @@ class ClientIa
 		void								pushFrontElevationEnd();
 		incantationState					state;
 		//bool								flagIsIncantationCaller;
-		void								printStack(string);
+		void								printStateIa(string);
 		
 	private:
 		void								findItemStart(map<string, int> *newItemsToFind, void (ClientIa::*caller)());

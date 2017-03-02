@@ -108,16 +108,26 @@ void	ClientIa::callbackCommandClear()
 	}
 }*/
 
-void	ClientIa::printStack(string c)
+void	ClientIa::printStateIa(string c)
 {
 	ostringstream s;
 
-	s << c << getpid() <<" stack callbackCommand:" << endl;
-	if (curCallbackCommand)
-		s << "\t-> " << getpid() << " " << curCallbackCommand->debug << endl;
-	for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
+	s << c;
+	if (DEBUG_MODE == 0)
 	{
-		s << "\t   " << getpid() << " " << (*it)->debug << endl;
+		if (curCallbackCommand)
+			s << KGRN <<" sate: " << curCallbackCommand->debug << KRESET;
+		s << endl;
+	}
+	else
+	{
+		s << endl << getpid() <<" stack callbackCommand:" << endl;
+		if (curCallbackCommand)
+			s << "\t-> " << getpid() << " " << curCallbackCommand->debug << endl;
+		for(auto it = stackCallbackCommand.begin(); it != stackCallbackCommand.end() ; ++it)
+		{
+			s << "\t   " << getpid() << " " << (*it)->debug << endl;
+		}
 	}
 	cout << s.str() << KRESET;
 }

@@ -82,7 +82,7 @@ void	ClientCommunication::manageRecv()
 			else if (msg.compare("elevation en cours\n") == 0 && (ia->state == slave || ia->state == none))
 			{
 				ia->pushFrontElevationEnd();
-				//ia->printStack(KMAG);
+				//ia->printStateIa(KMAG);
 			}
 			else
 			{
@@ -91,7 +91,7 @@ void	ClientCommunication::manageRecv()
 				else
 				{
 					ia->receiveCallbackCommand(msg);
-					//ia->printStack(KMAG);
+					//ia->printStateIa(KMAG);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ void	ClientCommunication::pushData()
 	}
 	replaceEnd(buffTmp = buffTmp.substr(0, retSend));
 	//cout << KYEL << getpid()  << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << endl;
-	ia->printStack(KYEL + to_string(getpid())  + " Sending to server: "+ KRESET +"["+buffTmp +"]\n" + KYEL);
+	ia->printStateIa(KYEL + to_string(getpid())  + " Sending to server: "+ KRESET +"["+buffTmp +"]" + KYEL);
 	if (retSend == -1)
 		throw (CustomException("send error"));
 	if (retSend > 0)
@@ -281,7 +281,7 @@ int		ClientCommunication::pullData()
 	string recvStr(buffRecv, retRecv);
 	replaceEnd(recvStr);
 	//cout << KBLU << getpid() << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << endl;
-	ia->printStack(KCYN + to_string(getpid()) + " Receiving to server: "+ KRESET + "["+ recvStr + "] len: " + to_string(retRecv) + "\n" + KCYN );
+	ia->printStateIa(KCYN + to_string(getpid()) + " Receiving to server: "+ KRESET + "["+ recvStr + "]" + KCYN );
 	delete[] buffRecv;
 	return (retRecv);
 }

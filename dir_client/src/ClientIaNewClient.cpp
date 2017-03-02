@@ -8,15 +8,16 @@ void	ClientIa::newClientStart(void (ClientIa::*caller)())
 
 void	ClientIa::callbackCommandConnectNbr(string connectNbr)
 {
-	(string)connectNbr;
-	if (connectNbr == "ko\n")
+	int nb = 0;
+
+	try
 	{
-		cout << KRED << "error callbackCommandConnectNbr()" << getpid() << KRESET << endl;
-		//stackCallbackCommand.push_front(&ClientIa::callbackCommandConnectNbr);
-		return ;
+		nb = stoi(connectNbr);
 	}
-	cout << "connect_nbr: " << connectNbr << endl;
-	int nb = stoi(connectNbr);
+	catch (invalid_argument e)
+	{
+		cout << KRED << "[ERROR] connect_nbr: invalid arg" << KRESET << endl;
+	}
 
 	if (nb > 0)
 	{

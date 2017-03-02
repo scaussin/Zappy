@@ -28,6 +28,7 @@
 # define END "\n"
 # define LEN_END 1
 # define LEVEL_MAX 8
+# define DEBUG_MODE 0
 
 using namespace std;
 /*
