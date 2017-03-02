@@ -46,7 +46,8 @@ void	ClientController::mainLoop()
 		catch (CustomException &e)
 		{
 			cout << KRED << e.what() << KRESET << endl;
-			return ;
+			break;
 		}
 	}
+	return ;
 }

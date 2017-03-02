@@ -21,11 +21,9 @@ void	gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		write_buffer(&gfx_client->buff_send, "sbp\n", 4);
 		return ;
 	}
-	// transform string to int.
 	errno = 0;
 	arg = strchr(param, ' ') + 1;
 	new_t = strtol(arg, NULL, 10);
-	// check int overflow
 	if (errno == ERANGE || errno == EINVAL)
 	{
 		printf(KMAG "Bad format to cmd [sst] "
@@ -33,13 +31,16 @@ void	gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		write_buffer(&gfx_client->buff_send, "sbp\n", 4);
 		return ;
 	}
-
-	// Change serveur time unit!
+	if (new_t > 1000)
+	{
+		printf(KMAG "Bad format to cmd [sst] "
+				"from gfx client (max value = 1000)\n" KRESET);
+		write_buffer(&gfx_client->buff_send, "sbp\n", 4);
+		return ;
+	}
 	old_t_unit = serv->world_hdl.t_unit;
 	serv->world_hdl.t_unit = (float)(1.0 / new_t);
-	// for each ongoing command, update their end time.
 	refresh_times(serv, old_t_unit);
-	// send answer to gfx.
 	asprintf(&gfx_msg, "sgt %f\n", serv->world_hdl.t_unit);
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);

@@ -239,6 +239,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	printf(KGRN "[Server]: Incantation #%d ending.\n", cur_client->player.incantation_id);
 	clients_tmp = serv->client_hdl.list_clients;
 	incanter_player = &cur_client->player;
+	// for the other players -> not the incanter.
 	while (clients_tmp)
 	{
 		if (&clients_tmp->player != incanter_player
@@ -257,6 +258,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 			{
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] -= 1;
 				clients_tmp->player.level += 1;
+				cur_client->player.nb_see_case = get_nb_case(cur_client->player.level);
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] += 1;
 			}
 			// send client: "niveau actuel : K"
@@ -280,6 +282,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	{
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 		cur_client->player.level += 1;
+		cur_client->player.nb_see_case = get_nb_case(cur_client->player.level);
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
 
 		// send client: "niveau actuel : K"
