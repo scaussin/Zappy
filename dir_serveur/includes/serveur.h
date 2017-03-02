@@ -292,6 +292,7 @@ typedef struct 				s_cmd_hdl
 /*
 ** ************************ World struct *****************************
 */
+
 typedef	struct				s_event_client
 {
 	t_client_entity			*client;
@@ -370,6 +371,7 @@ typedef struct				s_serveur
 /*
 ** serveur_data.c
 */
+
 void						init_data(t_serveur *serv);
 void						init_serveur(t_serveur *serv);
 void						fill_team_info(t_serveur *serv);
@@ -377,6 +379,7 @@ void						fill_team_info(t_serveur *serv);
 /*
 ** tools.c
 */
+
 void						exit_error(char *error_log);
 void						*s_malloc(size_t size);
 void						replace_nl(char * str, int len);
@@ -396,6 +399,7 @@ int							is_equal(double x, double y);
 /*
 ** input_handler.c
 */
+
 void						get_input(t_serveur *serv, int argc, char **argv);
 void						check_input_format(t_serveur *serv, int argc, char **argv);
 void						parse_input(int argc, char **argv);
@@ -406,18 +410,21 @@ int							regex_match(char *string_to_search, char *regex_str);
 /*
 ** terrain_generation.c
 */
+
 void						init_terrain(t_serveur *serv);
 void						generate_ressources_name(t_world_hdl *world_hdl);
 void						allocate_world_board(t_world_hdl *world_hdl);
 void						set_world_board_cases(t_world_hdl *world_hdl);
-void						generate_ressources(t_world_hdl *world_hdl);
+void						generate_ressources(t_serveur *serv, t_world_hdl *world_hdl);
 void						generate_ressources_flat(t_world_hdl *world_hdl, int x, int y);
 void						generate_ressources_diced(t_world_hdl *world_hdl, int x, int y);
+void						generate_added_ressources(t_serveur *serv, t_world_hdl *world_hdl, int x, int y);
 void						print_world_board(t_world_hdl *world_hdl);
 
 /*
 ** serveur_loop.c
 */
+
 void						init_fd(t_serveur *serv);
 void						main_loop(t_serveur *serv);
 void						manage_clients_input(t_serveur *serv);
@@ -505,6 +512,7 @@ void						refresh_times(t_serveur *serv, float old_t_unit);
 /*
 ** cmd_clients_manager.c
 */
+
 void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
 void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
 void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);

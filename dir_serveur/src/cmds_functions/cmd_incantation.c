@@ -239,6 +239,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	printf(KGRN "[Server]: Incantation #%d ending.\n", cur_client->player.incantation_id);
 	clients_tmp = serv->client_hdl.list_clients;
 	incanter_player = &cur_client->player;
+	// for the other players -> not the incanter.
 	while (clients_tmp)
 	{
 		if (&clients_tmp->player != incanter_player

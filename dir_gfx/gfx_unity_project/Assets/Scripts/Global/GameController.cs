@@ -207,12 +207,12 @@ public class GameController : MonoBehaviour {
 
 	public void OnUnknownCmdReception(string msg)
 	{
-		Debug.LogError ("Server received an unknown command");
+		Debug.LogWarning ("Server received an unknown command");
 	}
 
 	public void OnBadParameterForCmd(string msg)
 	{
-		Debug.LogError ("Server received a bad parameter for a command");
+		Debug.LogWarning ("Server received a bad parameter for a command");
 	}
 
 /* *************************************************************************************** 	*

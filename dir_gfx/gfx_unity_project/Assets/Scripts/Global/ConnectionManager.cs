@@ -97,7 +97,10 @@ public class ConnectionManager : MonoBehaviour
 		{
 			bytesToSend = buffer_send.ExtractBufferBytes ();
 			ClientSocket.Send(bytesToSend, 0, sizeToSend, SocketFlags.None);
-			Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString(bytesToSend) + "]");
+			if (GameManager.instance.DebugPrintMode)
+			{
+				Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString (bytesToSend) + "]");
+			}
 		}
 	}
 
@@ -107,7 +110,10 @@ public class ConnectionManager : MonoBehaviour
 		byte[]				buffer = new byte[msg_size];
 
 		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
-		Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
+		if (GameManager.instance.DebugPrintMode)
+		{
+			Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
+		}
 		buffer_recv.pushBytes (buffer, ret);
 
 		return ;
@@ -153,8 +159,10 @@ public class ConnectionManager : MonoBehaviour
                 OnConnectionFailed.Invoke();
             }
 			ClientSocket.ReceiveTimeout = 1000;
-
-            Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
+			if (GameManager.instance.DebugPrintMode)
+			{
+            	Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
+			}
 			OnConnectionWithServer.Invoke();
 			IsConnected = true;
         }

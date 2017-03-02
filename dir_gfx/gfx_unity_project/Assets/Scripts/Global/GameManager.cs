@@ -3,6 +3,8 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager		instance = null;
+	[Header("Display console logs?")]
+	public bool						DebugPrintMode = false;
 
 	[Header("Server address")]
 	public string					Port;

@@ -379,8 +379,7 @@ void	ClientPlayer::printMap(map<string, int> items)
 
 int		ClientPlayer::getHeightVision()
 {
-	//return (level + 1);
-	return (2);
+	return (level + 1);
 }
 
 vector<map<string, int> >	ClientPlayer::getItemsSeen()

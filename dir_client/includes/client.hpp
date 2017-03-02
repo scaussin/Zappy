@@ -24,7 +24,7 @@
 # include <ctime>
 
 
-# define BUFF_SIZE 8192
+# define BUFF_SIZE 96048
 # define END "\n"
 # define LEN_END 1
 # define LEVEL_MAX 8
