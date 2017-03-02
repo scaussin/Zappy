@@ -217,7 +217,7 @@ typedef struct 				s_list_cmds_entity
 	struct timespec			end_time;
 	void					(*on_end)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	char					*param;
-	
+
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -556,11 +556,14 @@ void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur,
 void						on_end_cmd_gauche(t_serveur *serv, t_client_entity *client_cur, char *param);
 
 int							on_start_cmd_voir(t_serveur *serv, t_client_entity *client_cur, char *param);
-void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						on_end_cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-t_pos							*get_see_case_coordinates(t_serveur *serv, t_player *player);
-int								get_nb_case(int level);
-void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+t_pos						*get_see_case_coordinates(t_serveur *serv, t_player *player);
+int							get_nb_case(int level);
+void						fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+char						*init_see_str(void);
+char						*get_players(char *see_str, t_pos *pos, int num, t_world_case **world);
+char						*get_ressources(t_serveur *serv, int x, int y, char *see_str);
+void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 
 int							on_start_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);

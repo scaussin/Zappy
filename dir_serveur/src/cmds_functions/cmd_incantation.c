@@ -45,7 +45,7 @@ void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *
 	}
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
-	
+
 }
 
 /*
@@ -61,7 +61,7 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 	t_player		*cur_player;
 	int				*target_res;
 	char			*client_msg;
-	
+
 	cur_player = &client_cur->player;
 	target_res = set_incantation_target_res(cur_player->level);
 	if (are_incantation_cdts_ok(serv, cur_player, target_res))
@@ -257,6 +257,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 			{
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] -= 1;
 				clients_tmp->player.level += 1;
+				clients_tmp->player.nb_see_case = get_nb_case(clients_tmp->player.level);
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] += 1;
 			}
 			// send client: "niveau actuel : K"
@@ -280,6 +281,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	{
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 		cur_client->player.level += 1;
+		cur_client->player.nb_see_case = get_nb_case(cur_client->player.level);
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
 
 		// send client: "niveau actuel : K"
@@ -302,7 +304,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 		cur_client->player.pos.x,
 		cur_client->player.pos.y);
 	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, msg);
-	free(msg);	
+	free(msg);
 }
 
 /*
