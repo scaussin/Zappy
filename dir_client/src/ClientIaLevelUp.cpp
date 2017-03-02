@@ -34,7 +34,7 @@ void	ClientIa::callbackCommandLevelUpInventory(string inventory)
 
 	itemsToLevelUp = player->getItemsLevelUp();
 	subItemsToFind(&itemsToLevelUp);
-	player->printMap(itemsToLevelUp);
+	//player->printMap(itemsToLevelUp);
 	findItemStart(&(itemsToLevelUp), &ClientIa::callbackContinueLevelUpFindItem);
 }
 

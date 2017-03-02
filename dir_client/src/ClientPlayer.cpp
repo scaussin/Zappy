@@ -263,8 +263,8 @@ void		ClientPlayer::descendre(int debuty, int finy, int debutx, int finx, vector
 
 void	ClientPlayer::setInventory(string inventory)
 {
-	char	*item;
-	char	*n;
+	char	*item = NULL;
+	char	*n = NULL;
 	char	*dup;
 
 	inventory = inventory.substr(1, inventory.size() - 3);
