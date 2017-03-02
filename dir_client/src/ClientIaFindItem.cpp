@@ -36,8 +36,7 @@ void	ClientIa::callbackCommandFindItemTake(string response)
 	{
 		itemsToFind[itemTryToTake.first]--;
 		player->setCaseItemsSeen(itemTryToTake.second, itemTryToTake.first,	player->getItemsSeen()[itemTryToTake.second][itemTryToTake.first] - 1);
-		cout << itemTryToTake.first << ": " << player->getItemsSeen()[itemTryToTake.second][itemTryToTake.first] << endl;
-		//printItemsToFind();
+		//cout << itemTryToTake.first << ": " << player->getItemsSeen()[itemTryToTake.second][itemTryToTake.first] << endl;
 	}
 	else
 		player->setCaseItemsSeen(itemTryToTake.second, itemTryToTake.first, 0);
