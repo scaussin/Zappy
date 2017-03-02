@@ -25,13 +25,18 @@ ClientInputHandler::ClientInputHandler(int argc, char **argv)
 ClientInputHandler::~ClientInputHandler()
 {}
 
+/*
+**	This method will check if the input is well format -> correct number of arguments,
+**	and options are correct. We do not parse what is entered yet, we just check the format.
+*/
+
 void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 {
 	if (strncmp(argv[1], "-n", 2) != 0)
 	{
 		throw (CustomException("Argument 1 (TeamName specifier -n) incorrect"));
 	}
-	if (regex_match (argv[2], regex("^\\w+")) == false)
+	if (regex_match (argv[2], regex("^[\\w ]+")) == false)
 	{
 		throw (CustomException("Argument 2 (TeamName string) incorrect"));
 	}
@@ -60,6 +65,11 @@ void	ClientInputHandler::CheckInputFormat(int argc, char **argv)
 	}
 }
 
+/*
+**	This is where we parse what is entered. We check if the team name isnt too long,
+**	or that the port is a correct one ... etc.
+*/
+
 void	ClientInputHandler::ParseInput(int argc, char **argv)
 {
 	(void)argc;
@@ -75,6 +85,11 @@ void	ClientInputHandler::ParseInput(int argc, char **argv)
 		throw (CustomException("Invalid port number [1023 <=> 65535]"));
 	}
 }
+
+/*
+**	At this point, the input is Format OK and has meaning. We now stock 
+**	this input in the corresponding variables.
+*/
 
 void	ClientInputHandler::FillInput(int argc, char **argv)
 {
