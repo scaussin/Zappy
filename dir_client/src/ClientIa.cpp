@@ -116,7 +116,7 @@ void	ClientIa::printStateIa(string c)
 	if (DEBUG_MODE == 0)
 	{
 		if (curCallbackCommand)
-			s << KGRN <<" sate: " << curCallbackCommand->debug << KRESET;
+			s << KGRN <<" state: " << curCallbackCommand->debug << KRESET;
 		s << endl;
 	}
 	else
