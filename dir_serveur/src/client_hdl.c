@@ -49,6 +49,7 @@ void			add_client(t_serveur *serv, t_client_entity *client)
 {
 	client->next = serv->client_hdl.list_clients;
 	serv->client_hdl.list_clients = client;
+	serv->client_hdl.nb_clients += 1;
 }
 
 void			remove_client(t_serveur *serv, t_client_entity *client)
@@ -57,9 +58,7 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	t_client_entity	*prev;
 
 	if (client->team)
-	{
 		client->team->available_slots += 1;
-	}
 	if (serv->client_hdl.list_clients == client)
 	{
 		serv->client_hdl.list_clients = client->next;
@@ -80,4 +79,5 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	}
 	prev->next = client->next;
 	free(client);
+	serv->client_hdl.nb_clients -= 1;
 }

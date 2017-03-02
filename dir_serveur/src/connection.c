@@ -11,6 +11,11 @@ SOCKET		accept_connection(t_serveur *serv)
 	SOCKADDR_IN		c_sin;
 	socklen_t		c_sin_size;
 
+	if (serv->client_hdl.nb_clients > MAX_CLIENTS_CONNECTED)
+	{
+		printf(KMAG "- Connection refused, too many clients connected.\n" KRESET);
+		return (-1);
+	}
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)

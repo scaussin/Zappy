@@ -1,3 +1,3 @@
 #/bin/sh
 
-./serveur -p 4242 -x 20 -y 20 -n Zeon Omni Zaft "Celestial Being" -c 1 -t $1
+./serveur -p 4242 -x 100 -y 100 -n Zeon Omni Zaft "Celestial Being" -c 1 -t $1

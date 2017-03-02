@@ -49,6 +49,8 @@
 **	Serveur communication defines.
 */
 
+# define MAX_CLIENTS_CONNECTED 200
+
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
@@ -63,6 +65,9 @@
 **	Game defines
 */
 
+# define MAX_GAME_TIME_UNIT 1000
+# define MAX_MAP_AREA 10000		// max X * Y for the map.
+# define MAX_NB_SLOT 20			// max -c value
 # define MAX_NB_OF_TEAM 10
 # define MAX_NB_OF_CLIENTS_PER_TEAM 20
 
@@ -402,7 +407,7 @@ int							is_equal(double x, double y);
 
 void						get_input(t_serveur *serv, int argc, char **argv);
 void						check_input_format(t_serveur *serv, int argc, char **argv);
-void						parse_input(int argc, char **argv);
+void						parse_filled_input(t_serveur *serv);
 void						fill_input(t_serveur *serv, int argc, char **argv);
 void						error_in_args(int pos, char *str);
 int							regex_match(char *string_to_search, char *regex_str);

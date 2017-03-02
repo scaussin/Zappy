@@ -31,7 +31,7 @@ void	gfx_cmd_sst(t_serveur *serv, t_client_entity *gfx_client, char *param)
 		write_buffer(&gfx_client->buff_send, "sbp\n", 4);
 		return ;
 	}
-	if (new_t > 1000)
+	if (new_t > MAX_GAME_TIME_UNIT)
 	{
 		printf(KMAG "Bad format to cmd [sst] "
 				"from gfx client (max value = 1000)\n" KRESET);

@@ -594,7 +594,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchGameOver(string msg)
 	{
-		rgx = new Regex("^seg \\w+$");
+		rgx = new Regex("^seg [\\w ]+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{

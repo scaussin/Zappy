@@ -115,6 +115,7 @@ public class BlockObject : MonoBehaviour
 	public void DesactivateAnimator()
 	{
 		transform.Find ("Model").transform.Find ("Root").transform.localScale = BlockRootScale;
+		transform.Find ("Hitbox").transform.Find ("MainCollider").gameObject.isStatic = true;
 		BlockAnimator.enabled = false;
 	}
 }
