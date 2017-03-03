@@ -107,9 +107,10 @@ public class ConnectionManager : MonoBehaviour
 	private void ReadMsg()
 	{
 		int					ret;
-		byte[]				buffer = new byte[msg_size];
+		byte[]				buffer = new byte[msg_size + 1];
 
 		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
+		buffer [ret] = 0;
 		if (GameManager.instance.DebugPrintMode)
 		{
 			Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");

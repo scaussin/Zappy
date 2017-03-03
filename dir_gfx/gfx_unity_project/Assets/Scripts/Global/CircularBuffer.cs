@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CircularBuffer
 {
-	private static int		buff_size = 4096;
+	private static int		buff_size = 12096;
 	private byte[]			buffer = new byte[buff_size];
 	private int				len;
 	private int				start;
@@ -27,12 +27,14 @@ public class CircularBuffer
 		if ((buffStr = getBufferStr ()) != null)
 		{
 			found = buffStr.IndexOf ('\n');
-			//Debug.Log ("found: " + found);
-			if (found > 0) {
+			if (found > 0)
+			{
 				buffStr = buffStr.Substring (0, found);
 				lenCmd = buffStr.Length + 1;
 				erase (lenCmd);
-			} else {
+			}
+			else
+			{
 				return (null);
 			}
 		}
@@ -97,6 +99,10 @@ public class CircularBuffer
 		return (new string(retBuff));
 	}
 
+	/// <summary>
+	/// Erase the specified sent_len.
+	/// </summary>
+	/// <param name="sent_len">Sent length.</param>
 	public void				erase(int sent_len)
 	{
 		start = (start + sent_len) % buff_size;
