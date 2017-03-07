@@ -3,6 +3,8 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager		instance = null;
+	[Header("Display console logs?")]
+	public bool						DebugPrintMode = false;
 
 	[Header("Server address")]
 	public string					Port;
@@ -13,6 +15,7 @@ public class GameManager : MonoBehaviour {
 	public WorldSettings			WorldSettings;
 	public KeyManager				KeyManager;
 	public PlayerManager			PlayerManager;
+	public StatisticManager			StatisticManager;
 
 	[Header("Program Control Manager references")] // program actors.
 	public GameController			GameController;
@@ -38,6 +41,7 @@ public class GameManager : MonoBehaviour {
 		WorldSettings = this.gameObject.GetComponent<WorldSettings> ();
 		KeyManager = this.gameObject.GetComponent<KeyManager> ();
 		PlayerManager = this.gameObject.GetComponent<PlayerManager> ();
+		StatisticManager = this.gameObject.GetComponent<StatisticManager> ();
 
 		// Set program control manager references.
 		GameController = GameObject.Find("GameController").GetComponent<GameController> ();

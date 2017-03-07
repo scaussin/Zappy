@@ -1,12 +1,12 @@
 #ifndef CUSTOMEXCEPTION_HPP
 # define CUSTOMEXCEPTION_HPP
 
-#include "Client.hpp"
+#include "client.hpp"
 
-class CustomException : public std::runtime_error
+class CustomException : public runtime_error
 {
 	public:
-		CustomException(const std::string& what_arg);
+		CustomException(const string& what_arg);
 };
 
 #endif 

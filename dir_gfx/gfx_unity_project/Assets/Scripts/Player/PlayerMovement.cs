@@ -4,10 +4,12 @@ using UnityEngine;
 
 /// <summary>
 /// Player movement. Each Player object handles its own movement, but none of them
-/// activate their methods by theirselves.
+/// activate their methods by theirselves. This class handle the actual player unity object's movement.
 /// </summary>
 public class PlayerMovement : MonoBehaviour
 {
+	public float			Offset_x;
+	public float			Offset_z;
 	public bool				IsAdvancing;
 	public bool				IsRotating;
 	public Vector3			TargetPos;
@@ -20,14 +22,16 @@ public class PlayerMovement : MonoBehaviour
 	private float			AdvanceDistance;
 
 	private float			moveStartTime;
-	private float			timeSinceStarted;
+	private float			movTimeSinceStarted;
+	private float			rotStartTime;
+	private float			rotTimeSinceStarted;
 	private float			fracComplete;
 	private float			timeUnit = 1.0f;
 	private float			advanceDelay = 7.0f;
 
 	private PlayerObject	playerObjInstance;
 	private Animator		playerAnimator;
-	private GameObject		boardZeroPoint;
+	private Vector3			boardZeroPoint;
 
 	// Init vars at spawn.
 	void OnEnable()
@@ -36,19 +40,19 @@ public class PlayerMovement : MonoBehaviour
 						+ GameManager.instance.WorldSettings.BlockSpacing;
 		playerObjInstance = GetComponent<PlayerObject> ();
 		playerAnimator =  GetComponent<Animator> ();
-		boardZeroPoint = transform.parent.transform.parent.GetComponent<ActorSpawner> ().BoardZeroPoint;
+		boardZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
 		timeUnit = GameManager.instance.WorldSettings.TimeUnit;
 	}
 
-	void FixedUpdate ()
+	void Update ()
 	{
 		if (IsAdvancing)
 		{
 			playerAnimator.SetBool ("IsMoving", true);
-			timeSinceStarted = Time.time - moveStartTime;
-			fracComplete = timeSinceStarted / (advanceDelay * timeUnit);
+			movTimeSinceStarted = Time.time - moveStartTime;
+			fracComplete = movTimeSinceStarted / (advanceDelay * timeUnit);
 			//transform.position = TargetPos;
-			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete);
+			transform.position = Vector3.Lerp (transform.position, TargetPos, fracComplete * Time.fixedDeltaTime);
 			if (Vector3.Distance (transform.position, TargetPos) < 0.02f)
 			{
 				IsAdvancing = false;
@@ -57,11 +61,12 @@ public class PlayerMovement : MonoBehaviour
 		}
 		if (IsRotating)
 		{
-			timeSinceStarted = Time.time - moveStartTime;
-			fracComplete = timeSinceStarted / (advanceDelay * timeUnit);
+			rotTimeSinceStarted = Time.time - moveStartTime;
+			fracComplete = rotTimeSinceStarted / (advanceDelay * timeUnit);
 			TargetRotationQuat = Quaternion.Euler (TargetRotation);
-			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete);
-			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f) {
+			transform.localRotation = Quaternion.Lerp (transform.localRotation, TargetRotationQuat, fracComplete * Time.fixedDeltaTime);
+			if (Vector3.Distance (transform.localEulerAngles, TargetRotation) < 0.02f)
+			{
 				IsRotating = false;
 			}
 		}
@@ -76,10 +81,14 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void StartMovement(int x, int y, int dir)
 	{
-		moveStartTime = Time.time;
+		// if ppo is received again during a movement,
+		// we dont want the linear interpolation frac to be changed.
+		if (IsAdvancing == false)
+		{
+			moveStartTime = Time.time;
+		}
 		SetTargetWorldPos (x, y, dir);
 		IsAdvancing = true;
-		IsRotating = false;
 	}
 
 	/// <summary>
@@ -90,9 +99,8 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void StartRotation(int x, int y, int dir)
 	{
-		moveStartTime = Time.time;
+		rotStartTime = Time.time;
 		SetTargetWorldRot (x, y, dir);
-		IsAdvancing = false;
 		IsRotating = true;
 	}
 
@@ -105,15 +113,18 @@ public class PlayerMovement : MonoBehaviour
 	/// <param name="dir">Dir.</param>
 	public void Teleport(int x, int y, int dir)
 	{
-		TargetPos = boardZeroPoint.transform.position;
-
+		TargetPos = boardZeroPoint;
 		TargetPos.x += (GameManager.instance.WorldSettings.BlockSize +
 			GameManager.instance.WorldSettings.BlockSpacing) * x;
 		TargetPos.z += (GameManager.instance.WorldSettings.BlockSize +
 			GameManager.instance.WorldSettings.BlockSpacing) * y;
-		
-		transform.position = TargetPos;
 
+		// adding personal offset for visual appreciation.
+		TargetPos.x += Offset_x;
+		TargetPos.z += Offset_z;
+
+		// apply final value.
+		transform.position = TargetPos;
 	}
 
 	/// <summary>
@@ -149,26 +160,36 @@ public class PlayerMovement : MonoBehaviour
 	/// Sets the target world position. From the server's XY map position, set a XYZ unity 3d position.
 	/// Remember: Y server == Z unity.
 	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
+	/// <param name="x">The x server map coordinate.</param>
+	/// <param name="y">The y server map coordinate.</param>
 	/// <param name="dir">Dir.</param>
 	private void SetTargetWorldPos(int x, int y, int dir)
 	{
-		// TargetPos = transform.forward + new Vector3(AdvanceDistance, 0.0f, AdvanceDistance);
-		TargetPos = transform.position;
+//		// TargetPos = transform.forward + new Vector3(AdvanceDistance, 0.0f, AdvanceDistance);
+//		TargetPos = transform.position;
+//
+//		// If new val == old val, ne rien faire.
+//		// Set x target position;
+//		if (x > playerObjInstance.X)
+//			TargetPos.x += AdvanceDistance;
+//		else if (x < playerObjInstance.X)
+//			TargetPos.x -= AdvanceDistance;
+//
+//		// Set y target position;
+//		if (y > playerObjInstance.Y)
+//			TargetPos.z += AdvanceDistance;
+//		else if (y < playerObjInstance.Y)
+//			TargetPos.z -= AdvanceDistance;
 
-		// If new val == old val, ne rien faire.
-		// Set x target position;
-		if (x > playerObjInstance.X)
-			TargetPos.x += AdvanceDistance;
-		else if (x < playerObjInstance.X)
-			TargetPos.x -= AdvanceDistance;
+		TargetPos = boardZeroPoint;
+		TargetPos.x += (GameManager.instance.WorldSettings.BlockSize +
+			GameManager.instance.WorldSettings.BlockSpacing) * x;
+		TargetPos.z += (GameManager.instance.WorldSettings.BlockSize +
+			GameManager.instance.WorldSettings.BlockSpacing) * y;
 
-		// Set y target position;
-		if (y > playerObjInstance.Y)
-			TargetPos.z += AdvanceDistance;
-		else if (y < playerObjInstance.Y)
-			TargetPos.z -= AdvanceDistance;
+		// adding personal offset for visual appreciation.
+		TargetPos.x += Offset_x;
+		TargetPos.z += Offset_z;
 	}
 
 	/// <summary>

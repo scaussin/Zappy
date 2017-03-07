@@ -49,6 +49,8 @@
 **	Serveur communication defines.
 */
 
+# define MAX_CLIENTS_CONNECTED 200
+
 # define BUFF_SIZE 4096
 
 # define SIZE_CMD_MATCH_TABLE 12 // The number of client available cmds.
@@ -63,6 +65,9 @@
 **	Game defines
 */
 
+# define MAX_GAME_TIME_UNIT 1000
+# define MAX_MAP_AREA 10000		// max X * Y for the map.
+# define MAX_NB_SLOT 20			// max -c value
 # define MAX_NB_OF_TEAM 10
 # define MAX_NB_OF_CLIENTS_PER_TEAM 20
 
@@ -90,8 +95,8 @@
 */
 
 # define MAX_LV 8
-# define VICTORY_CDT_PLAYER_NB 6
-# define VICTORY_CDT_PLAYER_LV 8
+# define VICTORY_CDT_PLAYER_NB 6	// default 6
+# define VICTORY_CDT_PLAYER_LV 8	// default 8
 
 /*
 **	Server structures.
@@ -217,7 +222,7 @@ typedef struct 				s_list_cmds_entity
 	struct timespec			end_time;
 	void					(*on_end)(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 	char					*param;
-	
+
 	t_list_cmds_entity		*next;
 }							t_list_cmds_entity;
 
@@ -292,6 +297,7 @@ typedef struct 				s_cmd_hdl
 /*
 ** ************************ World struct *****************************
 */
+
 typedef	struct				s_event_client
 {
 	t_client_entity			*client;
@@ -301,6 +307,7 @@ typedef	struct				s_event_client
 typedef struct				s_egg
 {
 	int						egg_nb;
+	int						father_nb;
 	t_team_entity			*team;
 	t_pos					pos;
 
@@ -360,12 +367,16 @@ typedef struct				s_serveur
 	t_cmd_hdl				cmd_hdl;
 	t_world_hdl				world_hdl;
 
+	int						victory_reached;
+	unsigned int			loop_nb;
+
 	t_game_settings			settings_hdl;
 }							t_serveur;
 
 /*
 ** serveur_data.c
 */
+
 void						init_data(t_serveur *serv);
 void						init_serveur(t_serveur *serv);
 void						fill_team_info(t_serveur *serv);
@@ -373,6 +384,7 @@ void						fill_team_info(t_serveur *serv);
 /*
 ** tools.c
 */
+
 void						exit_error(char *error_log);
 void						*s_malloc(size_t size);
 void						replace_nl(char * str, int len);
@@ -392,9 +404,10 @@ int							is_equal(double x, double y);
 /*
 ** input_handler.c
 */
+
 void						get_input(t_serveur *serv, int argc, char **argv);
 void						check_input_format(t_serveur *serv, int argc, char **argv);
-void						parse_input(int argc, char **argv);
+void						parse_filled_input(t_serveur *serv);
 void						fill_input(t_serveur *serv, int argc, char **argv);
 void						error_in_args(int pos, char *str);
 int							regex_match(char *string_to_search, char *regex_str);
@@ -402,18 +415,21 @@ int							regex_match(char *string_to_search, char *regex_str);
 /*
 ** terrain_generation.c
 */
+
 void						init_terrain(t_serveur *serv);
 void						generate_ressources_name(t_world_hdl *world_hdl);
 void						allocate_world_board(t_world_hdl *world_hdl);
 void						set_world_board_cases(t_world_hdl *world_hdl);
-void						generate_ressources(t_world_hdl *world_hdl);
+void						generate_ressources(t_serveur *serv, t_world_hdl *world_hdl);
 void						generate_ressources_flat(t_world_hdl *world_hdl, int x, int y);
 void						generate_ressources_diced(t_world_hdl *world_hdl, int x, int y);
+void						generate_added_ressources(t_serveur *serv, t_world_hdl *world_hdl, int x, int y);
 void						print_world_board(t_world_hdl *world_hdl);
 
 /*
 ** serveur_loop.c
 */
+
 void						init_fd(t_serveur *serv);
 void						main_loop(t_serveur *serv);
 void						manage_clients_input(t_serveur *serv);
@@ -501,6 +517,7 @@ void						refresh_times(t_serveur *serv, float old_t_unit);
 /*
 ** cmd_clients_manager.c
 */
+
 void						init_cmd_match_table(t_serveur *serv); // init command dictionnary.
 void						lex_and_parse_cmds(t_client_entity *client, t_cmd_match *cmd_match_table);
 void						check_cmd_match(t_cmd_match *cmd_match_table, t_client_entity *client, char *cmd);
@@ -552,11 +569,14 @@ void						cmd_gauche(struct s_serveur *serv, struct s_client_entity *client_cur,
 void						on_end_cmd_gauche(t_serveur *serv, t_client_entity *client_cur, char *param);
 
 int							on_start_cmd_voir(t_serveur *serv, t_client_entity *client_cur, char *param);
-void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 void						on_end_cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
-t_pos							*get_see_case_coordinates(t_serveur *serv, t_player *player);
-int								get_nb_case(int level);
-void							fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+t_pos						*get_see_case_coordinates(t_serveur *serv, t_player *player);
+int							get_nb_case(int level);
+void						fill_tab(t_pos *abs_pos, t_pos *rel_pos, t_player *player, t_serveur *serv);
+char						*init_see_str(void);
+char						*get_players(char *see_str, t_pos *pos, int num, t_world_case **world);
+char						*get_ressources(t_serveur *serv, int x, int y, char *see_str);
+void						cmd_voir(struct s_serveur *serv, struct s_client_entity *client_cur, char *param);
 
 int							on_start_cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);
 void						cmd_inventaire(t_serveur *serv, t_client_entity *client_cur, char *param);

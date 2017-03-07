@@ -1,18 +1,18 @@
 #ifndef CLIENTBUFFER_HPP
 # define CLIENTBUFFER_HPP
 
-# include "Client.hpp"
+# include "client.hpp"
 
 class ClientBuffer
 {
 	public:
 		ClientBuffer();
 		~ClientBuffer();
-		std::string	getFirstMsg();
-		std::string	getBuffer();
+		string	getFirstMsg();
+		string	getBuffer();
 		void		erase(int len);
 		int			getLen();
-		void		pushMsg(std::string msg);
+		void		pushMsg(string msg);
 		void		pushBuffer(char *to_write, int len);
 
 	private:

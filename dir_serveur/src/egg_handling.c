@@ -25,6 +25,7 @@ void	add_new_egg(t_serveur *serv, t_client_entity *client)
 	// set egg position and status
 	new_egg->pos.x = client->player.pos.x;
 	new_egg->pos.y = client->player.pos.y;
+	new_egg->father_nb = client->sock;
 	new_egg->has_hatched = 0;
 
 	new_egg->next = NULL;
@@ -139,6 +140,7 @@ void	refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit)
 				add_nsec_to_timespec(&egg_tmp->hatch_time,
 					time_left * 1000000000 * serv->world_hdl.t_unit);
 			}
+			egg_tmp = egg_tmp->next;
 		}
 	}
 }

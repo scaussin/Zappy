@@ -127,22 +127,24 @@ void	check_victory(t_serveur *serv)
 	int		i;
 
 	i = 0;
-	while (i < serv->team_hdl.nb_teams)
+	if (serv->victory_reached == 0)
 	{
-		if (serv->team_hdl.array_teams[i]
-			.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] == 
-			VICTORY_CDT_PLAYER_NB)
+		while (i < serv->team_hdl.nb_teams)
 		{
-			printf(KGRN "Victory condition reached for team %s!\n"KRESET,
-				serv->team_hdl.array_teams[i].name);
-			// TODO: Victory code ?
-			sleep(10); //
-			// gfx send victory "seg N\n"
-			asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
-			push_gfx_msg(serv, gfx_msg);
-			free(gfx_msg);
+			if (serv->team_hdl.array_teams[i]
+				.nb_players_per_lv[VICTORY_CDT_PLAYER_LV - 1] >= 
+				VICTORY_CDT_PLAYER_NB)
+			{
+				serv->victory_reached = 1;
+				printf(KGRN "Victory condition reached for team %s!\n"KRESET,
+					serv->team_hdl.array_teams[i].name);
+				// gfx send victory "seg N\n"
+				asprintf(&gfx_msg, "seg %s\n", serv->team_hdl.array_teams[i].name);
+				push_gfx_msg(serv, gfx_msg);
+				free(gfx_msg);
+			}
+			i++;
 		}
-		i++;
 	}
 }
 

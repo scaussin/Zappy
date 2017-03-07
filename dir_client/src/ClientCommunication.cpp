@@ -1,4 +1,4 @@
-#include "../includes/Client.hpp"
+#include "client.hpp"
 
 //------------------------------------------------------------------------------//
 //																				//
@@ -7,7 +7,7 @@
 //																				//
 //------------------------------------------------------------------------------//
 
-ClientCommunication::ClientCommunication(std::string _hostName, int _port, ClientPlayer *_player) : hostName(_hostName), port(_port), player(_player)
+ClientCommunication::ClientCommunication(string _hostName, int _port, ClientPlayer *_player, ClientIa *_ia) : player(_player), ia(_ia), hostName(_hostName), port(_port)
 {
 	isConnected = false;
 	isAuthenticated = false;
@@ -72,13 +72,29 @@ void	ClientCommunication::manageRecv()
 		return ;
 	if (isAuthenticated)
 	{
-		std::string msg = bufferRecv.getFirstMsg();
-		if (msg.compare("mort\n") == 0)
+		string msg;
+		while ((msg = bufferRecv.getFirstMsg()).size() > 0)
 		{
-			//TODO ;)
+			if (msg.compare("mort\n") == 0)
+			{
+
+			}
+			else if (msg.compare("elevation en cours\n") == 0 && (ia->state == slave || ia->state == none))
+			{
+				ia->pushFrontElevationEnd();
+				//ia->printStateIa(KMAG);
+			}
+			else
+			{
+				if (regex_match(msg, regex("message [0-8],.+\n")))
+					ia->receiveBroadcast(msg);
+				else
+				{
+					ia->receiveCallbackCommand(msg);
+					//ia->printStateIa(KMAG);
+				}
+			}
 		}
-		else
-			player->receiveCallbackCommande(msg);
 	}
 	else
 		clientAuthentication();
@@ -88,7 +104,7 @@ void	ClientCommunication::clientAuthentication()
 {
 	if (stateProcessAuth == 0) // BIENVENUE/n
 	{
-		std::string msg = bufferRecv.getFirstMsg();
+		string msg = bufferRecv.getFirstMsg();
 		if (msg.compare("BIENVENUE\n") == 0)
 		{
 			bufferSend.pushMsg(player->teamName + "\n");
@@ -99,39 +115,41 @@ void	ClientCommunication::clientAuthentication()
 	{		
 		try
 		{
-			std::string msg = bufferRecv.getFirstMsg();
+			string msg = bufferRecv.getFirstMsg();
 			parseTeamSlots(msg, &player->teamSlots);
 			stateProcessAuth = 2;
 		}
 		catch (CustomException &e)
 		{
-			std::cout << KRED << e.what() << KRESET << std::endl;
+			cout << KRED << e.what() << KRESET << endl;
 		}
 	}
 	if (stateProcessAuth == 2 && bufferRecv.getLen() > 0) // <x_position> <y_position>\n
 	{
 		try
 		{
-			std::string msg = bufferRecv.getFirstMsg();
+			string msg = bufferRecv.getFirstMsg();
 			parseWorldSize(msg, &player->worldSizeX, &player->worldSizeY);
-			player->bufferSend = &bufferSend;
-			std::cout << KGRN << "client authenticated" << KRESET << std::endl;
+			player->setBufferSend(&bufferSend);
+			cout << KGRN << "client authenticated" << KRESET << endl;
 			player->printStat();
 			isAuthenticated = true;
-
-			player->avance();
+			/**/
+			ia->startPlay();
+			/**/
+			
 		}
 		catch (CustomException &e)
 		{
-			std::cout << KRED << e.what() << KRESET << std::endl;
+			cout << KRED << e.what() << KRESET << endl;
 		}
 	}
 }
 
-void	ClientCommunication::replaceEnd(std::string &str)
+void	ClientCommunication::replaceEnd(string &str)
 {
 	size_t start_pos;
-	while ((start_pos = str.find(END)) != std::string::npos)
+	while ((start_pos = str.find(END)) != string::npos)
 	{
 		str.replace(start_pos, LEN_END, "*");
 	}
@@ -143,10 +161,11 @@ void	ClientCommunication::connectToServer()
 	
 	if (!isConnected)
 	{
-		//std::cout << KCYN "- Connection attempt... -" KRESET << std::endl;
+		//cout << KCYN "- Connection attempt... -" KRESET << endl;
+		//char * dupHostName = strdup(hostName.c_str());
 		if ((host = gethostbyname(hostName.c_str())))
 			hostName = inet_ntoa(*((struct in_addr **)(host->h_addr_list))[0]);
-
+		//free(dupHostName);
 		proto = getprotobyname("tcp");
 		if (!proto)
 			throw (CustomException("getprotobyname() error"));
@@ -159,19 +178,19 @@ void	ClientCommunication::connectToServer()
 		isConnected = true;
 	}
 	else
-		std::cout << "Client already connected" << std::endl;
+		cout << "Client already connected" << endl;
 }
 
 /*
 ** parse : <slot_number>\n<x_position> <y_position>\n
 ** TODO: check error
 */
-void	ClientCommunication::parseTeamSlots(std::string msg, int *teamSlots)
+void	ClientCommunication::parseTeamSlots(string msg, int *teamSlots)
 {
-	std::regex expression("^([0-9]+)\n$");
-	std::smatch matches;
+	regex expression("^([0-9]+)\n$");
+	smatch matches;
 
-	if(std::regex_search(msg, matches, expression))
+	if(regex_search(msg, matches, expression))
 	{
 		*teamSlots = strtol(matches[0].str().c_str(), NULL, 10);
 	} 
@@ -179,12 +198,12 @@ void	ClientCommunication::parseTeamSlots(std::string msg, int *teamSlots)
 		throw (CustomException("error parse team slots"));
 }
 
-void	ClientCommunication::parseWorldSize(std::string msg, int *worldSizeX, int *worldSizeY)
+void	ClientCommunication::parseWorldSize(string msg, int *worldSizeX, int *worldSizeY)
 {
-	std::regex expression("^([0-9]+) ([0-9]+)\n$");
-	std::smatch matches;
+	regex expression("^([0-9]+) ([0-9]+)\n$");
+	smatch matches;
 
-	if(std::regex_search(msg, matches, expression))
+	if(regex_search(msg, matches, expression))
 	{
 		*worldSizeX = strtol(matches[1].str().c_str(), NULL, 10);
 		*worldSizeY = strtol(matches[2].str().c_str(), NULL, 10);
@@ -199,10 +218,10 @@ void	ClientCommunication::disconnect()
 	{
 		isConnected = false;
 		close(sock);
-		std::cout << KCYN "Disconnected" KRESET<< std::endl;
+		cout << KCYN "Disconnected" KRESET<< endl;
 	}
 	else
-		std::cout << "Client not connected" << std::endl;
+		cout << "Client not connected" << endl;
 }
 
 /*
@@ -210,7 +229,7 @@ void	ClientCommunication::disconnect()
 */
 void	ClientCommunication::pushData()
 {
-	std::string buffTmp;
+	string buffTmp;
 	int			retSend;
 
 	buffTmp = bufferSend.getBuffer();
@@ -223,7 +242,8 @@ void	ClientCommunication::pushData()
 			break ;
 	}
 	replaceEnd(buffTmp = buffTmp.substr(0, retSend));
-	std::cout << KYEL << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << std::endl;
+	//cout << KYEL << getpid()  << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << endl;
+	ia->printStateIa(KYEL + to_string(getpid())  + " Sending to server: "+ KRESET +"["+buffTmp +"]" + KYEL);
 	if (retSend == -1)
 		throw (CustomException("send error"));
 	if (retSend > 0)
@@ -258,9 +278,10 @@ int		ClientCommunication::pullData()
 		throw (CustomException("recv error"));
 	else
 		bufferRecv.pushBuffer(buffRecv, retRecv);
-	std::string recvStr(buffRecv, retRecv);
+	string recvStr(buffRecv, retRecv);
 	replaceEnd(recvStr);
-	std::cout << KBLU << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << std::endl;
+	//cout << KBLU << getpid() << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << endl;
+	ia->printStateIa(KCYN + to_string(getpid()) + " Receiving to server: "+ KRESET + "["+ recvStr + "]" + KCYN );
 	delete[] buffRecv;
 	return (retRecv);
 }
@@ -268,8 +289,41 @@ int		ClientCommunication::pullData()
 /*
 void	ClientCommunication::displayInfos()
 {
-	std::cout << KGRN "Connection infos:" KRESET << std::endl;
-	std::cout << "TeamName: " << Settings.TeamName << std::endl;
-	std::cout << "Port: " << Settings.Port << std::endl;
-	std::cout << "HostName: " << Settings.HostName << std::endl;
+	cout << KGRN "Connection infos:" KRESET << endl;
+	cout << "TeamName: " << Settings.TeamName << endl;
+	cout << "Port: " << Settings.Port << endl;
+	cout << "HostName: " << Settings.HostName << endl;
 }*/
+
+/*
+**	Utilitary function.
+*/
+
+vector<string>	strSplit(string str, char c)
+{
+	vector<string> ret;
+	string a;
+	int i = 0;
+
+	i = 0;
+	while (1)
+	{
+		a = "";
+		while (str[i] && str[i] != c)
+		{
+			a.push_back(str[i]);
+			i++;
+		}
+		if (str[i] == 0)
+		{
+			ret.push_back(a);
+			break;
+		}
+		else
+		{
+			ret.push_back(a);
+			i++;
+		}
+	}
+	return (ret);
+}

@@ -36,7 +36,7 @@ public class ConnectionManager : MonoBehaviour
 	public bool							IsAuthMsgSend = false;
 
 	// private
-	public int							msg_size = 2048;
+	public int							msg_size = 1024;
 	public CircularBuffer				buffer_recv = new CircularBuffer();
 	public CircularBuffer				buffer_send = new CircularBuffer();
 
@@ -97,17 +97,24 @@ public class ConnectionManager : MonoBehaviour
 		{
 			bytesToSend = buffer_send.ExtractBufferBytes ();
 			ClientSocket.Send(bytesToSend, 0, sizeToSend, SocketFlags.None);
-			Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString(bytesToSend) + "]");
+			if (GameManager.instance.DebugPrintMode)
+			{
+				Debug.Log ("Sending: [" + System.Text.Encoding.UTF8.GetString (bytesToSend) + "]");
+			}
 		}
 	}
 
 	private void ReadMsg()
 	{
 		int					ret;
-		byte[]				buffer = new byte[msg_size];
+		byte[]				buffer = new byte[msg_size + 1];
 
 		ret = ClientSocket.Receive(buffer, 0, msg_size, SocketFlags.None);
-		Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
+		buffer [ret] = 0;
+		if (GameManager.instance.DebugPrintMode)
+		{
+			Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
+		}
 		buffer_recv.pushBytes (buffer, ret);
 
 		return ;
@@ -153,8 +160,10 @@ public class ConnectionManager : MonoBehaviour
                 OnConnectionFailed.Invoke();
             }
 			ClientSocket.ReceiveTimeout = 1000;
-
-            Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
+			if (GameManager.instance.DebugPrintMode)
+			{
+            	Debug.Log("Socket connected to " + ClientSocket.RemoteEndPoint.ToString());
+			}
 			OnConnectionWithServer.Invoke();
 			IsConnected = true;
         }
@@ -164,9 +173,19 @@ public class ConnectionManager : MonoBehaviour
             OnConnectionFailed.Invoke();
             Debug.Log("Error" + e.ToString());
         }
-
-
     }
+
+	/// <summary>
+	/// Disconnects the server. Closes the socket to make sure the connection is cut.
+	/// </summary>
+	public void DisconnectServer()
+	{
+		if (ClientSocket.Connected == true)
+		{
+			ClientSocket.Close ();
+			IsConnected = false;
+		}
+	}
 }
 
 /*

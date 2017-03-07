@@ -12,8 +12,8 @@
 # include <errno.h>
 # include <algorithm>
 # include <vector>
-# include <regex.h>
 # include <list>
+# include <map>
 
 // Connection includes.
 # include <sys/socket.h>
@@ -21,18 +21,23 @@
 # include <netdb.h>
 # include <fcntl.h>
 # include <sys/time.h>
-# include <netdb.h>
+# include <ctime>
 
-# define BUFF_SIZE 128
+
+# define BUFF_SIZE 96048
 # define END "\n"
 # define LEN_END 1
+# define LEVEL_MAX 8
+# define DEBUG_MODE 0
+
+using namespace std;
 /*
 // Connection related structure.
 typedef struct			s_CommunicationSettings
 {
-	std::string				TeamName;
+	string				TeamName;
 	int						Port;
-	std::string				HostName;
+	string				HostName;
 
 
 }							t_CommunicationSettings;*/
@@ -41,19 +46,23 @@ typedef struct			s_CommunicationSettings
 class ClientInputHandler; // handle and check args.
 class ClientBuffer;
 class ClientCommunication; // communicate with the server.
+class CallbackCommand;
 class ClientPlayer; // the actual game player.
 class ClientController; // main controller.
+class ClientIa;
 
 
 // Class files includes.
 # include "CustomException.hpp"
 # include "ClientInputHandler.hpp"
-# include "ClientCommande.hpp"
 # include "ClientBuffer.hpp"
 # include "ClientCommunication.hpp"
 # include "ClientPlayer.hpp"
 # include "ClientController.hpp"
+# include "CallbackCommand.hpp"
+# include "ClientIa.hpp"
 
+vector<string>	strSplit(string str, char c);
 
 // color in text;
 # define KNRM  "\x1B[0m"
@@ -65,5 +74,15 @@ class ClientController; // main controller.
 # define KCYN  "\x1B[36m"
 # define KWHT  "\x1B[37m"
 # define KRESET "\x1B[0m"
+
+# define MIN_FOOD_1 1800
+# define MIN_FOOD_2 1800
+//# define MIN_FOOD_BEFORE_INCANTATION 5000
+
+# define N_TO_EAT_1 14
+# define N_TO_EAT_2 14
+//# define N_TO_EAT_BEFORE_INCANTATION 50
+# define FOOD "nourriture"
+# define SUCCESS "ok\n"
 
 #endif

@@ -1,8 +1,13 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 int		main(void)
 {
-	printf("Hello gfx\n");
-	return (0);
+  char *command;
+  
+  asprintf(&command, "open gfx_unity_project/Assets/Scenes/gfx.unity");
+  system(command);
+  return (0);
 }

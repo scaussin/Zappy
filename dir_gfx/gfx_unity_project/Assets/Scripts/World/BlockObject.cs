@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public class BlockObject : MonoBehaviour
 {
-	[Header("Object with points of interests")]
-	public GameObject			Points;
+	[Header("Block events")]
+	public List<int>			Incantations_id;
 
 	[Header("Block datas")]
 	public int					x;
@@ -24,6 +24,8 @@ public class BlockObject : MonoBehaviour
 	public int					ThystameUnits = 0;
 
 	[Header ("Links to ressources 3d models")]
+	public GameObject			DecorationsObj;
+	public GameObject			BlockModelObj;
 	public GameObject			RessourcesContainer;
 	public GameObject			FoodModelObject;
 	public GameObject			LinemateModelObject;
@@ -35,12 +37,16 @@ public class BlockObject : MonoBehaviour
 
 	private Animator			BlockAnimator;
 
+	private GameObject			GroundSelectedModel;
+	private Vector3				BlockRootScale;
 
 	// Use this for initialization
 	void Awake ()
 	{
 		BlockAnimator = GetComponent<Animator>	();
-		Points = transform.Find ("Points").gameObject;
+		DecorationsObj = transform.Find ("Decorations").gameObject;
+		BlockModelObj =  transform.Find ("Model").transform.Find ("Root").transform.Find ("MainBlock").
+			transform.Find ("MainBlockModel").gameObject;
 		RessourcesContainer = transform.Find ("Ressources").gameObject;
 		FoodModelObject = RessourcesContainer.transform.Find ("Food").gameObject;
 		LinemateModelObject = RessourcesContainer.transform.Find ("Linemate").gameObject;
@@ -49,6 +55,12 @@ public class BlockObject : MonoBehaviour
 		MendianeModelObject = RessourcesContainer.transform.Find ("Mendiane").gameObject;
 		PhirasModelObject = RessourcesContainer.transform.Find ("Phiras").gameObject;
 		ThystameModelObject = RessourcesContainer.transform.Find ("Thystame").gameObject;
+
+		GroundSelectedModel = transform.Find ("Effects").transform.Find ("GroundSelected").gameObject;
+		ToggleSelection (false);
+		BlockRootScale.x = 1.0f;
+		BlockRootScale.y = 1.0f;
+		BlockRootScale.z = 1.0f;
 	}
 
 	/// <summary>
@@ -92,11 +104,18 @@ public class BlockObject : MonoBehaviour
 			ThystameModelObject.SetActive(false);
 	}
 
+	public void		ToggleSelection(bool b)
+	{
+		GroundSelectedModel.SetActive (b);
+	}
+
 	/// <summary>
 	/// Desactivates the animator at the end of appear animation, cause it makes a lot of lag on each block even when idle.;
 	/// </summary>
 	public void DesactivateAnimator()
 	{
+		transform.Find ("Model").transform.Find ("Root").transform.localScale = BlockRootScale;
+		transform.Find ("Hitbox").transform.Find ("MainCollider").gameObject.isStatic = true;
 		BlockAnimator.enabled = false;
 	}
 }

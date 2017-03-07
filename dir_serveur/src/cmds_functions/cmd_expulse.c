@@ -50,8 +50,23 @@ void	cmd_expulse(t_serveur *serv, t_client_entity *client_cur, char *param)
 			&& list_clients->player.pos.y == cur_player->pos.y
 			&& &(list_clients->player) != cur_player)
 		{
-			expulse_client_in_dir(serv, list_clients, cur_player->dir);
-			nb_client_expulsed++;
+			// rule modification checking.
+			if (!serv->settings_hdl.can_interrupt_incantation)
+			{
+				// incantation cannot be interrupted. dont expulse incanting players.
+				if (!list_clients->player.is_incanting && !list_clients->player.is_incanter)
+				{
+					expulse_client_in_dir(serv, list_clients, cur_player->dir);
+					nb_client_expulsed++;
+				}
+			}
+			else
+			{
+				// incantation can be interrupted. expulse all.
+				expulse_client_in_dir(serv, list_clients, cur_player->dir);
+				nb_client_expulsed++;
+			}
+			
 		}	
 		list_clients = list_clients->next;
 	}

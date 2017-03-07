@@ -30,15 +30,9 @@ void	init_terrain(t_serveur *serv)
 	}
 
 	allocate_world_board(&serv->world_hdl);
-
 	set_world_board_cases(&serv->world_hdl);
-
-	generate_ressources(&serv->world_hdl);
-
+	generate_ressources(serv, &serv->world_hdl);
 	generate_ressources_name(&serv->world_hdl);
-
-	// print_world_board(&serv->world_hdl); // Print the world map and resources.
-
 	printf(KGRN "Terrain generated successfully.\n" KRESET);
 
 }
@@ -104,10 +98,11 @@ void	set_world_board_cases(t_world_hdl *world_hdl)
 **	TODO: Add logical patterns (bioms?) to ressources generation.
 */
 
-void	generate_ressources(t_world_hdl *world_hdl)
+void	generate_ressources(t_serveur *serv, t_world_hdl *world_hdl)
 {
 	int		y;
 	int		x;
+	(void)	serv;
 
 	y = 0;
 	x = 0;
@@ -116,7 +111,6 @@ void	generate_ressources(t_world_hdl *world_hdl)
 	{
 		while (x < world_hdl->map_x)
 		{
-			// generate_ressources_flat(world_hdl);
 			generate_ressources_diced(world_hdl, x, y);
 			x++;
 		}
@@ -129,9 +123,9 @@ void	generate_ressources(t_world_hdl *world_hdl)
 **	This is the flat ressource generation. Just a simple random.
 */
 
-void generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
+void	generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
 {
-	world_hdl->world_board[y][x].ressources[FOOD] = rand() % 10;
+	world_hdl->world_board[y][x].ressources[FOOD] = (rand() % 10);
 	world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 10;
 	world_hdl->world_board[y][x].ressources[DERAUMERE] = rand() % 10;
 	world_hdl->world_board[y][x].ressources[SIBUR] = rand() % 10;
@@ -146,13 +140,13 @@ void generate_ressources_flat(t_world_hdl *world_hdl, int x, int y)
 **	This is a random of rarity.
 */
 
-void generate_ressources_diced(t_world_hdl *world_hdl, int x, int y)
+void	generate_ressources_diced(t_world_hdl *world_hdl, int x, int y)
 {
-	int dice;
+	int		dice;
 
 	dice = rand() % 100; // d100 cast.
-	if (dice < 60) // 70% that case has food.
-		world_hdl->world_board[y][x].ressources[FOOD] = rand() % 6;
+	if (dice < 70) // 70% that case has food.
+		world_hdl->world_board[y][x].ressources[FOOD] = rand() % 40;
 	dice = rand() % 100;
 	if (dice < 60) // 60% that case has linemate.
 		world_hdl->world_board[y][x].ressources[LINEMATE] = rand() % 8;
@@ -172,6 +166,36 @@ void generate_ressources_diced(t_world_hdl *world_hdl, int x, int y)
 	if (dice < 15) // 15% that case has thystame.
 		world_hdl->world_board[y][x].ressources[THYSTAME] = rand() % 2;
 }
+
+/*
+**	Add ressources to make more winning games. Aborted idea, too much problems
+**	results from overloading cases.
+*/
+
+void	generate_added_ressources(t_serveur *serv, t_world_hdl *world_hdl, int x, int y)
+{
+	int		mult_coef;
+	int		map_area_coef;
+
+	mult_coef = (VICTORY_CDT_PLAYER_NB - serv->team_hdl.nb_teams_slots) + serv->team_hdl.nb_teams;
+	map_area_coef = (world_hdl->map_x * world_hdl->map_y) / 50;
+	mult_coef -= map_area_coef;
+	if (mult_coef < 0)
+	{
+		mult_coef = 0;
+	}
+	world_hdl->world_board[y][x].ressources[FOOD] += (world_hdl->world_board[y][x].ressources[FOOD] * mult_coef);
+	world_hdl->world_board[y][x].ressources[LINEMATE] += (world_hdl->world_board[y][x].ressources[LINEMATE] * mult_coef);
+	world_hdl->world_board[y][x].ressources[DERAUMERE] += (world_hdl->world_board[y][x].ressources[DERAUMERE] * mult_coef);
+	world_hdl->world_board[y][x].ressources[SIBUR] += (world_hdl->world_board[y][x].ressources[SIBUR] * mult_coef);
+	world_hdl->world_board[y][x].ressources[MENDIANE] += (world_hdl->world_board[y][x].ressources[MENDIANE] * mult_coef);
+	world_hdl->world_board[y][x].ressources[PHIRAS] += (world_hdl->world_board[y][x].ressources[PHIRAS] * mult_coef);
+	world_hdl->world_board[y][x].ressources[THYSTAME] += (world_hdl->world_board[y][x].ressources[THYSTAME] * mult_coef);
+}
+
+/*
+**	Utility function to display the content of each case of the world board.
+*/
 
 void	print_world_board(t_world_hdl *world_hdl)
 {

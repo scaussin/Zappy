@@ -90,8 +90,10 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	public void ParseMsg(string msg)
 	{
-		Debug.Log ("Parsing: [" + msg + "]");
-
+		if (GameManager.instance.DebugPrintMode)
+		{
+			Debug.Log ("Parsing: [" + msg + "]");
+		}
 		// We dont want to execute every regex parsing method when we found the one we needed.
 		// The most likely receivable msg should at the top.
 		// Optimization pass: we check the first three chars before checking the rest.
@@ -145,6 +147,8 @@ public class MsgBroadcastController : MonoBehaviour
 			return;
 		else if (msg.StartsWith ("sbp") && CatchBadParameterForCmd (msg))
 			return;
+		else
+			Debug.LogError ("Unknown Command received from the server: " + msg);
 	}
 
 /* *************************************************************************************** 	*
@@ -185,7 +189,10 @@ public class MsgBroadcastController : MonoBehaviour
 			GameManager.instance.WorldSettings.WorldX = int.Parse(groups[1].Value);
 			GameManager.instance.WorldSettings.WorldY = int.Parse(groups[2].Value);
 
-			Debug.Log ("Success - Received world size");
+			if (GameManager.instance.DebugPrintMode)
+			{
+				Debug.Log ("Success - Received world size");
+			}
 			GameManager.instance.GameController.OnWorldSizeReceivedAction(); // call back to GameController, cause the timing is undetermined.
 			return (true);
 		}
@@ -205,19 +212,42 @@ public class MsgBroadcastController : MonoBehaviour
 		{
 			float calculatedTimescale;
 			groups = match.Groups;
-			GameManager.instance.WorldSettings.TimeUnit = float.Parse (groups [1].Value);
-			// May be incorrect, to be checked.
-			calculatedTimescale = (float) (1.0f / GameManager.instance.WorldSettings.TimeUnit);
-			Debug.Log ("calculated timescale = " + calculatedTimescale.ToString ());
 
-			if (calculatedTimescale > 100.0f) {
-				GameManager.instance.WorldSettings.InstantTimeMode = true;
-				Time.timeScale = 100;
-			} else {
-				GameManager.instance.WorldSettings.InstantTimeMode = false;
+			// Change game manager time unit for translations.
+			GameManager.instance.WorldSettings.TimeUnit = float.Parse (groups [1].Value);
+			Debug.Log ("Gfx time unit = " + GameManager.instance.WorldSettings.TimeUnit.ToString ());
+
+			// makes a reverse calculation of the time unit, as the reference is 1.
+			calculatedTimescale = (float) (1.0f / GameManager.instance.WorldSettings.TimeUnit);
+			if (GameManager.instance.DebugPrintMode)
+			{
+				Debug.Log ("calculated timescale = " + calculatedTimescale.ToString ());
+			}
+			// Unity timescale limit check
+			if (calculatedTimescale <= 100)
+			{
 				Time.timeScale = (int)calculatedTimescale;
 			}
-			Debug.Log ("Success - Received World Time unit");
+			else
+			{
+				Time.timeScale = 100;
+			}
+
+			// soft optimization limit for animation disabling.
+			if (calculatedTimescale > 50)
+			{
+				GameManager.instance.WorldSettings.InstantTimeMode = true;
+				GameManager.instance.GameController.TurnOffAllAnimator ();
+			}
+			else
+			{
+				GameManager.instance.WorldSettings.InstantTimeMode = false;
+				GameManager.instance.GameController.TurnOnAllAnimator ();
+			}
+			if (GameManager.instance.DebugPrintMode)
+			{
+				Debug.Log ("Success - Received World Time unit");
+			}
 			GameManager.instance.GameController.OnTimeUnitReceived(msg);
 			return (true);
 		}
@@ -392,11 +422,11 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchPlayerBroadcast(string msg)
 	{
-		rgx = new Regex("^pbc #\\d+ \\w+$");
+		rgx = new Regex("^pbc #\\d+ [\\w ']+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
-			GameManager.instance.GameController.OnPlayerExpulseReception (msg);
+			GameManager.instance.GameController.OnPlayerBroadcast (msg);
 			return (true);
 		}
 		return (false);
@@ -564,7 +594,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchGameOver(string msg)
 	{
-		rgx = new Regex("^seg \\w+$");
+		rgx = new Regex("^seg [\\w ]+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{
@@ -598,7 +628,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchBadParameterForCmd(string msg)
 	{
-		rgx = new Regex("^suc$");
+		rgx = new Regex("^sbp$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{

@@ -24,15 +24,20 @@ public class GameController : MonoBehaviour {
 	public UnityEvent	OnTimeUnitModified;
 	public UnityEvent	OnWorldSizeReceived;
 
+	// optimization references
+	private PlayerController	PlayerControllerScript;
+
 	void Awake()
 	{
 		OnTimeUnitModified = new UnityEvent ();
 		CameraViewControl = GameObject.Find ("CameraRoot");
+
 	}
 
 	// Use this for initialization
 	void Start () {
-		GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
+		PlayerControllerScript = GameManager.instance.WorldManager.PlayerController;
+		//GameManager.instance.MainMenuController.OnServerInfoSelected.AddListener (OnServerInfoEntered);
         GameManager.instance.ConnectionManager.OnConnectionFailed.AddListener(OnConnectionFailedAction);
 		GameManager.instance.ConnectionManager.OnConnectionWithServer.AddListener (OnConnectionWithServerAction);
 
@@ -69,12 +74,12 @@ public class GameController : MonoBehaviour {
     /// </summary>
 	public void		OnServerInfoEntered()
 	{
-        // desactivate menu.
-		//GameManager.instance.MainMenuController.DeactivateMainPanelInput ();
-
 		GameManager.instance.MainMenuController.MainPanelScript.CanEnterInput = false;
+		GameManager.instance.MainMenuController.DeactivateMainPanelInputs ();
 		InMainMenu = false;
 		SelectingServerInfos = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isHostnameSet = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isPortSet = false;
         GameManager.instance.ConnectionManager.ConnectToServer ();
 	}
 
@@ -86,6 +91,8 @@ public class GameController : MonoBehaviour {
 		ActivateMainMenuInput();
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Failed to connect to server -";
+		GameManager.instance.MainMenuController.MainPanelScript.isHostnameSet = false;
+		GameManager.instance.MainMenuController.MainPanelScript.isPortSet = false;
 		DisablePlayerCameraControl ();
 	}
 
@@ -99,6 +106,7 @@ public class GameController : MonoBehaviour {
 
     /// <summary>
     /// Called when connection is successful and the client is authentified. Starts spawning the world blocks.
+	///  -----------> equals ON GAME START 
     /// </summary>
 	public void		OnWorldSizeReceivedAction()
 	{
@@ -108,6 +116,14 @@ public class GameController : MonoBehaviour {
 		EnablePlayerCameraControl ();
 		IsWorldSpawned = true;
 		InGame = true;
+
+		// activate analyzer tool;
+		GameManager.instance.MainMenuController.InGameMenuController.
+		AnalyzerToolPanel.
+		GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = true;
+		// active time control tool
+		GameManager.instance.MainMenuController.InGameMenuController.
+		TimeControlPanel.SetActive (true);
 	}
 
 	public void		SetWorldBlockRessources(string msg)
@@ -152,44 +168,76 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public void OnServerShutdown()
 	{
+		// ----- Visual cleaning 
 		ActivateMainMenuInput();
-		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
-		GameManager.instance.PlayerManager.CleanPlayerManager ();
+		// deactivate analyzer tool;
+		GameManager.instance.MainMenuController.InGameMenuController.
+			AnalyzerToolPanel.
+			GetComponent<UIAnalyzerToolPanelScript> ().CanSelect = false;
+		GameManager.instance.MainMenuController.InGameMenuController.
+		AnalyzerToolPanel.GetComponent<UIAnalyzerToolPanelScript> ().DesactivateAnalyzerTool ();
+
+		// hide and desactivate ui time control.
+		GameManager.instance.MainMenuController.InGameMenuController.HideTimeControlMenu();
+		// set the menu animation in motion.
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
+
+		// ----- Data cleaning.
+		GameManager.instance.ConnectionManager.DisconnectServer();
+		InGame = false;
+		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
+		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
+		GameManager.instance.WorldManager.PlayerController.CleanMapOfEggs ();
+		GameManager.instance.PlayerManager.CleanPlayerManager ();
 		GameManager.instance.WorldManager.WorldBoardSpawner.DeleteWorld ();
+
+		// set Main menu UI message.
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost-";
 		DisablePlayerCameraControl ();
 	}
 
 	/// <summary>
-	/// Called when a team has won, or all players are dead.
+	/// Called when a team has won.
 	/// </summary>
 	public void	OnGameOver(string msg)
 	{
-		Debug.Log ("Received Game over, but its not yet implemented");
+		GameManager.instance.MainMenuController.GameOverMenuController.ActivateGameOver (msg);
 	}
 
 	public void OnUnknownCmdReception(string msg)
 	{
-		Debug.Log ("Received an unknown command");
-		// TODO: think about this, maybe we should ask for some infos
-		// 		 from server?
+		Debug.LogWarning ("Server received an unknown command");
 	}
 
 	public void OnBadParameterForCmd(string msg)
 	{
-		Debug.Log ("Received a bad parameter for a command");
-		// TODO: think about this, maybe we should ask for some infos
-		// 		 from server?
+		Debug.LogWarning ("Server received a bad parameter for a command");
 	}
 
 /* *************************************************************************************** 	*
  * 																							*		
  *	Game events Methods																		*
- *	All these methods may or not call other component to activate.							*
+ *	All these methods may or not call other components to activate.							*
  * 																							*
  * ***************************************************************************************	*/
+
+	/// <summary>
+	/// Turns the off all animators. Optimization method for high time scale use.
+	/// </summary>
+	public void TurnOffAllAnimator()
+	{
+		foreach (PlayerObject player in GameManager.instance.PlayerManager.ConnectedPlayers) {
+			player.gameObject.GetComponent<Animator> ().enabled = false;
+		}
+	}
+
+	public void TurnOnAllAnimator()
+	{
+		foreach (PlayerObject player in GameManager.instance.PlayerManager.ConnectedPlayers) {
+			player.gameObject.GetComponent<Animator> ().enabled = true;
+		}
+	}
 
 	public void OnTimeUnitReceived(string msg)
 	{
@@ -206,6 +254,7 @@ public class GameController : MonoBehaviour {
 		if (IsWorldSpawned) // we dont want player to spawn on empty ground.
 		{
 			GameManager.instance.WorldManager.ActorSpawner.SpawnNewPlayer (msg);
+			GameManager.instance.StatisticManager.NbOfConnections += 1;
 		}
 		else
 		{
@@ -215,81 +264,84 @@ public class GameController : MonoBehaviour {
 
 	public void OnPlayerMovement(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.MovePlayer (msg);
+		PlayerControllerScript.MovePlayer (msg);
+		GameManager.instance.StatisticManager.MoveActionNb += 1;
 	}
 
 	// Also handle player disconnection.
 	public void OnPlayerDeath(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.KillPlayer (msg);
+		PlayerControllerScript.KillPlayer (msg);
+		GameManager.instance.StatisticManager.DeathNumber += 1;
 	}
 
 	public void OnPlayerLevelReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.SetPlayerLevel (msg);
+		PlayerControllerScript.SetPlayerLevel (msg);
 	}
 
 	public void OnPlayerInventoryReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.SetPlayerInventory (msg);
+		PlayerControllerScript.SetPlayerInventory (msg);
 	}
 
 	public void OnPlayerExpulseReception(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerExpulse (msg);
+		PlayerControllerScript.PlayerExpulse (msg);
 	}
 
 	public void OnPlayerBroadcast(string msg)
 	{
-		Debug.Log ("Received broadcast cmd, but its not yet implemented");
-		// TODO: think about the broadcast system. Spawn an object? make a particle effect?
-		// 		  need to be defined.
+		PlayerControllerScript.PlayerBroadcast (msg);
+		GameManager.instance.StatisticManager.BroadcastNb += 1;
 	}
 
 	public void OnPlayerIncantation(string msg)
 	{
-		Debug.Log ("Received incantation cmd, but its not yet implemented");
-		// TODO: think about the incantation system.
+		PlayerControllerScript.IncantationStart (msg);
+		GameManager.instance.StatisticManager.IncantationCount += 1;
 	}
 
 	public void OnIncantationEnd(string msg)
 	{
-		Debug.Log ("Received incantation end, but its not yet implemented");
-		// TODO: think about the incantation system.
-	}
-
-	public void OnPlayerStartLayEgg(string msg)
-	{
-		Debug.Log ("Received Player starts lay egg, but its not yet implemented");
+		PlayerControllerScript.IncantationEnd (msg);
 	}
 
 	public void OnPlayerDropRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerDropRessource (msg);
+		PlayerControllerScript.PlayerDropRessource (msg);
+		GameManager.instance.StatisticManager.DropNb += 1;
 	}
 
 	public void OnPlayerTakeRessource(string msg)
 	{
-		GameManager.instance.WorldManager.PlayerController.PlayerTakeRessource (msg);
+		PlayerControllerScript.PlayerTakeRessource (msg);
+		GameManager.instance.StatisticManager.PickUpNb += 1;
+	}
+
+	public void OnPlayerStartLayEgg(string msg)
+	{
+		PlayerControllerScript.PlayerStartsLaying (msg);
 	}
 
 	public void OnPlayerLayedEgg(string msg)
 	{
-		Debug.Log ("Received Player layed egg, but its not yet implemented");
+		PlayerControllerScript.PlayerFinishEggLaying (msg);
+		GameManager.instance.StatisticManager.EggCount += 1;
 	}
 
 	public void OnEggHatched(string msg)
 	{
-		Debug.Log ("Received egg hatched, but its not yet implemented");
+		PlayerControllerScript.HatchEgg (msg);
 	}
 
 	public void OnEggPlayerConnection(string msg)
 	{
-		Debug.Log ("Received egg player connection, but its not yet implemented");
+		PlayerControllerScript.EggPlayerConnection (msg);
 	}
 
 	public void OnHatchedEggDeath(string msg)
 	{
-		Debug.Log ("Received hatched egg death, but its not yet implemented");
+		PlayerControllerScript.EggDeath (msg);
 	}
 }

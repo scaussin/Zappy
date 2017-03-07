@@ -45,7 +45,7 @@ void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur, char *
 	}
 	push_gfx_msg(serv, gfx_msg);
 	free(gfx_msg);
-	
+
 }
 
 /*
@@ -61,7 +61,7 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur, char *param)
 	t_player		*cur_player;
 	int				*target_res;
 	char			*client_msg;
-	
+
 	cur_player = &client_cur->player;
 	target_res = set_incantation_target_res(cur_player->level);
 	if (are_incantation_cdts_ok(serv, cur_player, target_res))
@@ -239,6 +239,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	printf(KGRN "[Server]: Incantation #%d ending.\n", cur_client->player.incantation_id);
 	clients_tmp = serv->client_hdl.list_clients;
 	incanter_player = &cur_client->player;
+	// for the other players -> not the incanter.
 	while (clients_tmp)
 	{
 		if (&clients_tmp->player != incanter_player
@@ -246,6 +247,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 			&& clients_tmp->player.pos.y == incanter_player->pos.y
 			&& clients_tmp->player.level == incanter_player->level
 			&& clients_tmp->player.is_incanting == 1
+			&& clients_tmp->is_player_dead == 0
 			&& clients_tmp->player.incantation_id == incanter_player->incantation_id)
 		{
 			clients_tmp->player.is_incanting = 0;
@@ -256,6 +258,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 			{
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] -= 1;
 				clients_tmp->player.level += 1;
+				clients_tmp->player.nb_see_case = get_nb_case(clients_tmp->player.level);
 				clients_tmp->team->nb_players_per_lv[clients_tmp->player.level - 1] += 1;
 			}
 			// send client: "niveau actuel : K"
@@ -273,10 +276,13 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 	}
 	// Incanter must be lvled up separately and after the others.
 	// Because modifiying his datas makes the upper loop impossible.
-	if (result == 1)
+	// Also, if he died of hunger during incantation, he does not level up,
+	// and dies after the incantation is over.
+	if (result == 1 && cur_client->player.inventory[FOOD] > 0)
 	{
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] -= 1;
 		cur_client->player.level += 1;
+		cur_client->player.nb_see_case = get_nb_case(cur_client->player.level);
 		cur_client->team->nb_players_per_lv[cur_client->player.level - 1] += 1;
 
 		// send client: "niveau actuel : K"
@@ -299,7 +305,7 @@ void	finish_incantation(t_serveur *serv, t_client_entity *cur_client, int result
 		cur_client->player.pos.x,
 		cur_client->player.pos.y);
 	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, msg);
-	free(msg);	
+	free(msg);
 }
 
 /*

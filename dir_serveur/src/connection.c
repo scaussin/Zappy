@@ -1,80 +1,66 @@
 #include "../includes/serveur.h"
 
-SOCKET	accept_connection(t_serveur *serv)
+/*
+**	All connections are accepted by the program. They will be checked 
+**	and closed if needed in the authentification process.
+*/
+
+SOCKET		accept_connection(t_serveur *serv)
 {
 	SOCKET			c_sock;
 	SOCKADDR_IN		c_sin;
 	socklen_t		c_sin_size;
-	int				i;
-	int 			n_available_slots;
 
-	i = 0;
-	n_available_slots = 0;
+	if (serv->client_hdl.nb_clients > MAX_CLIENTS_CONNECTED)
+	{
+		printf(KMAG "- Connection refused, too many clients connected.\n" KRESET);
+		return (-1);
+	}
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
 	{
 		perror("accept()");
 	}
-	while (i < serv->team_hdl.nb_teams)
-	{
-		n_available_slots += serv->team_hdl.array_teams[i].available_slots;
-		i++;
-	}
-	if (n_available_slots == 0)
-	{
-		printf(KRED "No available slot\n" KRESET);
-		if (c_sock > 0)
-			close(c_sock);
-		return (-1);
-	}
 	return (c_sock);
 }
 
-void new_client_connection(t_serveur *serv)
+/*
+**	This function will create a client on the server's global struct
+**	and send it the "BIENVENUE\n" message.
+**	At this point, we dont know if it is a client player, or gfx,
+**	Until the said player responds and get through authentification.
+*/
+
+void		new_client_connection(t_serveur *serv)
 {
 	SOCKET				c_sock;
 	t_client_entity		*client;
 
-	// Debug Print
 	printf(KGRN "\n- New client connection process started -\n" KRESET);
-
-	// Accept connection
 	if ((c_sock = accept_connection(serv)) < 0)
 		return ;
-
-	// Create Client and send "BIENVENUE\n"
 	client = create_client(c_sock);
-
-	// Sending BIENVENUE\n message.
 	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
-
-	// Set network Info
 	serv->network.sock_max = c_sock > serv->network.sock_max ? c_sock : serv->network.sock_max;
-
 	printf("sock_max: %d\n", serv->network.sock_max);
-	// Add client to the list
 	add_client(serv, client);
-
-	// Debug Print
 	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
 }
 
-void disconnect_client(SOCKET c_sock)
+void		disconnect_client(SOCKET c_sock)
 {
 	char	*buff;
 
 	buff = (char *)s_malloc(sizeof(char) * BUFF_SIZE);
-	// Debug Print
 	memset((void *)buff, 0, BUFF_SIZE);
 	sprintf(buff, "Client disconnected, sock : %d", c_sock);
 	printf("%s%s%s\n", KRED, buff, KRESET);
-
 	close(c_sock);
 	free(buff);
 }
 
-void close_all_connections(t_serveur *serv)
+void		close_all_connections(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 

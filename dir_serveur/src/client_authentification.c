@@ -85,9 +85,15 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client, char *
 			client->player.pos.x = egg->pos.x;
 			client->player.pos.y = egg->pos.y;
 			client->player.dir = rand() % 4;
+
+			client->player.cur_case = &(serv->world_hdl
+				.world_board[client->player.pos.y][client->player.pos.x]);
+			client->player.cur_case->nb_players += 1;
+
 			clear_egg(serv, egg);
 			// gfx egg connection "ebo #e\n"
 			asprintf(&str_to_send, "ebo #%d\n", egg->egg_nb);
+			push_gfx_msg(serv, str_to_send);
 			free(str_to_send);
 
 			printf(KGRN "[Serveur]: Client #%d connected as egg #%d\n" KRESET,

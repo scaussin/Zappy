@@ -7,9 +7,11 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 	[Header("Associated objects")]
 	public GameObject					BlockPrefab;
-	public GameObject					ZeroPoint;
+	public Vector3						ZeroPoint;
 	public GameObject					BlockContainer;
 
+	[Header("Block random mats")]
+	public List<Material>				BlockMats;
 
 	[System.Serializable]
 	public class WorldBoard
@@ -18,8 +20,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 	}
 
 	[Header("Access to each spawned block")]
-	public List <WorldBoard> Blocks_col;
-
+	public List <WorldBoard>			GameWorldBoard; // access with GameWorldBoard[y].Row[x]
 
 	public int							map_size_x;
 	public int							map_size_y;
@@ -31,16 +32,26 @@ public class WorldBoardSpawner : MonoBehaviour {
 	private int							cur_x;
 
 	private Vector3						spawn_location;
+	private Vector3						spawn_rotation;
+	private float						spawn_rotation_val;
 
 	private float						x_base_offset;
 	private float						z_base_offset;
 
 	// Use this for initialization
-	void Awake () {
-		ZeroPoint = transform.Find("ZeroPoint").gameObject;
+	void Awake ()
+	{
+		ZeroPoint = GameManager.instance.WorldSettings.BoardZeroPoint;
 		BlockContainer = transform.Find("BlockContainer").gameObject;
 		BlockPrefab = Resources.Load ("Prefabs/World/Block") as GameObject;
 		OnWorldBoardSpawned = new UnityEvent ();
+
+		// Get blocks material for randomization
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_1") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_2") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_3") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_4") as Material);
+		BlockMats.Add(Resources.Load ("Materials/Blocks/Block_base_5") as Material);
 	}
 
 	/// <summary>
@@ -51,7 +62,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 	/// <param name="y">The y coordinate. (server map)</param>
 	public BlockObject	GetBlockObject(int x, int y)
 	{
-		return (Blocks_col[y].Row[x].GetComponent<BlockObject> ());
+		return (GameWorldBoard[y].Row[x].GetComponent<BlockObject> ());
 	}
 
 	/// <summary>
@@ -75,23 +86,35 @@ public class WorldBoardSpawner : MonoBehaviour {
 							GameManager.instance.WorldSettings.BlockSpacing;
 		z_base_offset = GameManager.instance.WorldSettings.BlockSize +
 							GameManager.instance.WorldSettings.BlockSpacing;
-		spawn_location = ZeroPoint.transform.position;
+		spawn_location = ZeroPoint;
+
+		spawn_rotation = this.transform.eulerAngles;
 
 		// ---- Actual block spawn.
 		Debug.Log ("Spawning World Blocks!!");
-		Blocks_col = new List<WorldBoard> ();
+		GameWorldBoard = new List<WorldBoard> ();
 		while (cur_y < map_size_y)
 		{
-			Blocks_col.Add(new WorldBoard ());
-			Blocks_col[cur_y].Row = new List<GameObject> ();
+			GameWorldBoard.Add(new WorldBoard ());
+			GameWorldBoard[cur_y].Row = new List<GameObject> ();
 			while (cur_x < map_size_x)
 			{
+				int rand;
+				rand = Random.Range (0, 1);
+				if (rand == 1)
+					spawn_rotation.y += 90;
+				else
+					spawn_rotation.y -= 90;
 				// location is set through additionning variables -> faster calculation method.
 				GameObject new_block = (GameObject)Instantiate (BlockPrefab, spawn_location,
-											Quaternion.identity, BlockContainer.transform);
+					Quaternion.Euler(spawn_rotation), BlockContainer.transform);
 				new_block.GetComponent<BlockObject> ().x = cur_x;
 				new_block.GetComponent<BlockObject> ().y = cur_y;
-				Blocks_col[cur_y].Row.Add(new_block);
+
+				// 
+				new_block.GetComponent<BlockObject> ().BlockModelObj.GetComponent<MeshRenderer> ().material = BlockMats[Random.Range (0, BlockMats.Count)];
+
+				GameWorldBoard[cur_y].Row.Add(new_block);
 				new_block.isStatic = true;
 				cur_x++;
 				spawn_location.x += x_base_offset;
@@ -99,7 +122,7 @@ public class WorldBoardSpawner : MonoBehaviour {
 			cur_y++;
 			cur_x = 0;
 			// reset x positionning.
-			spawn_location.x = ZeroPoint.transform.position.x;
+			spawn_location.x = ZeroPoint.x;
 			spawn_location.z += z_base_offset;
 		}
 		OnWorldBoardSpawned.Invoke ();
@@ -107,13 +130,13 @@ public class WorldBoardSpawner : MonoBehaviour {
 
 	public void DeleteWorld()
 	{
-		for (int i = 0; i < Blocks_col.Count; i++)
+		for (int i = 0; i < GameWorldBoard.Count; i++)
 		{
-			for (int y = 0; y < Blocks_col [i].Row.Count; y++)
+			for (int y = 0; y < GameWorldBoard [i].Row.Count; y++)
 			{
-				Destroy (Blocks_col [i].Row[y].gameObject);
+				Destroy (GameWorldBoard [i].Row[y].gameObject);
 			}
 		}
-		Blocks_col.Clear ();
+		GameWorldBoard.Clear ();
 	}
 }
