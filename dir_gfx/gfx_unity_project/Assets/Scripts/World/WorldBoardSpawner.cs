@@ -62,7 +62,10 @@ public class WorldBoardSpawner : MonoBehaviour {
 	/// <param name="y">The y coordinate. (server map)</param>
 	public BlockObject	GetBlockObject(int x, int y)
 	{
-		return (GameWorldBoard[y].Row[x].GetComponent<BlockObject> ());
+		if (GameWorldBoard.Count > 0 && GameWorldBoard [y].Row.Count > 0)
+			return (GameWorldBoard [y].Row [x].GetComponent<BlockObject> ());
+		else
+			return null;
 	}
 
 	/// <summary>

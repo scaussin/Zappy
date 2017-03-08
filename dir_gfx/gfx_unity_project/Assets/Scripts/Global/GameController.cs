@@ -186,6 +186,7 @@ public class GameController : MonoBehaviour {
 		GameManager.instance.ConnectionManager.DisconnectServer();
 		InGame = false;
 		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
+		GameManager.instance.ConnectionManager.buffer_recv.ResetBuffer ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfEggs ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();

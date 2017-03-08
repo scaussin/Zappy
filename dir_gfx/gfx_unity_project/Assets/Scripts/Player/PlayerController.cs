@@ -114,8 +114,11 @@ public class PlayerController : MonoBehaviour {
 				if (player.AssignedNumber == player_nb)
 				{
 					// Found player to kill
-					Debug.Log ("Killing player #" + player.AssignedNumber);
-					GameManager.instance.PlayerManager.ConnectedPlayers.Remove (player);
+					if (GameManager.instance.DebugPrintMode)
+					{
+						Debug.Log ("Killing player #" + player.AssignedNumber);
+					}
+						GameManager.instance.PlayerManager.ConnectedPlayers.Remove (player);
 					Destroy(player.gameObject); // for now, its instant kill.
 					return ;
 				}
@@ -293,7 +296,6 @@ public class PlayerController : MonoBehaviour {
 			players_incanting_nb = new List<int> ();
 			foreach (string player_str_id in players_incanting_strarray)
 			{
-				Debug.Log ("[" + player_str_id + "]");
 				rgx = new Regex ("^#(\\d+)$");
 				match = rgx.Match (player_str_id);
 				if (match.Success)

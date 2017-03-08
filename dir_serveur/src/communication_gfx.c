@@ -98,6 +98,7 @@ void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
 			return ;
 		}
 		exec_gfx_cmd(serv, gfx_client, cmd, nb_of_parsed_chars);
+		return ;
 	}
 	printf(KMAG "[Serveur]: Unknown GFX command: %s on sock: %d\n" KRESET, cmd,
 		gfx_client->sock);
