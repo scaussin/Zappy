@@ -198,7 +198,7 @@ void									print_world_board(
 void									init_fd(t_serveur *serv);
 void									main_loop(t_serveur *serv);
 void									manage_clients_input(t_serveur *serv);
-void									check_fd(t_serveur *serv);
+int										check_fd(t_serveur *serv);
 
 /*
 ** connection.c

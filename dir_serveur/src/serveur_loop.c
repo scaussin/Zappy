@@ -53,20 +53,21 @@ void	main_loop(t_serveur *serv)
 				lower_time_end));
 		if (ret_select < 0)
 			exit_error("select()");
-		else if (ret_select > 0)
-			check_fd(serv);
+		else if (ret_select > 0 && check_fd(serv) != 0)
+			return ;
 		lower_time_end = exec_cmd_client(serv);
 	}
 }
 
-void	check_fd(t_serveur *serv)
+int		check_fd(t_serveur *serv)
 {
 	if (FD_ISSET(STDIN_FILENO, serv->network.read_fs))
-		return ;
+		return (1);
 	if (FD_ISSET(serv->network.sock_serveur, serv->network.read_fs))
 		new_client_connection(serv);
 	check_all_clients_communication(serv);
 	manage_clients_input(serv);
+	return (0);
 }
 
 /*
