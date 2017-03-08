@@ -25,7 +25,6 @@ class ClientCommunication
 		bool					isConnected;
 		bool					isAuthenticated;
 		ClientPlayer			*player;
-		
 
 		ClientBuffer			bufferRecv;
 		ClientBuffer			bufferSend;
