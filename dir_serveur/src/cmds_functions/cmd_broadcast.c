@@ -17,7 +17,7 @@ int		on_start_cmd_broadcast(t_serveur *serv, t_client_entity *client_cur,
 {
 	char				*msg;
 
-	if (!regex_match(param, "^[a-zA-Z0-9 ']+\n$"))
+	if (!regex_match(param, "^[a-zA-Z0-9 '<>]+\n$"))
 	{
 		printf(KMAG "Bad format to cmd [broadcast] "
 					"from sock %d\n" KRESET, client_cur->sock);

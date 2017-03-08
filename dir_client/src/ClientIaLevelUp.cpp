@@ -216,8 +216,10 @@ void	ClientIa::receiveBroadcast(string broadcast)
 {
 	smatch match;
 
+	//cout <<"broadcast:" << broadcast;
 	if (regex_search(broadcast, match, regex("message ([0-8]),qui veut incanter niveau ([2-8]) ([0-9]+)\n")))
 	{
+	//	cout <<"match broadcast:" << endl;
 		if (((state == slave || state == none) && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) != 0) 
 			|| (state == master && pid > stoi(match[3]) && player->getLevel() == stoi(match[2]) - 1))
 		{

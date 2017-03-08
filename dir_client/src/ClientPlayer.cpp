@@ -130,7 +130,7 @@ void	ClientPlayer::pose(string item)
 
 void	ClientPlayer::broadcast(string broadcast)
 {
-	bufferSend->pushMsg("broadcast [" + teamName + "] " + broadcast + "\n");
+	bufferSend->pushMsg("broadcast <" + teamName + "> " + broadcast + "\n");
 }
 
 void	ClientPlayer::fork(string noArg)

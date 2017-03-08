@@ -87,10 +87,13 @@ void	ClientCommunication::manageRecv()
 			else
 			{
 				smatch match;
-				if (regex_search(msg, match, regex("message [0-8],(\[.+]).+\n")))
+				if (regex_search(msg, match, regex("message [0-8],\\<(.+)\\>.+\n")))
 				{
 					if (match[1] == player->teamName)
-						ia->receiveBroadcast(msg.substr(14, player->teamName.size() + 2));
+					{
+						//cout <<"broadcast:" << msg.erase(10, player->teamName.size() + 3)<< endl;
+						ia->receiveBroadcast(msg.erase(10, player->teamName.size() + 3));
+					}
 				}
 				/*if (regex_match(msg, regex("message [0-8],(\[.+\]).+\n")))
 				{
