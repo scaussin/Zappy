@@ -211,7 +211,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void PlayerBroadcast(string msg)
 	{
-		rgx = new Regex ("^pbc #(\\d+) ([\\w ']+)$");
+		rgx = new Regex ("^pbc #(\\d+) ([\\w '\\<\\>]+)$");
 		match = rgx.Match (msg);
 		if (match.Success)
 		{
