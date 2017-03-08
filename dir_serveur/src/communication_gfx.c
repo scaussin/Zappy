@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   communication_gfx.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: scaussin <scaussin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:00:56 by scaussin          #+#    #+#             */
+/*   Updated: 2017/03/03 18:48:41 by scaussin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/serveur.h"
 
 /*
@@ -9,7 +21,7 @@ void	push_gfx_msg(t_serveur *serv, char *msg)
 	if (serv->client_hdl.gfx_client)
 	{
 		write_buffer(&(serv->client_hdl.gfx_client->buff_send),
-						msg, strlen(msg));
+			msg, strlen(msg));
 	}
 }
 
@@ -17,38 +29,33 @@ void	send_current_world_state(t_serveur *serv, t_client_entity *gfx_client)
 {
 	char				*msg;
 	t_client_entity		*tmp_client;
-	t_egg				*eggs;
-	
-	// sending World size
+
 	gfx_cmd_msz(serv, gfx_client, "msz\n");
-	// sending server time unit
 	gfx_cmd_sgt(serv, gfx_client, "sgt\n");
-	// Sending map content
-	// "bct X Y q q q q q q q\n" * nbr_cases
 	gfx_cmd_mct(serv, gfx_client, "mct\n");
-	// Sending team names
 	gfx_cmd_tna(serv, gfx_client, "tna\n");
-	// Sending currently connected players
 	tmp_client = serv->client_hdl.list_clients;
 	while (tmp_client)
 	{
-		// we dont want to send non authentified and the gfx
 		if (tmp_client->is_gfx == 0 && tmp_client->is_in_game == 1)
 		{
-			// send "pnw #n X Y O L N\n"
-			asprintf(&msg, "pnw #%d %d %d %d %d %s\n",
-				tmp_client->sock,
-				tmp_client->player.pos.x,
-				tmp_client->player.pos.y,
-				tmp_client->player.dir + 1, // +1 cause enum start at 0, and gfx protocol wants 1;
-				tmp_client->player.level,
+			asprintf(&msg, "pnw #%d %d %d %d %d %s\n", tmp_client->sock,
+				tmp_client->player.pos.x, tmp_client->player.pos.y,
+				tmp_client->player.dir + 1, tmp_client->player.level,
 				tmp_client->team->name);
 			push_gfx_msg(serv, msg);
 			free(msg);
 		}
 		tmp_client = tmp_client->next;
 	}
-	// Sending Spawned Eggs
+	send_spawned_eggs(serv);
+}
+
+void	send_spawned_eggs(t_serveur *serv)
+{
+	t_egg	*eggs;
+	char	*msg;
+
 	eggs = serv->world_hdl.eggs;
 	while (eggs)
 	{
@@ -66,7 +73,7 @@ void	lex_and_parse_gfx_cmds(t_serveur *serv, t_client_entity *gfx_client)
 {
 	char *cmd;
 
-	while ((cmd = get_first_cmd(&gfx_client->buff_recv))) // -> Buffer lexer.
+	while ((cmd = get_first_cmd(&gfx_client->buff_recv)))
 	{
 		parse_gfx_cmd(serv, gfx_client, cmd);
 		free(cmd);
@@ -75,12 +82,9 @@ void	lex_and_parse_gfx_cmds(t_serveur *serv, t_client_entity *gfx_client)
 
 void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
 {
-	int		i;
 	char	*arg_cmd;
 	int		nb_of_parsed_chars;
 
-	i = 0;
-	// Check for arguments
 	if (cmd[0] && cmd[0] != ' ')
 	{
 		if ((arg_cmd = strchr(cmd, ' ')))
@@ -89,26 +93,14 @@ void	parse_gfx_cmd(t_serveur *serv, t_client_entity *gfx_client, char *cmd)
 			nb_of_parsed_chars = strlen(cmd);
 		if (nb_of_parsed_chars > 4)
 		{
-			printf(KMAG "[Serveur]: gfx cmd too long (no gfx cmd takes more than 3 char):"
-						"%s on gfx client command parsing." KRESET, cmd);
+			printf(KMAG "[Serveur]: gfx cmd too long (no gfx cmd takes more "
+				"than 3 char): %s on gfx client command parsing." KRESET, cmd);
 			return ;
 		}
-
-		// parsing with gfx match table.
-		while (i < SIZE_GFX_CMD_MATCH_TABLE)
-		{
-			if (strncmp(serv->cmd_hdl.gfx_cmd_match_table[i].name,
-				cmd, nb_of_parsed_chars) == 0)
-			{
-				// -> Direct execution of cmds.
-				serv->cmd_hdl.gfx_cmd_match_table[i].on_end(serv, gfx_client, cmd);
-				return ;
-			}
-			i++;
-		}
+		exec_gfx_cmd(serv, gfx_client, cmd, nb_of_parsed_chars);
 	}
-	printf(KMAG "[Serveur]: Unknown GFX command: %s on sock: %d\n" KRESET, cmd, gfx_client->sock);
-	// send gfx "suc\n"
+	printf(KMAG "[Serveur]: Unknown GFX command: %s on sock: %d\n" KRESET, cmd,
+		gfx_client->sock);
 	write_buffer(&gfx_client->buff_send, "suc\n", 4);
 	return ;
 }

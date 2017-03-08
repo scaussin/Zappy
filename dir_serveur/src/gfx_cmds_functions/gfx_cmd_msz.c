@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   gfx_cmd_msz.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleung-c <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:27:46 by aleung-c          #+#    #+#             */
+/*   Updated: 2017/03/03 18:27:48 by aleung-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/serveur.h"
 
 /*
@@ -6,9 +18,6 @@
 
 void	gfx_cmd_msz(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
-	(void)serv;
-	(void)gfx_client;
-	(void)param;
 	char			*msg;
 
 	if (!regex_match(param, "^msz\n$"))

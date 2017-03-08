@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   gfx_cmd_tna.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleung-c <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:55:17 by aleung-c          #+#    #+#             */
+/*   Updated: 2017/03/03 18:55:18 by aleung-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/serveur.h"
 
 /*
@@ -6,16 +18,13 @@
 
 void	gfx_cmd_tna(t_serveur *serv, t_client_entity *gfx_client, char *param)
 {
-	(void)gfx_client;
-	(void)param;
 	int		x;
 	char	*msg;
 
 	x = 0;
 	if (!regex_match(param, "^tna\n$"))
 	{
-		printf(KMAG "Bad format to gfx cmd [tna] "
-					"from gfx client\n" KRESET);
+		printf(KMAG "Bad format to gfx cmd [tna] from gfx client\n" KRESET);
 		write_buffer(&gfx_client->buff_send, "sbp\n", 4);
 		return ;
 	}

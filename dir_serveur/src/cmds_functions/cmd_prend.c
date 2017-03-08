@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmd_prend.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleung-c <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:07:59 by aleung-c          #+#    #+#             */
+/*   Updated: 2017/03/03 18:08:01 by aleung-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/serveur.h"
 
-int		on_start_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
+int		on_start_cmd_prend(t_serveur *serv, t_client_entity *client_cur,
+							char *param)
 {
 	int			res;
 	char		*gfx_msg;
@@ -13,10 +26,7 @@ int		on_start_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *para
 		return (-1);
 	}
 	if (serv->settings_hdl.is_pickup_instant == B_TRUE)
-	{
 		cmd_prend(serv, client_cur, param);
-	}
-	// send prend cmd"pgt #n i\n"
 	res = parse_ressource_index(param);
 	asprintf(&gfx_msg, "pgt #%d %d\n", client_cur->sock, res);
 	push_gfx_msg(serv, gfx_msg);
@@ -24,51 +34,38 @@ int		on_start_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *para
 	return (0);
 }
 
-void	on_end_cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
+void	on_end_cmd_prend(t_serveur *serv, t_client_entity *client_cur,
+							char *param)
 {
 	char *gfx_msg;
 
 	if (serv->settings_hdl.is_pickup_instant == B_FALSE)
-	{
 		cmd_prend(serv, client_cur, param);
-	}
 	if (client_cur->list_cmds->success == 1)
 	{
 		write_buffer(&client_cur->buff_send, "ok\n", 3);
-		
-		// send inventaire "pin #n X Y q q q q q q q\n" through cmd gfx_cmd_pin.
 		asprintf(&gfx_msg, "pin #%d\n", client_cur->sock);
 		gfx_cmd_pin(serv, serv->client_hdl.gfx_client, gfx_msg);
 		free(gfx_msg);
-
-		// gfx world block ressource update.
-		asprintf(&gfx_msg, "bct %d %d\n",
-			client_cur->player.pos.x,
+		asprintf(&gfx_msg, "bct %d %d\n", client_cur->player.pos.x,
 			client_cur->player.pos.y);
 		gfx_cmd_bct(serv, serv->client_hdl.gfx_client, gfx_msg);
 		free(gfx_msg);
 	}
 	else
-	{
 		write_buffer(&client_cur->buff_send, "ko\n", 3);
-	}
-
 }
 
 void	cmd_prend(t_serveur *serv, t_client_entity *client_cur, char *param)
 {
-	(void)	serv;
 	int		res_i;
 
+	(void)serv;
 	if ((res_i = parse_ressource_index(param)) >= 0 &&
 		(try_to_take_res(&client_cur->player, res_i)) >= 0)
-	{
 		client_cur->list_cmds->success = 1;
-	}
 	else
-	{
 		client_cur->list_cmds->success = 0;
-	}
 }
 
 /*
@@ -82,26 +79,24 @@ int		parse_ressource_index(char *param)
 {
 	int		arg_len;
 
-	arg_len = strlen(param) - 1; // we dont want the \n
-	// Try to take the ressource from the ground for the corresponding ressource.
-	if (strncmp(param, "0", arg_len) == 0 || strncmp(param, "nourriture", arg_len) == 0)
+	arg_len = strlen(param) - 1;
+	if (dual_strncmp(param, "0", "nourriture", arg_len) == 0)
 		return (0);
-	else if (strncmp(param, "1", arg_len) == 0 || strncmp(param, "linemate", arg_len) == 0)
+	else if (dual_strncmp(param, "1", "linemate", arg_len) == 0)
 		return (1);
-	else if (strncmp(param, "2", arg_len) == 0 || strncmp(param, "deraumere", arg_len) == 0)
+	else if (dual_strncmp(param, "2", "deraumere", arg_len) == 0)
 		return (2);
-	else if (strncmp(param, "3", arg_len) == 0 || strncmp(param, "sibur", arg_len) == 0)
+	else if (dual_strncmp(param, "3", "sibur", arg_len) == 0)
 		return (3);
-	else if (strncmp(param, "4", arg_len) == 0 || strncmp(param, "mendiane", arg_len) == 0)
+	else if (dual_strncmp(param, "4", "mendiane", arg_len) == 0)
 		return (4);
-	else if (strncmp(param, "5", arg_len) == 0 || strncmp(param, "phiras", arg_len) == 0)
+	else if (dual_strncmp(param, "5", "phiras", arg_len) == 0)
 		return (5);
-	else if (strncmp(param, "6", arg_len) == 0 || strncmp(param, "thystame", arg_len) == 0)
+	else if (dual_strncmp(param, "6", "thystame", arg_len) == 0)
 		return (6);
 	else
 		printf(KMAG "Invalid parameter for cmd [%s]\n" KRESET, param);
 	return (-1);
-
 }
 
 /*

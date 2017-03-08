@@ -1,24 +1,37 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   connection.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: scaussin <scaussin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:49:29 by scaussin          #+#    #+#             */
+/*   Updated: 2017/03/03 18:49:37 by scaussin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/serveur.h"
 
 /*
-**	All connections are accepted by the program. They will be checked 
+**	All connections are accepted by the program. They will be checked
 **	and closed if needed in the authentification process.
 */
 
-SOCKET		accept_connection(t_serveur *serv)
+t_socket		accept_connection(t_serveur *serv)
 {
-	SOCKET			c_sock;
-	SOCKADDR_IN		c_sin;
-	socklen_t		c_sin_size;
+	t_socket			c_sock;
+	t_sockaddr_in		c_sin;
+	socklen_t			c_sin_size;
 
 	if (serv->client_hdl.nb_clients > MAX_CLIENTS_CONNECTED)
 	{
-		printf(KMAG "- Connection refused, too many clients connected.\n" KRESET);
+		printf(KMAG "- Connection refused, too many clients connected.\n"
+			KRESET);
 		return (-1);
 	}
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
-		(SOCKADDR *)&c_sin, &c_sin_size)) < 0)
+		(t_sockaddr *)&c_sin, &c_sin_size)) < 0)
 	{
 		perror("accept()");
 	}
@@ -32,9 +45,9 @@ SOCKET		accept_connection(t_serveur *serv)
 **	Until the said player responds and get through authentification.
 */
 
-void		new_client_connection(t_serveur *serv)
+void			new_client_connection(t_serveur *serv)
 {
-	SOCKET				c_sock;
+	t_socket			c_sock;
 	t_client_entity		*client;
 
 	printf(KGRN "\n- New client connection process started -\n" KRESET);
@@ -42,13 +55,14 @@ void		new_client_connection(t_serveur *serv)
 		return ;
 	client = create_client(c_sock);
 	write_buffer(&client->buff_send, "BIENVENUE\n", 10);
-	serv->network.sock_max = c_sock > serv->network.sock_max ? c_sock : serv->network.sock_max;
+	serv->network.sock_max = c_sock > serv->network.sock_max ? c_sock :
+	serv->network.sock_max;
 	printf("sock_max: %d\n", serv->network.sock_max);
 	add_client(serv, client);
 	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
 }
 
-void		disconnect_client(SOCKET c_sock)
+void			disconnect_client(t_socket c_sock)
 {
 	char	*buff;
 
@@ -60,7 +74,7 @@ void		disconnect_client(SOCKET c_sock)
 	free(buff);
 }
 
-void		close_all_connections(t_serveur *serv)
+void			close_all_connections(t_serveur *serv)
 {
 	t_client_entity	*p_client;
 
