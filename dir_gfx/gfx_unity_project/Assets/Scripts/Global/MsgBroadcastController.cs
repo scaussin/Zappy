@@ -148,7 +148,7 @@ public class MsgBroadcastController : MonoBehaviour
 		else if (msg.StartsWith ("sbp") && CatchBadParameterForCmd (msg))
 			return;
 		else
-			Debug.LogError ("Unknown Command received from the server: " + msg);
+			Debug.LogWarning ("Unknown Command received from the server: " + msg);
 	}
 
 /* *************************************************************************************** 	*
@@ -354,7 +354,7 @@ public class MsgBroadcastController : MonoBehaviour
 	/// <param name="msg">Message.</param>
 	private bool	CatchServerMessage(string msg)
 	{
-		rgx = new Regex("^smg \\w+$");
+		rgx = new Regex("^smg [\\w \\[\\]]+$");
 		match = rgx.Match(msg);
 		if (match.Success)
 		{

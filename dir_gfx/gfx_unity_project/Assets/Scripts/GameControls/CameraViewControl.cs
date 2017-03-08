@@ -26,7 +26,6 @@ public class CameraViewControl : MonoBehaviour {
 	// Camera rotation
 	private Vector3				newAngle;
 	private float				AngleXCount = 0.0f;
-	private float				AngleYCount = 0.0f;
 
 	// camera zoom
 	private Vector3				newpos;
