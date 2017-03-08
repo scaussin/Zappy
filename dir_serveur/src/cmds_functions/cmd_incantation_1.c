@@ -113,7 +113,7 @@ void		set_players_incanting(t_serveur *serv, t_client_entity *cur_client)
 		cur_player->level, cur_client->sock);
 	while (clients_tmp)
 	{
-		if ((other_incanting_player_cdts(serv, clients_tmp, cur_client)) == 1)
+		if ((other_incanting_player_cdts(serv, cur_client, clients_tmp)) == 1)
 		{
 			put_player_in_incantation(serv, cur_client, clients_tmp);
 			asprintf(&gfx_msg_cat, "%s #%d", gfx_msg, clients_tmp->sock);
