@@ -86,8 +86,17 @@ void	ClientCommunication::manageRecv()
 			}
 			else
 			{
-				if (regex_match(msg, regex("message [0-8],.+\n")))
+				smatch match;
+				if (regex_search(msg, match, regex("message [0-8],(\[.+]).+\n")))
+				{
+					if (match[1] == player->teamName)
+						ia->receiveBroadcast(msg.substr(14, player->teamName.size() + 2));
+				}
+				/*if (regex_match(msg, regex("message [0-8],(\[.+\]).+\n")))
+				{
+
 					ia->receiveBroadcast(msg);
+				}*/
 				else
 				{
 					ia->receiveCallbackCommand(msg);
