@@ -178,7 +178,7 @@ void	ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo()
 	{
 		state = none;
 		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-			"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon pas assez de monde)"));
+			"abandon de l'incantation level " + to_string(player->getLevel() + 1) + " fork", "[levelUp] broadcast(abandon pas assez de monde)"));
 		if (flagFork == false)
 		{
 			pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg");
@@ -269,6 +269,17 @@ void	ClientIa::receiveBroadcast(string broadcast)
 	}
 	else if (regex_search(broadcast, match, regex("message ([0-8]),abandon de l'incantation level ([2-8])\n")) && player->getLevel() == stoi(match[2]) - 1)
 	{
+		if (!isInLoopCheckFood())
+			loopCheckFood();
+		flagGoToBroadcaster = false;
+	}
+	else if (regex_search(broadcast, match, regex("message ([0-8]),abandon de l'incantation level ([2-8]) fork\n")) && player->getLevel() == stoi(match[2]) - 1)
+	{
+		if (flagFork == false)
+		{
+			pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg (pas assez de monde)");
+			flagFork = true;
+		}
 		if (!isInLoopCheckFood())
 			loopCheckFood();
 		flagGoToBroadcaster = false;
