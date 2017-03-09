@@ -51,10 +51,14 @@ void		put_player_in_incantation(t_serveur *serv,
 	int					client_msg_len;
 
 	(void)serv;
-	client_msg = strdup("elevation en cours\n");
-	client_msg_len = strlen(client_msg);
-	write_buffer(&clients_tmp->buff_send, client_msg, client_msg_len);
-	clients_tmp->player.is_incanting = 1;
-	clients_tmp->player.incantation_id = cur_client->player.incantation_id;
-	clients_tmp->player.is_incanter = 0;
+	if (cur_client && clients_tmp)
+	{
+		client_msg = strdup("elevation en cours\n");
+		client_msg_len = strlen(client_msg);
+		write_buffer(&clients_tmp->buff_send, client_msg, client_msg_len);
+		free(client_msg);
+		clients_tmp->player.is_incanting = 1;
+		clients_tmp->player.incantation_id = cur_client->player.incantation_id;
+		clients_tmp->player.is_incanter = 0;
+	}
 }

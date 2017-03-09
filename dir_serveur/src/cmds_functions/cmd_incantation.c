@@ -118,5 +118,6 @@ void	start_incantating(t_serveur *serv, t_client_entity *client_cur)
 	client_cur->player.is_incanter = 1;
 	client_msg = strdup("elevation en cours\n");
 	write_buffer(&client_cur->buff_send, client_msg, strlen(client_msg));
+	free(client_msg);
 	set_players_incanting(serv, client_cur);
 }

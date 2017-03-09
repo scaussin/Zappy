@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour {
 	private int					incantation_x;
 	private int					incantation_y;
 	private int					incantation_lv;
-	private GameObject			incantation_block_obj;
+	private BlockObject			incantation_block_obj;
 	private int					incantation_result;
 	private int					asked_egg_nb;
 
@@ -314,15 +314,16 @@ public class PlayerController : MonoBehaviour {
 				}
 			}
 			// set block status datas.
-			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.
-				GameWorldBoard [incantation_y].Row [incantation_x].gameObject;
+			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.GetBlockObject(incantation_x, incantation_y);
+			if (incantation_block_obj)
+			{
+				// add one ongoing incantation to the world block.
+				incantation_block_obj.Incantations_id.Add (Incantation_nb);
 
-			// add one ongoing incantation to the world block.
-			incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.Add(Incantation_nb);
-
-			// set the ground particle effect ON.
-			incantation_block_obj.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
+				// set the ground particle effect ON.
+				incantation_block_obj.gameObject.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
 				gameObject.SetActive (true);
+			}
 		}
 	}
 
@@ -337,13 +338,12 @@ public class PlayerController : MonoBehaviour {
 			incantation_x = int.Parse (groups [1].Value);
 			incantation_y = int.Parse (groups [2].Value);
 			incantation_result = int.Parse (groups [3].Value);
-			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.
-				GameWorldBoard [incantation_y].Row [incantation_x].gameObject;
-			if (incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.Count > 0)
+			incantation_block_obj = GameManager.instance.WorldManager.WorldBoardSpawner.GetBlockObject(incantation_x, incantation_y);
+			if (incantation_block_obj != null && incantation_block_obj.Incantations_id.Count > 0)
 			{
 				Debug.Log ("incantation end");
 				// we want the first launched incantation, because they finish in a chronological order(first in, first out);
-				int cur_incantation = incantation_block_obj.GetComponent<BlockObject> ().Incantations_id [0];
+				int cur_incantation = incantation_block_obj.Incantations_id [0];
 
 				foreach (PlayerObject player in Players) {
 					if (player.IsIncanting == true && player.IncantationId == cur_incantation) {
@@ -358,8 +358,8 @@ public class PlayerController : MonoBehaviour {
 					}
 				}
 				// set the ground particle effect OFF.
-				incantation_block_obj.GetComponent<BlockObject> ().Incantations_id.RemoveAt (0);
-				incantation_block_obj.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
+				incantation_block_obj.Incantations_id.RemoveAt (0);
+				incantation_block_obj.gameObject.transform.Find ("Effects").transform.Find ("IncantingSparkEffect").
 					gameObject.SetActive (false);
 			}
 		}

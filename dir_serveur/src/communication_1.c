@@ -120,7 +120,7 @@ void		disconnect_flagged_clients(t_serveur *serv)
 				push_gfx_msg(serv, msg);
 				free(msg);
 			}
-			disconnect_client(p_client->sock);
+			disconnect_client(p_client);
 			remove_client(serv, p_client);
 			p_client = serv->client_hdl.list_clients;
 		}

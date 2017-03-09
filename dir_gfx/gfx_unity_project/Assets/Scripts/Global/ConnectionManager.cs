@@ -32,11 +32,12 @@ public class ConnectionManager : MonoBehaviour
     [HideInInspector]
 	public int							ServerPort;
 	public bool							IsConnected = false;
+	public bool							IsDisconnecting = false;
     public bool                 		IsAuthenticated = false;
 	public bool							IsAuthMsgSend = false;
 
 	// private
-	public int							msg_size = 1024;
+	public int							msg_size = 8196;
 	public CircularBuffer				buffer_recv = new CircularBuffer();
 	public CircularBuffer				buffer_send = new CircularBuffer();
 
@@ -60,30 +61,42 @@ public class ConnectionManager : MonoBehaviour
 	/// </summary>
 	void Update()
 	{
-	    if (IsConnected)
+		if (IsDisconnecting == true)
+		{
+			ClientSocket.Close ();
+			IsConnected = false;
+			IsDisconnecting = false;
+		}
+	    else if (IsConnected)
         {
             // Use the SelectWrite enumeration to obtain Socket status.
-			if (ClientSocket.Poll(100, SelectMode.SelectRead))
-            {
+			if (ClientSocket.Poll (100, SelectMode.SelectRead))
+			{
 				// Check if server cut the connection.
 				if (ClientSocket.Available == 0)
 				{
 					Debug.Log ("Client Disconnected from server");
 					GameManager.instance.GameController.OnServerShutdown ();
 					IsConnected = false;
-					return ;
+					return;
 				}
 				ReadMsg ();
-            }
-			else if (ClientSocket.Poll(100, SelectMode.SelectWrite))
+			}
+			else if (ClientSocket.Poll (100, SelectMode.SelectWrite))
 			{
 				SendMsg ();
 			}
-			else if (ClientSocket.Poll(100, SelectMode.SelectError))
-            {
-                Debug.Log("This Socket has an error.");
-            }
+			else if (ClientSocket.Poll (100, SelectMode.SelectError))
+			{
+				Debug.LogWarning ("This Socket has an error.");
+			}
         }
+	}
+
+	public void DelaySocketClose()
+	{
+		ClientSocket.Close ();
+		IsConnected = false;
 	}
 
 	// to send msg to server, use ConnectionManager.buffer_send.pushMsg(string);
@@ -133,6 +146,7 @@ public class ConnectionManager : MonoBehaviour
         string port = GameManager.instance.Port;
         string hostname = GameManager.instance.Hostname;
 
+		IsDisconnecting = false;
         try
         {
             // -------------- Set the connection datas.
@@ -176,14 +190,15 @@ public class ConnectionManager : MonoBehaviour
     }
 
 	/// <summary>
-	/// Disconnects the server. Closes the socket to make sure the connection is cut.
+	/// Disconnects the server. It seems close() is too abrupt and causes "connection reset by peer".
+	/// Now, I set a flag and disconnect in the main loop.
 	/// </summary>
 	public void DisconnectServer()
 	{
 		if (ClientSocket.Connected == true)
 		{
-			ClientSocket.Close ();
-			IsConnected = false;
+			Debug.Log ("Disconnecting flag set");
+			IsDisconnecting = true;
 		}
 	}
 }

@@ -252,7 +252,7 @@ public class GameController : MonoBehaviour {
 	/// <param name="msg">Message.</param>
 	public void OnNewPlayerConnection(string msg)
 	{
-		if (IsWorldSpawned) // we dont want player to spawn on empty ground.
+		if (IsWorldSpawned && GameManager.instance.ConnectionManager.IsDisconnecting == false) // we dont want player to spawn on empty ground.
 		{
 			GameManager.instance.WorldManager.ActorSpawner.SpawnNewPlayer (msg);
 			GameManager.instance.StatisticManager.NbOfConnections += 1;
