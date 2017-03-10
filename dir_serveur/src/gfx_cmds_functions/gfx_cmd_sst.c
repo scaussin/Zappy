@@ -59,7 +59,7 @@ int		get_time_val(char *param, int *val, t_client_entity *gfx_client)
 
 int		sst_check_max(int new_t, t_client_entity *gfx_client)
 {
-	if (new_t > MAX_GAME_TIME_UNIT)
+	if (new_t > MAX_GAME_TIME_UNIT || new_t <= 0)
 	{
 		printf(KMAG "Bad format to cmd [sst] "
 				"from gfx client (max value = 1000)\n" KRESET);

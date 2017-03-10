@@ -83,7 +83,7 @@ public class TimeControlScript : MonoBehaviour {
 	{
 		timeDisplay = Mathf.RoundToInt(1.0f / GameManager.instance.WorldSettings.TimeUnit);
 		timeDisplay += 1;
-		// TODO: boundary check ?
+		// boundary check is done by server.
 		ChangeTimeValueTroughUI (timeDisplay.ToString ());
 	}
 

@@ -75,7 +75,7 @@
 **	Game defines
 */
 
-# define MAX_GAME_TIME_UNIT 1000
+# define MAX_GAME_TIME_UNIT 300
 # define MAX_MAP_AREA 10000
 # define MAX_NB_SLOT 20
 # define MAX_NB_OF_TEAM 10

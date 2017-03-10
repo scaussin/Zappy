@@ -86,13 +86,21 @@ public class GameOverMenuController : MonoBehaviour
 			GameManager.instance.StatisticManager.EggCount.ToString();
 	}
 
+	public void CloseGameOverMenu()
+	{
+		GameOverMenuUp = false;
+		GameOverPanelContainer.SetActive (false);
+	}
+
 	void Update()
 	{
 		if (GameOverMenuUp && (Input.GetKeyUp(enterKey) || Input.GetKeyUp(enterKeyAlt)))
 		{
-			GameOverMenuUp = false;
-			GameOverPanelContainer.SetActive (false);
-			GameManager.instance.GameController.OnServerShutdown();
+			if (GameManager.instance.ConnectionManager.IsConnected == true)
+			{
+				GameManager.instance.GameController.OnServerShutdown ();
+			}
+			CloseGameOverMenu ();
 		}
 	}
 }

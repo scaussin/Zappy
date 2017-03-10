@@ -170,6 +170,10 @@ public class GameController : MonoBehaviour {
 	{
 		// ----- Visual cleaning 
 		ActivateMainMenuInput();
+		if (GameManager.instance.MainMenuController.GameOverMenuController.GameOverMenuUp)
+		{
+			GameManager.instance.MainMenuController.GameOverMenuController.CloseGameOverMenu ();
+		}
 		// deactivate analyzer tool;
 		GameManager.instance.MainMenuController.InGameMenuController.
 			AnalyzerToolPanel.
@@ -203,7 +207,7 @@ public class GameController : MonoBehaviour {
 
 		// set Main menu UI message.
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
-		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost-";
+		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost -";
 	}
 
 	/// <summary>
