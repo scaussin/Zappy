@@ -83,6 +83,7 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur,
 {
 	t_player		*cur_player;
 	int				*target_res;
+	char			*msg;
 
 	(void)param;
 	cur_player = &client_cur->player;
@@ -97,7 +98,9 @@ int		init_incantation(t_serveur *serv, t_client_entity *client_cur,
 	}
 	else
 	{
-		write_buffer(&client_cur->buff_send, "ko\n", 3);
+		asprintf(&msg, "niveau actuel : %d\n", client_cur->player.level);
+		write_buffer(&client_cur->buff_send, msg, strlen(msg));
+		free(msg);
 		free(target_res);
 		return (-1);
 	}
@@ -113,8 +116,9 @@ void	start_incantating(t_serveur *serv, t_client_entity *client_cur)
 	cur_player = &client_cur->player;
 	serv->world_hdl.nb_of_incantations += 1;
 	cur_player->incantation_id = serv->world_hdl.nb_of_incantations;
-	printf(KGRN "[Server]: Incantation #%d starting ...\n",
-			cur_player->incantation_id);
+	printf(KGRN "[Server]: %s incantation #%d level %d starting ...\n" KRESET,
+			client_cur->team->name, cur_player->incantation_id,
+			cur_player->level + 1);
 	client_cur->player.is_incanter = 1;
 	client_msg = strdup("elevation en cours\n");
 	write_buffer(&client_cur->buff_send, client_msg, strlen(client_msg));

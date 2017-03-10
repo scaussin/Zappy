@@ -179,14 +179,23 @@ public class GameController : MonoBehaviour {
 
 		// hide and desactivate ui time control.
 		GameManager.instance.MainMenuController.InGameMenuController.HideTimeControlMenu();
+
 		// set the menu animation in motion.
 		GameManager.instance.MainMenuController.gameObject.GetComponent<Animator> ().SetTrigger ("BackToMenu");
+		GameManager.instance.ConnectionManager.DisconnectServer();
+		GameManager.instance.StatisticManager.CleanStats ();
 
 		// ----- Data cleaning.
-		GameManager.instance.ConnectionManager.DisconnectServer();
+		Invoke("DelayedWorldCleaning", 0.2f);
 		InGame = false;
+		DisablePlayerCameraControl ();
+	}
+
+	public void DelayedWorldCleaning()
+	{
 		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
 		GameManager.instance.ConnectionManager.buffer_recv.ResetBuffer ();
+
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfPlayers ();
 		GameManager.instance.WorldManager.PlayerController.CleanMapOfEggs ();
 		GameManager.instance.PlayerManager.CleanPlayerManager ();
@@ -195,7 +204,6 @@ public class GameController : MonoBehaviour {
 		// set Main menu UI message.
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.color = Color.red;
 		GameManager.instance.MainMenuController.MainPanelScript.ResponseText.text = "- Connection to server lost-";
-		DisablePlayerCameraControl ();
 	}
 
 	/// <summary>

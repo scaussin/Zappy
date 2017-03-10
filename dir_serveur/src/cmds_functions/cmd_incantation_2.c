@@ -25,8 +25,9 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 	t_client_entity		*clients_tmp;
 	char				*msg;
 
-	printf(KGRN "[Server]: Incantation #%d ending.\n",
-			cur_client->player.incantation_id);
+	printf(KGRN "[Server]: %s Incantation #%d level %d ending.\n" KRESET,
+		cur_client->team->name, cur_client->player.incantation_id,
+		cur_client->player.level);
 	clients_tmp = serv->client_hdl.list_clients;
 	while (clients_tmp)
 	{

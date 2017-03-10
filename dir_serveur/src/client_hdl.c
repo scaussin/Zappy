@@ -74,11 +74,16 @@ void			remove_client(t_serveur *serv, t_client_entity *client)
 	t_client_entity	*prev;
 
 	if (client->team)
-		client->team->available_slots += 1;
+	{
+		client->team->cur_nb_players -= 1;
+		if (client->team->cur_nb_players < serv->team_hdl.nb_teams_slots)
+			client->team->available_slots += 1;
+	}
 	if (serv->client_hdl.list_clients == client)
 	{
 		serv->client_hdl.list_clients = client->next;
 		free(client);
+		serv->client_hdl.nb_clients -= 1;
 		return ;
 	}
 	prev = serv->client_hdl.list_clients;

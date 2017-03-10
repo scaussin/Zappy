@@ -116,6 +116,7 @@ void	print_input_values(t_serveur *serv)
 	while (i < serv->team_hdl.nb_teams)
 	{
 		printf("  [%s]", serv->team_hdl.array_teams[i].name);
+		serv->team_hdl.array_teams[i].cur_nb_players = 0;
 		while (y < MAX_LV)
 		{
 			serv->team_hdl.array_teams[i].nb_players_per_lv[y] = 0;

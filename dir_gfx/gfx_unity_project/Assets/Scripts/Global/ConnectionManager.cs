@@ -129,7 +129,6 @@ public class ConnectionManager : MonoBehaviour
 			Debug.Log ("Received: [" + System.Text.Encoding.UTF8.GetString (buffer) + "]");
 		}
 		buffer_recv.pushBytes (buffer, ret);
-
 		return ;
 	}
 
@@ -147,6 +146,8 @@ public class ConnectionManager : MonoBehaviour
         string hostname = GameManager.instance.Hostname;
 
 		IsDisconnecting = false;
+		buffer_send.ResetBuffer ();
+		buffer_recv.ResetBuffer ();
         try
         {
             // -------------- Set the connection datas.

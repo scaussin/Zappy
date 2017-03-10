@@ -69,6 +69,13 @@ void	client_authenticate_player(t_serveur *serv, t_client_entity *client,
 {
 	t_team_entity	*team;
 
+	if (serv->client_hdl.nb_clients > MAX_CLIENTS_CONNECTED)
+	{
+		printf(KMAG "- Connection refused, too many clients connected.\n"
+			KRESET);
+		client->is_disconnecting = 1;
+		return ;
+	}
 	if (!(team = get_team_by_name(serv, cmd)))
 	{
 		printf(KRED "Get_team() failed: team name not found: %s\n" KRESET, cmd);
@@ -95,6 +102,7 @@ void	client_authenticate_slots_available(t_serveur *serv,
 
 	client->is_in_game = 1;
 	client->team = team;
+	client->team->cur_nb_players += 1;
 	asprintf(&str_to_send, "%d\n%d %d\n", team->available_slots,
 			serv->world_hdl.map_x, serv->world_hdl.map_y);
 	write_buffer(&client->buff_send, str_to_send, strlen(str_to_send));
