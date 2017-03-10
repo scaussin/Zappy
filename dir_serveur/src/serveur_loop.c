@@ -90,8 +90,8 @@ void	manage_clients_input(t_serveur *serv)
 			if (!p_client->is_in_game && !p_client->is_gfx &&
 				!p_client->is_player_dead)
 				client_authentification(serv, p_client);
-			else if (p_client->is_in_game && !p_client->is_player_dead &&
-				!p_client->is_gfx)
+			else if (!serv->victory_reached && p_client->is_in_game &&
+				!p_client->is_player_dead && !p_client->is_gfx)
 				lex_and_parse_cmds(p_client, serv->cmd_hdl.cmd_match_table);
 			else if (p_client->is_gfx)
 				lex_and_parse_gfx_cmds(serv, p_client);

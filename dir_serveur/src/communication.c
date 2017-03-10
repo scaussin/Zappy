@@ -14,6 +14,8 @@
 
 /*
 **	For each client, check if there is something to read on the socket.
+**	Check if that something is zero bytes, in which case its a 
+**	connection close.
 **	If there is, put the content into the client's circular buffer.
 **
 **	Also check if there is something to read on their buffers.
@@ -31,16 +33,20 @@ void		check_all_clients_communication(t_serveur *serv)
 		if (FD_ISSET(p_client->sock, serv->network.read_fs)
 			&& !(ret_read = read_client(p_client)))
 		{
+			// check gfx clear
 			if (p_client->is_gfx == 1)
 				serv->client_hdl.gfx_client = NULL;
 			if (p_client->is_in_game == 1)
 			{
-				asprintf(&msg, "pdi #%d\n", p_client->sock);
+				// gfx msg : "pdi #n\n"
+				asprintf(&msg, "pdi #%d\n",
+					p_client->sock);
 				push_gfx_msg(serv, msg);
 				free(msg);
 			}
-			disconnect_client(p_client->sock);
-			return (remove_client(serv, p_client));
+			disconnect_client(p_client);
+			remove_client(serv, p_client);
+			return ;
 		}
 		if (FD_ISSET(p_client->sock, serv->network.write_fs))
 			write_client(p_client);

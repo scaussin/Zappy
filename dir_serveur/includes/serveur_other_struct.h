@@ -80,6 +80,7 @@ typedef struct							s_team_entity
 	char								*name;
 	int									available_slots;
 	int									nb_players_per_lv[MAX_LV];
+	int									cur_nb_players;
 }										t_team_entity;
 
 typedef struct							s_team_hdl

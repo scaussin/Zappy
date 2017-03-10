@@ -97,8 +97,10 @@ public class ActorSpawner : MonoBehaviour
 
 
 		// ---- Set player color according to team.
-		SetPlayerColor(NewPlayerScriptRef);
-
+		if (newPlayer != null)
+		{
+			SetPlayerColor (NewPlayerScriptRef);
+		}
 		// Player Added to list of players.
 		GameManager.instance.PlayerManager.ConnectedPlayers.Add(newPlayer.GetComponent<PlayerObject> ());
 	}
@@ -128,13 +130,16 @@ public class ActorSpawner : MonoBehaviour
 
 	public void SetPlayerColor(PlayerObject player)
 	{
-		player.gameObject.transform.Find("Model").transform.Find ("Root").transform
+		if (player != null)
+		{
+			player.gameObject.transform.Find ("Model").transform.Find ("Root").transform
 			.Find ("Head").transform.Find ("HeadModel")
 			.gameObject.GetComponent<MeshRenderer> ().material
-			= HeadMats[PlayerTeamsRef.IndexOf (player.Team) % HeadMatCount];
-		player.gameObject.transform.Find("Model").transform.Find ("Root").transform
+			= HeadMats [PlayerTeamsRef.IndexOf (player.Team) % HeadMatCount];
+			player.gameObject.transform.Find ("Model").transform.Find ("Root").transform
 			.Find ("Body").transform.Find ("BodyModel")
 			.gameObject.GetComponent<MeshRenderer> ().material
-			= BodyMats[PlayerTeamsRef.IndexOf (player.Team) % BodyMatCount];
+			= BodyMats [PlayerTeamsRef.IndexOf (player.Team) % BodyMatCount];
+		}
 	}
 }

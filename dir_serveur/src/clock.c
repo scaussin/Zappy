@@ -79,12 +79,9 @@ struct timeval	*set_timeout_select(struct timeval *timeout,
 {
 	struct timespec now;
 
-	if (!lower_time_end)
-	{
-		timeout->tv_sec = 0;
-		timeout->tv_usec = 100;
-		return (timeout);
-	}
+	timeout->tv_sec = 0;
+	timeout->tv_usec = 100;
+	return (timeout);
 	get_time(&now);
 	if (min_timespec(&now, lower_time_end) == &now)
 	{

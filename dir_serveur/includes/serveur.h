@@ -59,9 +59,9 @@
 **	Serveur communication defines.
 */
 
-# define MAX_CLIENTS_CONNECTED 200
+# define MAX_CLIENTS_CONNECTED 100
 
-# define BUFF_SIZE 4096
+# define BUFF_SIZE 8192
 
 # define SIZE_CMD_MATCH_TABLE 12
 # define SIZE_GFX_CMD_MATCH_TABLE 9
@@ -207,7 +207,8 @@ int										check_fd(t_serveur *serv);
 t_socket								accept_connection(t_serveur *serv);
 void									new_client_connection(
 											t_serveur *serveur);
-void									disconnect_client(t_socket c_sock);
+void									disconnect_client(
+											t_client_entity *client);
 void									close_all_connections(t_serveur *serv);
 
 /*

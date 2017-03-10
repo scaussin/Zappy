@@ -22,6 +22,12 @@ t_client_entity	*create_client(t_socket sock)
 	new_client->is_in_game = 0;
 	new_client->is_gfx = 0;
 	new_client->is_player_dead = 0;
+	new_client->buff_recv.len = 0;
+	new_client->buff_recv.overflow = NULL;
+	new_client->buff_recv.len_overflow = 0;
+	new_client->buff_send.len = 0;
+	new_client->buff_send.overflow = NULL;
+	new_client->buff_send.len_overflow = 0;
 	set_client_player_datas(new_client);
 	return (new_client);
 }
@@ -58,17 +64,26 @@ void			add_client(t_serveur *serv, t_client_entity *client)
 	serv->client_hdl.nb_clients += 1;
 }
 
+/*
+**	Remove client node from server's client list.
+*/
+
 void			remove_client(t_serveur *serv, t_client_entity *client)
 {
 	t_client_entity	*current;
 	t_client_entity	*prev;
 
 	if (client->team)
-		client->team->available_slots += 1;
+	{
+		client->team->cur_nb_players -= 1;
+		if (client->team->cur_nb_players < serv->team_hdl.nb_teams_slots)
+			client->team->available_slots += 1;
+	}
 	if (serv->client_hdl.list_clients == client)
 	{
 		serv->client_hdl.list_clients = client->next;
 		free(client);
+		serv->client_hdl.nb_clients -= 1;
 		return ;
 	}
 	prev = serv->client_hdl.list_clients;

@@ -78,7 +78,9 @@ int			are_incantation_cdts_ok(t_serveur *serv, t_player *cur_player,
 	{
 		if (clients_tmp->player.pos.x == cur_player->pos.x
 			&& clients_tmp->player.pos.y == cur_player->pos.y
-			&& clients_tmp->player.level == cur_player->level)
+			&& clients_tmp->player.level == cur_player->level
+			&& clients_tmp->player.is_incanting == B_FALSE
+			&& clients_tmp->player.is_incanter == B_FALSE)
 			nb_players_same_lvl += 1;
 		clients_tmp = clients_tmp->next;
 	}
@@ -134,7 +136,9 @@ int			other_incanting_player_cdts(t_serveur *serv,
 										t_client_entity *clients_tmp)
 {
 	(void)serv;
-	if (&clients_tmp->player != &cur_client->player
+	if (clients_tmp && cur_client
+			&& &clients_tmp->player != &cur_client->player
+			&& clients_tmp->is_gfx == B_FALSE
 			&& clients_tmp->player.incantation_id == -1
 			&& clients_tmp->player.is_incanting == B_FALSE
 			&& clients_tmp->player.is_incanter == B_FALSE

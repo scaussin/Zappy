@@ -25,8 +25,9 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 	t_client_entity		*clients_tmp;
 	char				*msg;
 
-	printf(KGRN "[Server]: Incantation #%d ending.\n",
-			cur_client->player.incantation_id);
+	printf(KGRN "[Server]: %s Incantation #%d level %d ending.\n" KRESET,
+		cur_client->team->name, cur_client->player.incantation_id,
+		cur_client->player.level);
 	clients_tmp = serv->client_hdl.list_clients;
 	while (clients_tmp)
 	{
@@ -51,30 +52,38 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 
 void		level_up_clients_player(t_client_entity *client)
 {
-	client->team->nb_players_per_lv[client->player.level - 1] -= 1;
-	client->player.level += 1;
-	client->player.nb_see_case = get_nb_case(client->player.level);
-	client->team->nb_players_per_lv[client->player.level - 1] += 1;
+	if (client)
+	{
+		client->team->nb_players_per_lv[client->player.level - 1] -= 1;
+		client->player.level += 1;
+		client->player.nb_see_case = get_nb_case(client->player.level);
+		client->team->nb_players_per_lv[client->player.level - 1] += 1;
+	}
 }
 
 void		send_level_messages(t_serveur *serv, t_client_entity *client)
 {
 	char				*msg;
 
-	asprintf(&msg, "niveau actuel : %d\n", client->player.level);
-	write_buffer(&client->buff_send, msg, strlen(msg));
-	free(msg);
-	asprintf(&msg, "plv #%d %d\n",
-		client->sock, client->player.level);
-	push_gfx_msg(serv, msg);
-	free(msg);
+	if (client)
+	{
+		asprintf(&msg, "niveau actuel : %d\n", client->player.level);
+		write_buffer(&client->buff_send, msg, strlen(msg));
+		free(msg);
+		asprintf(&msg, "plv #%d %d\n",
+			client->sock, client->player.level);
+		push_gfx_msg(serv, msg);
+		free(msg);
+	}
 }
 
 int			other_players_incantation_level_up_cdts(t_serveur *serv,
 			t_client_entity *cur_client, t_client_entity *clients_tmp)
 {
 	(void)serv;
-	if (&clients_tmp->player != &cur_client->player
+	if (clients_tmp && cur_client
+			&& &clients_tmp->player != &cur_client->player
+			&& clients_tmp->player.inventory[FOOD] > 0
 			&& clients_tmp->player.pos.x == cur_client->player.pos.x
 			&& clients_tmp->player.pos.y == cur_client->player.pos.y
 			&& clients_tmp->player.level == cur_client->player.level
@@ -90,9 +99,12 @@ int			other_players_incantation_level_up_cdts(t_serveur *serv,
 void		other_players_finish_incantation(t_serveur *serv,
 					t_client_entity *clients_tmp, int result)
 {
-	clients_tmp->player.is_incanting = 0;
-	clients_tmp->player.incantation_id = -1;
-	if (result == 1)
-		level_up_clients_player(clients_tmp);
-	send_level_messages(serv, clients_tmp);
+	if (clients_tmp)
+	{
+		clients_tmp->player.is_incanting = 0;
+		clients_tmp->player.incantation_id = -1;
+		if (result == 1)
+			level_up_clients_player(clients_tmp);
+		send_level_messages(serv, clients_tmp);
+	}
 }

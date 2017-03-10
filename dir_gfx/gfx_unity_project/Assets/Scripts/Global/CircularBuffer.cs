@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CircularBuffer
 {
-	private static int		buff_size = 12096;
+	private static int		buff_size = 49152;
 	private byte[]			buffer = new byte[buff_size];
 	private int				len;
 	private int				start;

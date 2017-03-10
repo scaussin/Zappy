@@ -66,6 +66,7 @@ void	send_spawned_eggs(t_serveur *serv)
 			eggs->pos.y);
 		push_gfx_msg(serv, msg);
 		free(msg);
+		eggs = eggs->next;
 	}
 }
 

@@ -42,16 +42,17 @@ public class ItemSpawner : MonoBehaviour {
 				
 				groups = match.Groups;
 				CurBlock = WorldBoardSpawner.GetBlockObject (int.Parse (groups [1].Value), int.Parse (groups [2].Value));
+				if (CurBlock) {
+					CurBlock.FoodUnits = int.Parse (groups [3].Value);
+					CurBlock.LinemateUnits = int.Parse (groups [4].Value);
+					CurBlock.DeraumereUnits = int.Parse (groups [5].Value);
+					CurBlock.SiburUnits = int.Parse (groups [6].Value);
+					CurBlock.MendianeUnits = int.Parse (groups [7].Value);
+					CurBlock.PhirasUnits = int.Parse (groups [8].Value);
+					CurBlock.ThystameUnits = int.Parse (groups [9].Value);
 
-				CurBlock.FoodUnits = int.Parse(groups[3].Value);
-				CurBlock.LinemateUnits = int.Parse(groups[4].Value);
-				CurBlock.DeraumereUnits = int.Parse(groups[5].Value);
-				CurBlock.SiburUnits = int.Parse(groups[6].Value);
-				CurBlock.MendianeUnits = int.Parse(groups[7].Value);
-				CurBlock.PhirasUnits = int.Parse(groups[8].Value);
-				CurBlock.ThystameUnits = int.Parse(groups[9].Value);
-
-				CurBlock.UpdateModelDisplay ();
+					CurBlock.UpdateModelDisplay ();
+				}
 			}
 		}
 	}

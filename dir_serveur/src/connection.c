@@ -23,12 +23,6 @@ t_socket		accept_connection(t_serveur *serv)
 	t_sockaddr_in		c_sin;
 	socklen_t			c_sin_size;
 
-	if (serv->client_hdl.nb_clients > MAX_CLIENTS_CONNECTED)
-	{
-		printf(KMAG "- Connection refused, too many clients connected.\n"
-			KRESET);
-		return (-1);
-	}
 	c_sin_size = sizeof(c_sin);
 	if ((c_sock = accept(serv->network.sock_serveur,
 		(t_sockaddr *)&c_sin, &c_sin_size)) < 0)
@@ -62,16 +56,24 @@ void			new_client_connection(t_serveur *serv)
 	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
 }
 
-void			disconnect_client(t_socket c_sock)
+void			disconnect_client(t_client_entity *client)
 {
-	char	*buff;
-
-	buff = (char *)s_malloc(sizeof(char) * BUFF_SIZE);
-	memset((void *)buff, 0, BUFF_SIZE);
-	sprintf(buff, "Client disconnected, sock : %d", c_sock);
-	printf("%s%s%s\n", KRED, buff, KRESET);
-	close(c_sock);
-	free(buff);
+	printf(KRED "Client disconnected, sock : %d\n" KRESET, client->sock);
+	close(client->sock);
+	client->buff_recv.len = 0;
+	client->buff_recv.len_overflow = 0;
+	client->buff_send.len = 0;
+	client->buff_send.len_overflow = 0;
+	if (client->buff_recv.overflow)
+	{
+		free(client->buff_recv.overflow);
+		client->buff_recv.overflow = NULL;
+	}
+	if (client->buff_send.overflow)
+	{
+		free(client->buff_send.overflow);
+		client->buff_send.overflow = NULL;
+	}
 }
 
 void			close_all_connections(t_serveur *serv)
