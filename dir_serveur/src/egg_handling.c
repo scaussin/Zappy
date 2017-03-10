@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   egg_handling.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: scaussin <scaussin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/03/03 18:50:19 by scaussin          #+#    #+#             */
+/*   Updated: 2017/03/03 18:56:59 by scaussin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/serveur.h"
 
 /*
@@ -8,30 +20,28 @@
 void	add_new_egg(t_serveur *serv, t_client_entity *client)
 {
 	t_egg	*new_egg;
-	t_egg	*egg_tmp;
 
 	new_egg = (t_egg *)malloc(sizeof(t_egg));
-
-	// set egg number and team (there is no egg #0)
 	serv->world_hdl.nb_of_eggs += 1;
-	new_egg->egg_nb = serv->world_hdl.nb_of_eggs; // set the egg nb as the last one.
+	new_egg->egg_nb = serv->world_hdl.nb_of_eggs;
 	new_egg->team = client->team;
-
-	// set egg time of hatching.
 	get_time(&new_egg->hatch_time);
 	add_nsec_to_timespec(&new_egg->hatch_time,
 		EGG_HATCH_TIME * serv->world_hdl.t_unit * 1000000000);
-	
-	// set egg position and status
 	new_egg->pos.x = client->player.pos.x;
 	new_egg->pos.y = client->player.pos.y;
 	new_egg->father_nb = client->sock;
 	new_egg->has_hatched = 0;
-
 	new_egg->next = NULL;
-	printf(KGRN "[Serveur]: player #%d layed egg #%d\n" KRESET, client->sock, new_egg->egg_nb);
+	printf(KGRN "[Serveur]: player #%d layed egg #%d\n" KRESET, client->sock,
+		new_egg->egg_nb);
+	add_egg_to_list(serv, new_egg);
+}
 
-	// add t_egg node to chained list of eggs.
+void	add_egg_to_list(t_serveur *serv, t_egg *new_egg)
+{
+	t_egg	*egg_tmp;
+
 	if (serv->world_hdl.eggs == NULL)
 	{
 		serv->world_hdl.eggs = new_egg;
@@ -58,7 +68,7 @@ t_egg	*egg_available(t_serveur *serv, t_client_entity *client)
 {
 	t_egg	*egg_tmp;
 
-	if (serv->world_hdl.eggs) 
+	if (serv->world_hdl.eggs)
 	{
 		egg_tmp = serv->world_hdl.eggs;
 		while (egg_tmp)
@@ -71,7 +81,6 @@ t_egg	*egg_available(t_serveur *serv, t_client_entity *client)
 		}
 	}
 	return (NULL);
-
 }
 
 /*
@@ -121,7 +130,7 @@ void	refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit)
 	struct timespec		now;
 	struct timespec		timespec_life_left;
 
-	if (serv->world_hdl.eggs) // any eggs spawned on the world ?
+	if (serv->world_hdl.eggs)
 	{
 		egg_tmp = serv->world_hdl.eggs;
 		while (egg_tmp)
@@ -130,12 +139,9 @@ void	refresh_eggs_hatching_time(t_serveur *serv, float old_t_unit)
 			{
 				get_time(&now);
 				timespec_life_left = timespec_diff(&now, &egg_tmp->hatch_time);
-
-				// Time conversion to nanoseconds for precise time remaining.
 				nsec_left = convert_timespec_to_nsec(timespec_life_left);
-				time_left = (long)roundf((float)(nsec_left / (float)1000000000) * (1 / old_t_unit));
-
-				// reset hatch time.
+				time_left = (long)roundf((float)(nsec_left / (float)1000000000)
+					* (1 / old_t_unit));
 				get_time(&egg_tmp->hatch_time);
 				add_nsec_to_timespec(&egg_tmp->hatch_time,
 					time_left * 1000000000 * serv->world_hdl.t_unit);
