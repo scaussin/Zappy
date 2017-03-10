@@ -217,6 +217,8 @@ void									close_all_connections(t_serveur *serv);
 
 void									check_all_clients_communication(
 											t_serveur *serv);
+void									client_connection_lost(t_serveur *serv,
+											t_client_entity *p_client);
 void									write_client(t_client_entity *client);
 int										read_client(t_client_entity *client);
 int										write_buffer(t_buffer *buff,
@@ -264,6 +266,8 @@ void									add_client(t_serveur *serv,
 											t_client_entity *client);
 void									remove_client(t_serveur *serv,
 											t_client_entity *client);
+void									remove_team_slot(t_serveur *serv,
+											t_client_entity *client);
 
 /*
 **	client_authentification.c
@@ -287,6 +291,9 @@ void									assign_player_to_egg(
 											t_serveur *serv,
 											t_client_entity *client,
 											t_egg *egg);
+void									client_authenticate_send_gfx_msg(
+											t_serveur *serv,
+											t_client_entity *client);
 
 /*
 **	Player game datas handling
@@ -577,6 +584,11 @@ void									start_incantating(t_serveur *serv,
 void									finish_incantation(t_serveur *serv,
 											t_client_entity *cur_client,
 											int result);
+void									incanter_finish_incantation(
+											t_serveur *serv,
+											t_client_entity *cur_client,
+											int result);
+
 void									level_up_clients_player(
 											t_client_entity *client);
 void									send_level_messages(t_serveur *serv,

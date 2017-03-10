@@ -118,11 +118,7 @@ void	client_authenticate_slots_available(t_serveur *serv,
 		client->player.pos.y);
 	get_time(&client->delay_time);
 	assign_player_time_of_dinner(serv, &(client->player));
-	asprintf(&str_to_send, "pnw #%d %d %d %d %d %s\n",
-		client->sock, client->player.pos.x, client->player.pos.y,
-		client->player.dir + 1, client->player.level, client->team->name);
-	push_gfx_msg(serv, str_to_send);
-	free(str_to_send);
+	client_authenticate_send_gfx_msg(serv, client);
 }
 
 void	assign_player_to_egg(t_serveur *serv, t_client_entity *client,

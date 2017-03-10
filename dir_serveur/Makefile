@@ -19,6 +19,7 @@ src/input_handler.c \
 src/input_handler_1.c \
 src/client_hdl.c \
 src/client_authentification.c \
+src/client_authentification_1.c \
 src/team_hdl.c \
 src/serveur_data.c \
 src/terrain_generation.c \

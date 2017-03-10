@@ -36,6 +36,16 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 			other_players_finish_incantation(serv, clients_tmp, result);
 		clients_tmp = clients_tmp->next;
 	}
+	incanter_finish_incantation(serv, cur_client, result);
+	asprintf(&msg, "bct %d %d\n", cur_client->player.pos.x,
+		cur_client->player.pos.y);
+	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, msg);
+	free(msg);
+}
+
+void		incanter_finish_incantation(t_serveur *serv,
+	t_client_entity *cur_client, int result)
+{
 	if (result == 1 && cur_client->player.inventory[FOOD] > 0)
 	{
 		level_up_clients_player(cur_client);
@@ -44,10 +54,6 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 	cur_client->player.incantation_id = -1;
 	cur_client->player.is_incanter = 0;
 	serv->world_hdl.nb_of_incantations -= 1;
-	asprintf(&msg, "bct %d %d\n", cur_client->player.pos.x,
-		cur_client->player.pos.y);
-	gfx_cmd_bct(serv, serv->client_hdl.gfx_client, msg);
-	free(msg);
 }
 
 void		level_up_clients_player(t_client_entity *client)
@@ -58,22 +64,6 @@ void		level_up_clients_player(t_client_entity *client)
 		client->player.level += 1;
 		client->player.nb_see_case = get_nb_case(client->player.level);
 		client->team->nb_players_per_lv[client->player.level - 1] += 1;
-	}
-}
-
-void		send_level_messages(t_serveur *serv, t_client_entity *client)
-{
-	char				*msg;
-
-	if (client)
-	{
-		asprintf(&msg, "niveau actuel : %d\n", client->player.level);
-		write_buffer(&client->buff_send, msg, strlen(msg));
-		free(msg);
-		asprintf(&msg, "plv #%d %d\n",
-			client->sock, client->player.level);
-		push_gfx_msg(serv, msg);
-		free(msg);
 	}
 }
 

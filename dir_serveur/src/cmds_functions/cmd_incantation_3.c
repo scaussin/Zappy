@@ -62,3 +62,19 @@ void		put_player_in_incantation(t_serveur *serv,
 		clients_tmp->player.is_incanter = 0;
 	}
 }
+
+void		send_level_messages(t_serveur *serv, t_client_entity *client)
+{
+	char				*msg;
+
+	if (client)
+	{
+		asprintf(&msg, "niveau actuel : %d\n", client->player.level);
+		write_buffer(&client->buff_send, msg, strlen(msg));
+		free(msg);
+		asprintf(&msg, "plv #%d %d\n",
+			client->sock, client->player.level);
+		push_gfx_msg(serv, msg);
+		free(msg);
+	}
+}
