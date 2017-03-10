@@ -89,23 +89,13 @@ void	ClientIa::pushFrontElevationEnd()
 void	ClientIa::callbackCommandLevelUpIncantationStart(string response)
 {
 	cout << "incantation: " << response << endl;
-	/*if (response == "elevation en cours\n")
+	if (response == "elevation en cours\n")
 		pushBackCallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] incantationEnd()");
 	else
 	{
 		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
 			"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(incantation KO)"));
 		levelUpStart(NULL);
-	}*/
-	if (response == "ok\n")
-	{
-		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-			"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(incantation KO)"));
-		levelUpStart(NULL);
-	}
-	else
-	{
-		pushBackCallbackCommand(NULL, &ClientIa::callbackCommandLevelUpIncantationEnd, "[levelUp] incantationEnd()");
 	}
 }
 
@@ -175,7 +165,7 @@ void	ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo()
 {
 	if (nPlayersBroadcastResponse >= player->getNPlayerLevelUp() - 1) //assez de personne pour faire une incantation
 	{
-		if (nPlayersReadyForIncantation == 6/*nPlayersBroadcastResponse*/) // == 6 //tous sur zone 
+		if (nPlayersReadyForIncantation == nPlayersBroadcastResponse || nPlayersReadyForIncantation == 5) // == 6 //tous sur zone 
 		{
 			itemsPoseStart(player->getItemsLevelUp(), &ClientIa::callbackContinueLevelUpIncantation);
 		}
@@ -186,25 +176,15 @@ void	ClientIa::callbackCommandLevelUpBroadcastResponseCheckNeedFoodNo()
 	}
 	else //pas assez de personne
 	{
-		//state = none;
-		state = slave;
+		state = none;
 		pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
 			"abandon de l'incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(abandon pas assez de monde)"));
 		if (flagFork == false)
 		{
-			int i = 0;
-			while (i < (player->getNPlayerLevelUp() - 1) - nPlayersBroadcastResponse)
-			{
-				pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg -> pas assez de monde");
-				checkStart(MIN_FOOD_2, N_TO_EAT_2, NULL);
-				i++;
-			}
+			pushBackCallbackCommand(&ClientPlayer::fork, &ClientIa::callbackCommandIgnore, "[levelUp] fork() lay egg");
 			flagFork = true;
 		}
-		if (!isInLoopCheckFood())
-			loopCheckFood();
-		flagGoToBroadcaster = false;
-		//callbackContinueLevelUpFindItem();
+		callbackContinueLevelUpFindItem();
 	}
 }
 

@@ -49,10 +49,10 @@ ClientPlayer::ClientPlayer(string _teamName, char **_argv) : teamName(_teamName)
 
 	nPlayersLevelUp.resize(7);
 	nPlayersLevelUp[0] = 1;
-	nPlayersLevelUp[1] = 6;
-	nPlayersLevelUp[2] = 6;
-	nPlayersLevelUp[3] = 6;
-	nPlayersLevelUp[4] = 6;
+	nPlayersLevelUp[1] = 2;
+	nPlayersLevelUp[2] = 2;
+	nPlayersLevelUp[3] = 4;
+	nPlayersLevelUp[4] = 4;
 	nPlayersLevelUp[5] = 6;
 	nPlayersLevelUp[6] = 6;
 }
