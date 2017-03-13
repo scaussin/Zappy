@@ -17,6 +17,7 @@ src/cmd_clients_manager.c \
 src/cmd_clients_manager_1.c \
 src/input_handler.c \
 src/input_handler_1.c \
+src/input_handler_2.c \
 src/client_hdl.c \
 src/client_authentification.c \
 src/client_authentification_1.c \

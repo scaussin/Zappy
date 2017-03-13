@@ -62,8 +62,7 @@ void	fill_input_part_2(t_serveur *serv, int *i, char **argv, int team_i)
 		(*i) += 2;
 		if (argv[*i] && strncmp(argv[*i], "-t", 2) == 0)
 		{
-			serv->world_hdl.t_unit = strtol(argv[*i + 1], NULL, 10);
-			serv->world_hdl.t_unit = 1 / serv->world_hdl.t_unit;
+			check_time_input_limit(serv, argv[*i + 1]);
 		}
 	}
 }

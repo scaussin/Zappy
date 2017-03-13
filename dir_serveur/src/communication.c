@@ -19,21 +19,27 @@
 **	If there is, put the content into the client's circular buffer.
 **
 **	Also check if there is something to read on their buffers.
+**
+**	If there is a client disconnection, i do NOT stop the loop.
+**	Instead, I continue checking the following socks through the
+**	'next' pointer.
 */
 
 void		check_all_clients_communication(t_serveur *serv)
 {
 	t_client_entity		*p_client;
+	t_client_entity		*next;
 	int					ret_read;
 
 	p_client = serv->client_hdl.list_clients;
 	while (p_client)
 	{
 		if (FD_ISSET(p_client->sock, serv->network.read_fs)
-			&& !(ret_read = read_client(p_client)))
+			&& (ret_read = read_client(p_client)) == 0)
 		{
+			next = p_client->next;
 			client_connection_lost(serv, p_client);
-			p_client = serv->client_hdl.list_clients;
+			p_client = next;
 		}
 		if (p_client)
 		{
@@ -86,6 +92,7 @@ int			read_client(t_client_entity *client)
 	if ((size_read = check_size_read(client)) == 0)
 		return (0);
 	buff_tmp = s_malloc(size_read);
+	printf("recv on sock %d\n", client->sock);
 	while (1)
 	{
 		ret = recv(client->sock, buff_tmp, size_read, 0);

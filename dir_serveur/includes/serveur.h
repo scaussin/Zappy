@@ -166,6 +166,8 @@ void									error_in_args(int pos, char *str);
 void									print_input_values(t_serveur *serv);
 int										regex_match(char *string_to_search,
 											char *regex_str);
+void									check_time_input_limit(
+											t_serveur *serv, char *arg);
 
 /*
 ** terrain_generation.c
