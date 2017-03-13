@@ -18,20 +18,27 @@
 
 void	print_send(int sock, char *str, int len)
 {
-	printf(KYEL " Sending to sock %d: " KRESET, sock);
 	replace_nl(str, len);
-	printf("[%.*s]\n", len, str);
+	if (len > MAX_PRINT_SIZE)
+		printf(KYEL " Sending sock %d:%s [%.*s...] len: %d ", sock, KRESET,
+			MAX_PRINT_SIZE, str, len);
+	else
+		printf(KYEL " Sending sock %d:%s [%.*s] len: %d ", sock, KRESET,
+			len, str, len);
 }
 
 void	print_send_gfx(char *str)
 {
-	printf(KMAG " Sending to gfx : " KRESET);
-	printf("[%.*s]\n", (int)strlen(str), str);
+	printf("Sending gfx: [%.80s]", str);
 }
 
 void	print_receive(int sock, char *str, int len)
 {
-	printf(KBLU " Receiving from sock %d: " KRESET, sock);
 	replace_nl(str, len);
-	printf("[%.*s] len: %d\n", len, str, len);
+	if (len > MAX_PRINT_SIZE)
+		printf(KBLU "Receiving sock %d:%s [%.*s] len: %d ", sock, KRESET,
+			MAX_PRINT_SIZE, str, len);
+	else
+		printf(KBLU " Receiving sock %d:%s [%.*s] len: %d ", sock, KRESET,
+			len, str, len);
 }

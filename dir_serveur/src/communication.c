@@ -92,7 +92,6 @@ int			read_client(t_client_entity *client)
 	if ((size_read = check_size_read(client)) == 0)
 		return (0);
 	buff_tmp = s_malloc(size_read);
-	printf("recv on sock %d\n", client->sock);
 	while (1)
 	{
 		ret = recv(client->sock, buff_tmp, size_read, 0);
@@ -114,6 +113,7 @@ int			read_client(t_client_entity *client)
 
 /*
 **	Write into an actual buffer -> preparing for the select() pass.
+**	Also handles the buffer overflow.
 */
 
 int			write_buffer(t_buffer *buff, char *to_write, int size)
@@ -127,7 +127,6 @@ int			write_buffer(t_buffer *buff, char *to_write, int size)
 			buff->overflow = realloc(buff->overflow, buff->len_overflow + size);
 			memcpy(buff->overflow + buff->len_overflow, to_write, size);
 			buff->len_overflow += size;
-			printf("[WARNING] : buffer overflow\n");
 		}
 		else
 		{

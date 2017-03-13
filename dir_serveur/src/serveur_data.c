@@ -68,4 +68,5 @@ void	clear_serv(t_serveur *serv, t_socket sock)
 	serv->settings_hdl.is_pickup_instant = 1;
 	serv->settings_hdl.can_interrupt_incantation = 0;
 	serv->settings_hdl.are_teams_growing = 1;
+	serv->print_buff = NULL;
 }

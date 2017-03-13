@@ -25,7 +25,7 @@ void		finish_incantation(t_serveur *serv, t_client_entity *cur_client,
 	t_client_entity		*clients_tmp;
 	char				*msg;
 
-	printf(KGRN "[Server]: %s Incantation #%d level %d ending.\n" KRESET,
+	printf(KGRN " [Server]: %s Incantation #%d level %d ending. " KRESET,
 		cur_client->team->name, cur_client->player.incantation_id,
 		cur_client->player.level);
 	clients_tmp = serv->client_hdl.list_clients;
@@ -96,5 +96,10 @@ void		other_players_finish_incantation(t_serveur *serv,
 		if (result == 1)
 			level_up_clients_player(clients_tmp);
 		send_level_messages(serv, clients_tmp);
+	}
+	else
+	{
+		printf(KRED "Tried Leveling up null player\n" KRESET);
+		exit(-1);
 	}
 }

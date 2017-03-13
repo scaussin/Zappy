@@ -33,7 +33,7 @@ void	fill_input(t_serveur *serv, int argc, char **argv)
 		i++;
 	}
 	i = 8;
-	serv->team_hdl.array_teams = (t_team_entity *)malloc(
+	serv->team_hdl.array_teams = (t_team_entity *)s_malloc(
 		sizeof(t_team_entity) * serv->team_hdl.nb_teams);
 	fill_input_part_2(serv, &i, argv, 0);
 	serv->network.max_clients = serv->team_hdl.nb_teams
@@ -50,7 +50,7 @@ void	fill_input_part_2(t_serveur *serv, int *i, char **argv, int team_i)
 			if (strlen(argv[*i]) > 40)
 				error_in_args(*i, "Team Name is too long (40 char max)");
 			serv->team_hdl.array_teams[team_i].name =
-				(char *)malloc(sizeof(char) * strlen(argv[*i]) + 1);
+				(char *)s_malloc(sizeof(char) * strlen(argv[*i]) + 1);
 			strncpy(serv->team_hdl.array_teams[team_i].name, argv[*i],
 				strlen(argv[*i]));
 			serv->team_hdl.array_teams[team_i].name[strlen(argv[*i])] = '\0';

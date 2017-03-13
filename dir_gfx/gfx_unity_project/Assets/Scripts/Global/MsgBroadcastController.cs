@@ -224,13 +224,13 @@ public class MsgBroadcastController : MonoBehaviour
 				Debug.Log ("calculated timescale = " + calculatedTimescale.ToString ());
 			}
 			// Unity timescale limit check
-			if (calculatedTimescale <= 100)
+			if (calculatedTimescale <= 50)
 			{
 				Time.timeScale = (int)calculatedTimescale;
 			}
 			else
 			{
-				Time.timeScale = 100;
+				Time.timeScale = 50;
 			}
 
 			// soft optimization limit for animation disabling.

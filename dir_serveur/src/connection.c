@@ -53,12 +53,12 @@ void			new_client_connection(t_serveur *serv)
 	serv->network.sock_max;
 	printf("sock_max: %d\n", serv->network.sock_max);
 	add_client(serv, client);
-	printf(KGRN "New client connected, sock : %d\n" KRESET, client->sock);
+	printf(KGRN "\nNew client connected, sock : %d\n" KRESET, client->sock);
 }
 
 void			disconnect_client(t_client_entity *client)
 {
-	printf(KRED "Client disconnected, sock : %d\n" KRESET, client->sock);
+	printf(KRED "\nClient disconnected, sock : %d\n" KRESET, client->sock);
 	close(client->sock);
 	client->buff_recv.len = 0;
 	client->buff_recv.len_overflow = 0;
@@ -88,5 +88,5 @@ void			close_all_connections(t_serveur *serv)
 		p_client = p_client->next;
 	}
 	close(serv->network.sock_serveur);
-	printf(KGRN "Server disconnected\n" KRESET);
+	printf(KGRN "\nServer disconnected\n" KRESET);
 }

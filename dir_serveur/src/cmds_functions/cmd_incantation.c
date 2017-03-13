@@ -30,45 +30,11 @@ void	on_end_cmd_incantation(t_serveur *serv, t_client_entity *client_cur,
 	char	*gfx_msg;
 
 	(void)param;
-	if (serv->settings_hdl.can_interrupt_incantation == B_TRUE)
-	{
-		end_incantation_interruptable(serv, client_cur);
-	}
-	else
-	{
-		finish_incantation(serv, client_cur, 1);
-		asprintf(&gfx_msg, "pie %d %d %d\n",
-			client_cur->player.pos.x, client_cur->player.pos.y, 1);
-		push_gfx_msg(serv, gfx_msg);
-		free(gfx_msg);
-	}
-}
-
-/*
-**	If the incantation is interruptable, we check the ressources AGAIN,
-**	and strip the case's ressources at the END.
-*/
-
-void	end_incantation_interruptable(t_serveur *serv,
-				t_client_entity *client_cur)
-{
-	int		*target_res;
-	char	*gfx_msg;
-
-	target_res = set_incantation_target_res(client_cur->player.level);
-	if (are_incantation_cdts_ok(serv, &client_cur->player, target_res))
-	{
-		finish_incantation(serv, client_cur, 1);
-		strip_case_ressources(serv, client_cur, target_res);
-		asprintf(&gfx_msg, "pie %d %d %d\n",
-			client_cur->player.pos.x, client_cur->player.pos.y, 1);
-	}
-	else
-	{
-		finish_incantation(serv, client_cur, 0);
-		asprintf(&gfx_msg, "pie %d %d %d\n",
-			client_cur->player.pos.x, client_cur->player.pos.y, 0);
-	}
+	finish_incantation(serv, client_cur, 1);
+	asprintf(&gfx_msg, "pie %d %d %d\n",
+		client_cur->player.pos.x, client_cur->player.pos.y, 1);
+	push_gfx_msg(serv, gfx_msg);
+	free(gfx_msg);
 }
 
 /*
@@ -116,7 +82,7 @@ void	start_incantating(t_serveur *serv, t_client_entity *client_cur)
 	cur_player = &client_cur->player;
 	serv->world_hdl.nb_of_incantations += 1;
 	cur_player->incantation_id = serv->world_hdl.nb_of_incantations;
-	printf(KGRN "[Server]: %s incantation #%d level %d starting ...\n" KRESET,
+	printf(KGRN " [Server]: %s incantation #%d level %d starting ... " KRESET,
 			client_cur->team->name, cur_player->incantation_id,
 			cur_player->level + 1);
 	client_cur->player.is_incanter = 1;

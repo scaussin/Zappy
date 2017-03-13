@@ -70,6 +70,7 @@
 # define CHAR_END '\n'
 # define LEN_END 1
 # define MSG_ARG_MAX_SIZE 10
+# define MAX_PRINT_SIZE 40
 
 /*
 **	Game defines
@@ -575,9 +576,6 @@ int										on_start_cmd_incantation(
 void									on_end_cmd_incantation(t_serveur *serv,
 											t_client_entity *client_cur,
 											char *param);
-void									end_incantation_interruptable(
-											t_serveur *serv,
-											t_client_entity *client_cur);
 int										init_incantation(t_serveur *serv,
 											t_client_entity *client_cur,
 											char *param);

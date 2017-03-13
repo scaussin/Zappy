@@ -56,7 +56,7 @@ void		update_buffer_overflow(t_buffer *buff, int size)
 	if (buff->len_overflow > size)
 	{
 		tmp = buff->overflow;
-		buff->overflow = malloc(buff->len_overflow - size);
+		buff->overflow = s_malloc(buff->len_overflow - size);
 		memcpy(buff->overflow, tmp + size, buff->len_overflow - size);
 		buff->len_overflow -= size;
 		free(tmp);

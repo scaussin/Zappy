@@ -21,7 +21,7 @@ void	add_new_egg(t_serveur *serv, t_client_entity *client)
 {
 	t_egg	*new_egg;
 
-	new_egg = (t_egg *)malloc(sizeof(t_egg));
+	new_egg = (t_egg *)s_malloc(sizeof(t_egg));
 	serv->world_hdl.nb_of_eggs += 1;
 	new_egg->egg_nb = serv->world_hdl.nb_of_eggs;
 	new_egg->team = client->team;

@@ -51,11 +51,11 @@ void	allocate_world_board(t_world_hdl *world_hdl)
 
 	y = 0;
 	world_hdl->world_board =
-		(t_world_case **)malloc(sizeof(t_world_case *) * world_hdl->map_y);
+		(t_world_case **)s_malloc(sizeof(t_world_case *) * world_hdl->map_y);
 	while (y < world_hdl->map_y)
 	{
 		world_hdl->world_board[y] =
-			(t_world_case *)malloc(sizeof(t_world_case) * world_hdl->map_x);
+			(t_world_case *)s_malloc(sizeof(t_world_case) * world_hdl->map_x);
 		y++;
 	}
 }

@@ -32,7 +32,10 @@ void		client_connection_lost(t_serveur *serv,
 	char				*msg;
 
 	if (p_client->is_gfx == 1)
+	{
+		p_client->is_gfx = 0;
 		serv->client_hdl.gfx_client = NULL;
+	}
 	if (p_client->is_in_game == 1)
 	{
 		asprintf(&msg, "pdi #%d\n", p_client->sock);

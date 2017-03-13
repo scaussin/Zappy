@@ -118,15 +118,15 @@ void	ClientIa::callbackContinueLevelUpCheck()
 void	ClientIa::callbackContinueLevelUpJoin()
 {
 	pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore, 
-		"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
+		"rejoignez moi level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 	pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore, 
-		"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
+		"rejoignez moi level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 	pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore, 
-		"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
+		"rejoignez moi level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 	pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore, 
-		"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
+		"rejoignez moi level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 	pushBackCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandLevelUpRepeatBroadcast, 
-		"rejoignez moi pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
+		"rejoignez moi level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(rejoignez moi)"));
 }
 
 void	ClientIa::callbackCommandLevelUpRepeatBroadcast(string response)
@@ -203,7 +203,7 @@ void	ClientIa::callbackContinueLevelUpComming()
 void	ClientIa::callbackContinueLevelUpCheckNeedFoodYes()
 {
 	pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-		"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé (yes))"));
+		"j'arrive level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé (yes))"));
 }
 
 void	ClientIa::callbackContinueLevelUpCheckNeedFoodNo()
@@ -230,7 +230,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 				stackCallbackCallerContinue.clear();
 				itemsToFind.clear();
 				pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-					"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive)"));
+					"j'arrive level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive)"));
 				checkStart(MIN_FOOD_2, N_TO_EAT_2, &ClientIa::callbackContinueLevelUpComming);
 			}
 			else // faim -> double_egg_burger(2)
@@ -242,7 +242,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 				itemsToFind.clear();
 				itemsToFind[FOOD] = food;
 				pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-					"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé)"));
+					"j'arrive level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé)"));
 			}
 		}
 		else if ((state == slave || state == none) && player->getLevel() == stoi(match[2]) - 1 && stoi(match[1]) == 0)
@@ -263,7 +263,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 				itemsToFind.clear();
 				itemsToFind[FOOD] = food;
 				pushFrontCallbackCommand(new CallbackCommand(&ClientPlayer::broadcast, &ClientIa::callbackCommandIgnore,
-					"j'arrive pour incantation level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé (sur zone))"));
+					"j'arrive level " + to_string(player->getLevel() + 1), "[levelUp] broadcast(j'arrive apres mangé (sur zone))"));
 			}
 		}
 	}
@@ -284,7 +284,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			loopCheckFood();
 		flagGoToBroadcaster = false;
 	}*/
-	else if (state == master && regex_search(broadcast, match, regex("message ([0-8]),j'arrive pour incantation level ([2-8])\n")))
+	else if (state == master && regex_search(broadcast, match, regex("message ([0-8]),j'arrive level ([2-8])\n")))
 	{
 		if (player->getLevel() == stoi(match[2]) - 1)
 		{
@@ -299,7 +299,7 @@ void	ClientIa::receiveBroadcast(string broadcast)
 			nPlayersReadyForIncantation++;
 		}
 	}
-	else if (flagGoToBroadcaster && regex_search(broadcast, match, regex("message ([0-8]),rejoignez moi pour incantation level ([2-8])\n")))
+	else if (flagGoToBroadcaster && regex_search(broadcast, match, regex("message ([0-8]),rejoignez moi level ([2-8])\n")))
 	{
 		if (player->getLevel() == stoi(match[2]) - 1)
 			goToBroadcaster(stoi(match[1]));

@@ -55,6 +55,8 @@ typedef struct							s_serveur
 	int									victory_reached;
 	unsigned int						loop_nb;
 
+	char								*print_buff;
+
 	t_game_settings						settings_hdl;
 }										t_serveur;
 

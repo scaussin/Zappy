@@ -33,14 +33,14 @@ void	*s_malloc(size_t size)
 
 void	replace_nl(char *str, int len)
 {
-	int i;
-
-	i = 0;
-	while (i < len)
+	str[len] = '\0';
+	while (len > 0)
 	{
-		if (str[i] == '\n')
-			str[i] = '*';
-		i++;
+		if (str[len] == '\n')
+		{
+			str[len] = '*';
+		}
+		len--;
 	}
 }
 

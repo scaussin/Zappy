@@ -29,6 +29,7 @@
 # define LEN_END 1
 # define LEVEL_MAX 8
 # define DEBUG_MODE 0
+# define MAX_PRINT_SIZE 40
 
 using namespace std;
 /*

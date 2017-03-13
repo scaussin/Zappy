@@ -253,7 +253,7 @@ void	ClientCommunication::pushData()
 	}
 	replaceEnd(buffTmp = buffTmp.substr(0, retSend));
 	//cout << KYEL << getpid()  << " Sending to server: "<< KRESET << "["<< buffTmp << "]" << endl;
-	ia->printStateIa(KYEL + to_string(getpid())  + " Sending to server: "+ KRESET +"["+buffTmp +"]" + KYEL);
+	ia->printStateIa(KYEL + to_string(getpid())  + " Sending: "+ KRESET +"["+buffTmp +"]" + KYEL);
 	if (retSend == -1)
 		throw (CustomException("send error"));
 	if (retSend > 0)
@@ -290,8 +290,13 @@ int		ClientCommunication::pullData()
 		bufferRecv.pushBuffer(buffRecv, retRecv);
 	string recvStr(buffRecv, retRecv);
 	replaceEnd(recvStr);
+	if (recvStr.size() > MAX_PRINT_SIZE)
+	{
+		recvStr.erase(MAX_PRINT_SIZE);
+		recvStr.append("...");
+	}
 	//cout << KBLU << getpid() << " Receiving to server: "<< KRESET << "["<< recvStr << "] len: " << retRecv << endl;
-	ia->printStateIa(KCYN + to_string(getpid()) + " Receiving to server: "+ KRESET + "["+ recvStr + "]" + KCYN );
+	ia->printStateIa(KCYN + to_string(getpid()) + " Receiving: "+ KRESET + "["+ recvStr + "]" + KCYN );
 	delete[] buffRecv;
 	return (retRecv);
 }

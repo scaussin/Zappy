@@ -67,6 +67,8 @@ int		check_fd(t_serveur *serv)
 		new_client_connection(serv);
 	check_all_clients_communication(serv);
 	manage_clients_input(serv);
+	if ((serv->loop_nb % 500) == 0)
+		printf("\n");
 	return (0);
 }
 

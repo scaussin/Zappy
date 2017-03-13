@@ -56,8 +56,8 @@ public class GameOverMenuController : MonoBehaviour
 	{
 		// Winning team stats
 		GameOverDatasContainer.transform.Find ("WinningTeamValue").GetComponent<Text> ().text = winningTeam;
-		GameOverDatasContainer.transform.Find ("TeamNbValue").GetComponent<Text> ().text =
-			GameManager.instance.PlayerManager.PlayerTeams.IndexOf(winningTeam).ToString();
+		GameOverDatasContainer.transform.Find ("TeamNbValue").GetComponent<Text> ().text = "Team " +
+			(GameManager.instance.PlayerManager.PlayerTeams.IndexOf(winningTeam) + 1).ToString();
 
 		// Get nb of players for team;
 		foreach (PlayerObject player in playerObjsRef)
@@ -68,7 +68,8 @@ public class GameOverMenuController : MonoBehaviour
 			}
 		}
 		GameOverDatasContainer.transform.Find ("NbOfUnitsValue").GetComponent<Text> ().text = nbOfPlayers.ToString();
-
+		nbOfPlayers = 0; // reset var for next game.
+	
 		// Global stats
 		GameOverDatasContainer.transform.Find ("NbOfConnectionsValue").GetComponent<Text> ().text =
 			GameManager.instance.StatisticManager.NbOfConnections.ToString();
