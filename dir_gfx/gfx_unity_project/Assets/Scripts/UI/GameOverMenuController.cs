@@ -17,6 +17,7 @@ public class GameOverMenuController : MonoBehaviour
 	private Regex					rgx;
 	private Match					match;
 	private GroupCollection			groups;
+	private bool					EnterPressed = false;
 
 	// Use this for initialization
 	void Awake ()
@@ -43,6 +44,7 @@ public class GameOverMenuController : MonoBehaviour
 			string winningTeam = groups [1].Value;
 
 			GameOverMenuUp = true;
+			EnterPressed = false;
 			GameOverPanelContainer.SetActive (true);
 			SetGameOverMenuDatas (winningTeam);
 		}
@@ -95,12 +97,10 @@ public class GameOverMenuController : MonoBehaviour
 
 	void Update()
 	{
-		if (GameOverMenuUp && (Input.GetKeyUp(enterKey) || Input.GetKeyUp(enterKeyAlt)))
+		if (EnterPressed == false && GameOverMenuUp && (Input.GetKeyUp(enterKey) || Input.GetKeyUp(enterKeyAlt)))
 		{
-			if (GameManager.instance.ConnectionManager.IsConnected == true)
-			{
-				GameManager.instance.GameController.OnServerShutdown ();
-			}
+			EnterPressed = true;
+			GameManager.instance.GameController.OnServerShutdown ();
 			CloseGameOverMenu ();
 		}
 	}

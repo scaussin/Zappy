@@ -60,7 +60,7 @@ public class MainMenuController : MonoBehaviour {
 		InGameMenuPanel.SetActive (true);
 		EscapeMenuPanel.SetActive (true);
 		GameOverMenuPanel.SetActive (true);
-		InGameMenuController.TabPanel.SetActive (false);
+//		InGameMenuController.TabPanel.SetActive (false);
     }
 
 	/// <summary>

@@ -78,9 +78,9 @@
 
 # define MAX_GAME_TIME_UNIT 300
 # define MAX_MAP_AREA 10000
-# define MAX_NB_SLOT 20
-# define MAX_NB_OF_TEAM 10
-# define MAX_NB_OF_CLIENTS_PER_TEAM 20
+# define MAX_NB_SLOT 10
+# define MAX_NB_OF_TEAM 8
+# define MAX_NB_OF_CLIENTS_PER_TEAM 16
 
 # define NB_RESSOURCES 7
 

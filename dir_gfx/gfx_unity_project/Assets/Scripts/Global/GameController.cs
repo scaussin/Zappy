@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour {
 	public bool			SelectingServerInfos;
 	public bool			IsWorldSpawned;
 	public bool			InGame;
+	public bool			MenuUp;
 
 	// Events. May be useful to stand alone modules.
 	public UnityEvent	OnTimeUnitModified;
@@ -169,7 +170,6 @@ public class GameController : MonoBehaviour {
 	public void OnServerShutdown()
 	{
 		// ----- Visual cleaning 
-		ActivateMainMenuInput();
 		if (GameManager.instance.MainMenuController.GameOverMenuController.GameOverMenuUp)
 		{
 			GameManager.instance.MainMenuController.GameOverMenuController.CloseGameOverMenu ();
@@ -197,6 +197,8 @@ public class GameController : MonoBehaviour {
 
 	public void DelayedWorldCleaning()
 	{
+		ActivateMainMenuInput();
+
 		GameManager.instance.ConnectionManager.buffer_send.ResetBuffer ();
 		GameManager.instance.ConnectionManager.buffer_recv.ResetBuffer ();
 

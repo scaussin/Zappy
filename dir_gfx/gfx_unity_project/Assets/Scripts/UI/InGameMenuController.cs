@@ -32,12 +32,14 @@ public class InGameMenuController : MonoBehaviour {
 		if ((Input.GetKeyDown (tabPanelKey) || Input.GetKeyDown (tabPanelKeyAlt))
 			&& tabPanelUp == false)
 		{
+			GameManager.instance.GameController.MenuUp = true;
 			tabPanelUp = true;
 			TabPanel.SetActive (true);
 		}
 		if ((Input.GetKeyUp (tabPanelKey) || Input.GetKeyUp (tabPanelKeyAlt))
 		    && tabPanelUp == true)
 		{
+			GameManager.instance.GameController.MenuUp = false;
 			tabPanelUp = false;
 			TabPanel.SetActive (false);
 		}

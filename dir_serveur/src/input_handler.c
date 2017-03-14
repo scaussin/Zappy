@@ -81,7 +81,7 @@ void	get_input_team_names_format(t_serveur *serv, int *i, char **argv)
 		serv->team_hdl.nb_teams += 1;
 		(*i)++;
 	}
-	if (!argv[*i])
+	if (!argv[*i] || strncmp(argv[*i], "-c", 2) != 0)
 		error_in_args(*i, "missing required arguments");
 	if (argv[*i] && strncmp(argv[*i], "-c", 2) == 0)
 	{
@@ -118,9 +118,9 @@ void	parse_filled_input(t_serveur *serv)
 	if (serv->world_hdl.map_x * serv->world_hdl.map_y > MAX_MAP_AREA)
 		error_in_args(4, "Map area is too big [map_x * map_y > 100000]");
 	if (serv->team_hdl.nb_teams > MAX_NB_OF_TEAM)
-		error_in_args(8, "Too many teams in game [Max 10]");
+		error_in_args(8, "Too many teams in game [Max 8]");
 	if (serv->world_hdl.t_unit > MAX_GAME_TIME_UNIT)
-		error_in_args(0, "Time unit too big [Max 1000]");
+		error_in_args(0, "Time unit too big [Max 300]");
 	if (serv->team_hdl.nb_teams_slots > MAX_NB_SLOT)
-		error_in_args(0, "Too much starting slot [Max 20]");
+		error_in_args(0, "Too much starting slot [Max 10]");
 }

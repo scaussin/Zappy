@@ -30,6 +30,7 @@ public class CameraViewControl : MonoBehaviour {
 	// camera zoom
 	private Vector3				newpos;
 	private float				curAltitude;
+	private bool				TabPanelUp;
 
 	/// <summary>
 	/// Updates the camera view control keys. Call this when the keys are changed in game.
@@ -112,15 +113,18 @@ public class CameraViewControl : MonoBehaviour {
 		// Camera altitude
 		newpos = CameraYRotation.transform.position;
 		float d = Input.GetAxis("Mouse ScrollWheel");
-		if (d > 0f)
+		if (GameManager.instance.GameController.MenuUp == false)
 		{
-			// scroll up
-			newpos.y -= 1.0f;
-		}
-		else if (d < 0f)
-		{
-			// scroll down
-			newpos.y += 1.0f;
+			if (d > 0f)
+			{
+				// scroll up
+				newpos.y -= 1.0f;
+			}
+			else if (d < 0f)
+			{
+				// scroll down
+				newpos.y += 1.0f;
+			}
 		}
 		CameraYRotation.transform.position = newpos;
 	}

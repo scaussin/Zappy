@@ -61,9 +61,9 @@ void	fill_input_part_2(t_serveur *serv, int *i, char **argv, int team_i)
 			serv->team_hdl.nb_teams_slots = strtol(argv[*i + 1], NULL, 10);
 		(*i) += 2;
 		if (argv[*i] && strncmp(argv[*i], "-t", 2) == 0)
-		{
 			check_time_input_limit(serv, argv[*i + 1]);
-		}
+		if (serv->world_hdl.t_unit == 0)
+			serv->world_hdl.t_unit = 100.0;
 	}
 }
 
