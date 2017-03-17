@@ -63,7 +63,7 @@ void	fill_input_part_2(t_serveur *serv, int *i, char **argv, int team_i)
 		if (argv[*i] && strncmp(argv[*i], "-t", 2) == 0)
 			check_time_input_limit(serv, argv[*i + 1]);
 		if (serv->world_hdl.t_unit == 0)
-			serv->world_hdl.t_unit = 100.0;
+			serv->world_hdl.t_unit = 0.01;
 	}
 }
 
