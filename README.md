@@ -22,5 +22,22 @@ This project is composed of 3 distinct programs:
 
 
 ## AI
-The decision-making algorithm is based on a [Finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine) principle.
+__Artificial Intelligence__ uses a decision-making algorithm is based on a [Finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine) principle.
 ![alt text](./Finite-state_machine.png "Finite state machine")
+
+## Screenshot
+![Alt text](./screens/zappy_1.jpg "zappy screenshot 1")
+![Alt text](./screens/zappy_2.jpg "zappy screenshot 2")
+![Alt text](./screens/zappy_3.jpg "zappy screenshot 3")
+![Alt text](./screens/zappy_4.jpg "zappy screenshot 4")
+![Alt text](./screens/zappy_5.jpg "zappy screenshot 5")
+
+Model meshes:
+
+![Alt text](./screens/zappy_6.jpg "zappy screenshot 6")
+![Alt text](./screens/zappy_7.jpg "zappy screenshot 7")
+
+Server-clients output examples:
+
+![Alt text](./screens/zappy_8.jpg "zappy screenshot 8")
+![Alt text](./screens/zappy_9.jpg "zappy screenshot 9")
