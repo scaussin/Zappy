@@ -26,7 +26,7 @@ __Artificial Intelligence__ uses a decision-making algorithm is based on a [Fini
 
 ![alt text](./Finite-state_machine.png "Finite state machine")
 
-## Screenshot
+## Screenshots
 ![Alt text](./screenshots/zappy_1.jpg "zappy screenshot 1")
 ![Alt text](./screenshots/zappy_2.jpg "zappy screenshot 2")
 
@@ -37,6 +37,6 @@ Model meshes:
 
 Server-clients output examples:
 
-![Alt text](./screens/zappy_9.jpg "zappy screenshot 9")
+![Alt text](./screenshots/zappy_9.jpg "zappy screenshot 9")
 
 By [scaussin](https://github.com/scaussin), [aleung-c](https://github.com/aleung-c) and [alegay](https://github.com/alegay)
