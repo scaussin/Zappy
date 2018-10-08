@@ -22,7 +22,7 @@ This project is composed of 3 distinct programs:
 
 
 ## AI
-__Artificial Intelligence__ uses a decision-making algorithm is based on a [Finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine) principle.
+__Artificial Intelligence__ uses a decision-making algorithm is based on a [Finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine) principle as following:  
 ![alt text](./Finite-state_machine.png "Finite state machine")
 
 ## Screenshot
